@@ -1,5 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.entities.operable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategoryItem;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
@@ -15,6 +16,7 @@ public class Item extends Operable {
     private String description;
 
     // Manages bidirectional relationship with SubstanceTabs.
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "item")
     private Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet;
 

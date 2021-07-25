@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @MappedSuperclass
 //@Inheritance(strategy = InheritanceType.JOINED) ????
-public class Operable extends Queryable implements Comparable<Operable>  {
+public abstract class Operable extends Queryable implements Comparable<Operable>  {
 
     @javax.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // A.I. not working within embedded keys
