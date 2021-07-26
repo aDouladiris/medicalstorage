@@ -1,8 +1,8 @@
 package com.unipi.adouladiris.medicalstorage;
 
 import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
-import com.unipi.adouladiris.medicalstorage.database.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.operations.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.database.operations.session;
+package com.unipi.adouladiris.medicalstorage.database.session;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

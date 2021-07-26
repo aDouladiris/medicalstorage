@@ -1,10 +1,10 @@
-package com.unipi.adouladiris.medicalstorage.database.operations.insert;
+package com.unipi.adouladiris.medicalstorage.database.dao.insert;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
-import com.unipi.adouladiris.medicalstorage.database.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.operations.select.Select;
-import com.unipi.adouladiris.medicalstorage.database.operations.session.SessionManager;
+import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;

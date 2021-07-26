@@ -1,7 +1,7 @@
-package com.unipi.adouladiris.medicalstorage.database.operations.update;
+package com.unipi.adouladiris.medicalstorage.database.dao.update;
 
 import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.database.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
 public interface UpdateInterface {

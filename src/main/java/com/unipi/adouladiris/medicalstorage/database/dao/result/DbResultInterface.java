@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.database;
+package com.unipi.adouladiris.medicalstorage.database.dao.result;
 
 import com.sun.istack.NotNull;
 

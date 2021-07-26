@@ -1,7 +1,7 @@
-package com.unipi.adouladiris.medicalstorage.database.operations.select;
+package com.unipi.adouladiris.medicalstorage.database.dao.select;
 
 import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.database.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
