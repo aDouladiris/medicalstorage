@@ -93,6 +93,7 @@ public class MedicalStorageApplication {
         }
         System.out.println("----------------  Demo ends  --------------------");
 
+
         SpringApplication.run(MedicalStorageApplication.class, args);
     }
 

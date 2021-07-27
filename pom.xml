@@ -71,6 +71,12 @@
         </dependency>
 
 <!--        <dependency>-->
+<!--            <groupId>org.apache.xbean</groupId>-->
+<!--            <artifactId>xbean-reflect</artifactId>-->
+<!--            <version>3.4</version>-->
+<!--        </dependency>-->
+
+        <!--        <dependency>-->
 <!--            <groupId>org.hibernate.dialect</groupId>-->
 <!--            <artifactId>sqlite-dialect</artifactId>-->
 <!--            <version>0.1.0</version>-->
