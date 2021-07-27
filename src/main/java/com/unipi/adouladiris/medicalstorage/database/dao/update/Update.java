@@ -13,7 +13,7 @@ public class Update extends SessionManager implements UpdateInterface {
     @Override
     public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {
         try {
-            session.getTransaction().begin();
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Operable object = session.find(operable.getClass(), id);
             object.setName(operable.getName());
             if( operable.getClass().getSimpleName().equals("Item") ){
@@ -24,7 +24,7 @@ public class Update extends SessionManager implements UpdateInterface {
             }
             session.update(object);
             session.getTransaction().commit();
-            session.getTransaction().begin();
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
             object = session.find(operable.getClass(), id);
             session.getTransaction().commit();
             return new DbResult(object);

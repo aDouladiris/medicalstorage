@@ -63,7 +63,7 @@ public class Insert extends SessionManager implements InsertInterface {
         dbResult = new DbResult();
 
         try {
-            if ( !session.getTransaction().isActive()) { session.getTransaction().begin(); }
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Serializable insertedId =  session.save(queryable);
             session.getTransaction().commit();
             dbResult.setResult( insertedId );

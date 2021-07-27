@@ -1,5 +1,7 @@
 package com.unipi.adouladiris.medicalstorage.rest;
 import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
+import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
+import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
@@ -11,12 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -49,102 +46,87 @@ public class Controller {
     @DeleteMapping("/product/{name}")
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
 
-        DbResult dbResult = new Select().findProduct(name);
-
+        DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
-        Product product = dbResult.getResult(Product.class);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-    private Object analyze(Object object){
-
-        if(object.getClass().getSimpleName().equals("String")){
-            return String.class.cast(Map.Entry.class.cast(object).getKey());
-        }
-
-//        if(object.getClass().getSimpleName().equals("ArrayList")){
-//            for (Object o2 : ArrayList.class.cast(Map.Entry.class.cast(o1).getValue()) ){
-//                System.out.println(o2.getClass().getSimpleName());
-//            }
-//        }
-        return null;
+        String msg = dbResult.getResult().getClass().getSimpleName();
+        System.out.println(msg);
+        return new ResponseEntity(msg, HttpStatus.OK);
     }
 
     @PostMapping(path = "newProduct", consumes = "application/json")
-    public ResponseEntity<ArrayList<Object>> insertProduct(@RequestBody ArrayList<Object> body) {
+    public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
 
-        for (Object o : body ){
-            System.out.println(o.getClass().getSimpleName());
-            if(o.getClass().getSimpleName().equals("LinkedHashMap")){
-                Map lhm = LinkedHashMap.class.cast(o);
-                for (Object o1 : lhm.entrySet() ){
-//                    System.out.println(Map.Entry.class.cast(o1).getKey().getClass().getSimpleName());
-                    System.out.println(analyze(o1));
+        Set<Product> productSet = new HashSet<>();
+        for(int i=0; i<body.size(); i++){
+            Product product = new Product();
+            Map<String, HashMap> subMap = Map.class.cast(body.get(i));
+            HashMap<String, HashMap> nameTabMap = subMap.get("Substance");
+            for (Map.Entry e : nameTabMap.entrySet() ){
 
-//                    System.out.println(Map.Entry.class.cast(o1).getValue().getClass().getSimpleName());
-                    if(Map.Entry.class.cast(o1).getValue().getClass().getSimpleName().equals("ArrayList")){
-                        for (Object o2 : ArrayList.class.cast(Map.Entry.class.cast(o1).getValue()) ){
-                            System.out.println(analyze(o2));
+//                System.out.println(e.getKey());
+                Substance substance = new Substance(e.getKey().toString());
+                TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ArrayList<HashMap> tabValueJSONList = ArrayList.class.cast(HashMap.class.cast(e.getValue()).get("Tab"));
+                for(HashMap<String, HashMap> tabValueJSON : tabValueJSONList ){
+                    for (Map.Entry tabValueJSONEntry : tabValueJSON.entrySet() ){
+
+//                        System.out.println(tabValueJSONEntry.getKey());
+                        Tab tab = new Tab(tabValueJSONEntry.getKey().toString());
+                        TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        ArrayList<HashMap> categoryValueJSONList = ArrayList.class.cast(HashMap.class.cast(tabValueJSONEntry.getValue()).get("Category"));
+                        for(HashMap<String, HashMap> categoryValueJSON : categoryValueJSONList ){
+                            for (Map.Entry categoryValueJSONEntry : categoryValueJSON.entrySet() ){
+
+//                                System.out.println(categoryValueJSONEntry.getKey());
+                                Category category = new Category(categoryValueJSONEntry.getKey().toString());
+                                TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
+                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                ArrayList<HashMap> itemValueJSONList = ArrayList.class.cast(HashMap.class.cast(categoryValueJSONEntry.getValue()).get("Item"));
+                                for (HashMap itemValueJSON : itemValueJSONList){
+
+//                                    System.out.println(itemValueJSON.get("Title"));
+//                                    System.out.println(itemValueJSON.get("Description"));
+                                    ArrayList<String> tagList = ArrayList.class.cast(itemValueJSON.get("Tag"));
+                                    TreeSet<Tag> tagSet = new TreeSet<>();
+                                    for(String tag: tagList ){
+//                                        System.out.println(tag);
+                                        Tag newTag = new Tag(tag);
+                                        tagSet.add(newTag);
+                                    }
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    Item newItem = new Item(itemValueJSON.get("Title").toString(), itemValueJSON.get("Description").toString() );
+                                    itemMap.put(newItem, tagSet);
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                }
+                                categoryMap.put(category, itemMap);
+                            }
                         }
+                        tabMap.put(tab, categoryMap);
                     }
                 }
+                product.getProduct().put(substance, tabMap);
             }
+            productSet.add(product);
         }
+        System.out.println("----------------------------------");
+        Map<String, Integer> results = new HashMap();
+        for (Product p : productSet){
+            DbResult dbResult = new Insert().product(p);
 
-//        for(Map.Entry e : body.entrySet()){
-//            System.out.print(e.getKey() + " => ");
-//            if(e.getValue().getClass().getSimpleName().equals("ArrayList")){
-//                ArrayList arr = ArrayList.class.cast(e.getValue());
-//                for ( Object o : arr ){
-//                    String str = String.class.cast(o);
-//                    System.out.print(str+" ");
-//                }
-//                System.out.print("\n");
-//            }
-//            else{
-//                System.out.println(e.getValue());
-//            }
-//
-//        }
-
+            System.out.println(dbResult.isEmpty());
+            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
+            for (Map.Entry entry : resultMap.entrySet()){
+                System.out.println(entry.getKey() + " => " + entry.getValue() );
+            }
+            results = resultMap;
+        }
         System.out.println("----------------------------------");
 
-//        Substance substance = null;
-//        Tab tab = null;
-//        Category category = null;
-//        Item item = null;
-//        Tag tag = null;
-//
-//        for (Operable operable : operables){
-//            if(operable.getClass().getSimpleName().equals(Substance.class.getSimpleName())){
-//                substance = Substance.class.cast(operable);
-//            }
-//            else if(operable.getClass().getSimpleName().equals(Tab.class.getSimpleName())){
-//                tab = Tab.class.cast(operable);
-//            }
-//            else if(operable.getClass().getSimpleName().equals(Category.class.getSimpleName())){
-//                category = Category.class.cast(operable);
-//            }
-//            else if(operable.getClass().getSimpleName().equals(Item.class.getSimpleName())){
-//                item = Item.class.cast(operable);
-//            }
-//            else if(operable.getClass().getSimpleName().equals(Tag.class.getSimpleName())){
-//                tag = Tag.class.cast(operable);
-//            }
-//        }
-
-
-
-//        DbResult dbResult = new Select().findProduct("asp");
-//
 //        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
-//        Product product = dbResult.getResult(Product.class);
-//        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(results.toString(), HttpStatus.OK);
 
-        Map<String, String> jsonMessage = new HashMap<>();
-        jsonMessage.put("message", body.toString());
-
-        return new ResponseEntity(jsonMessage, HttpStatus.OK);
     }
 
     @PutMapping("/product/{name}")

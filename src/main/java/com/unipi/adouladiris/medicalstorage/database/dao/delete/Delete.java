@@ -14,7 +14,7 @@ public class Delete extends SessionManager implements DeleteInterface {
     @Override
     public DbResult deleteEntityById(@NotNull Class<? extends Queryable> typeClass, @NotNull Integer id) {
         try {
-            session.getTransaction().begin();
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Object object = session.find(typeClass, id);
             session.remove(object);
             session.getTransaction().commit();
@@ -29,14 +29,16 @@ public class Delete extends SessionManager implements DeleteInterface {
     public DbResult deleteEntityByName(@NotNull Class<? extends Operable> typeClass, @NotNull String name) {
         Operable objectToDelete = new Select().findOperableEntityByName(typeClass, name).getResult( typeClass );
         try {
-            session.getTransaction().begin();
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
             session.remove( objectToDelete );
             session.getTransaction().commit();
-            return new Select().findOperableEntityByName(typeClass, name);
+            session.refresh(objectToDelete);
+            return new DbResult(true);
         } catch (Exception ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
             return new DbResult(ex);
         }
+        //return new Select().findOperableEntityByName(typeClass, name);
     }
 
     @Override
