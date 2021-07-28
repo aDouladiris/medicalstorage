@@ -1,5 +1,6 @@
 package com.unipi.adouladiris.medicalstorage;
 
+import io.swagger.annotations.Api;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,7 +28,6 @@ public class SpringFoxConfig {
                 .groupName("public-api")
                 .apiInfo(apiInfo())
                 .select()
-                //.apis(RequestHandlerSelectors.any())
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage" ) )
                 .paths(PathSelectors.any())
                 .build();

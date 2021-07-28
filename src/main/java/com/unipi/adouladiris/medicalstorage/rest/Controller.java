@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 import java.util.*;
@@ -24,6 +25,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class Controller {
 
     //TODO need parent class
+
+    @ApiIgnore
     @GetMapping("")
     public ModelAndView redirectWithUsingRedirectPrefix(ModelMap model) {
         return new ModelAndView("redirect:/swagger-ui.html#/controller", model);
