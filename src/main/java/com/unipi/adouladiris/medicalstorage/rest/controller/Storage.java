@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest;
+package com.unipi.adouladiris.medicalstorage.rest.controller;
 import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
@@ -22,14 +22,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 
 @RestController
-public class Controller {
+public class Storage {
 
     //TODO need parent class
 
     @ApiIgnore
     @GetMapping("")
     public ModelAndView redirectWithUsingRedirectPrefix(ModelMap model) {
-        return new ModelAndView("redirect:/swagger-ui.html#/controller", model);
+        return new ModelAndView("redirect:/swagger-ui.html#/"+this.getClass().getSimpleName().toLowerCase(), model);
     }
 
     @GetMapping("/product/{name}")
@@ -41,7 +41,7 @@ public class Controller {
         return new ResponseEntity(dto.getJsonSet(), HttpStatus.OK);
     }
 
-    @GetMapping("/products")
+    @GetMapping("/product/all")
     public ResponseEntity<String> getAllProducts() {
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
@@ -60,7 +60,7 @@ public class Controller {
         return new ResponseEntity(dbResult.getResult(), HttpStatus.OK);
     }
 
-    @PostMapping("/newProduct")
+    @PostMapping("/product/")
     public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
         Map<String, Integer> results = new HashMap();

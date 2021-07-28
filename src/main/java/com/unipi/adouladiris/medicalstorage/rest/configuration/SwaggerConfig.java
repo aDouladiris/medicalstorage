@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage;
+package com.unipi.adouladiris.medicalstorage.rest.configuration;
 
 import io.swagger.annotations.Api;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +20,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 //https://www.javainuse.com/spring/boot_swagger
 @Configuration
 @EnableSwagger2
-public class SpringFoxConfig {
+public class SwaggerConfig {
 
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("public-api")
+                .groupName("public-api-endpoints")
                 .apiInfo(apiInfo())
                 .select()
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage" ) )
