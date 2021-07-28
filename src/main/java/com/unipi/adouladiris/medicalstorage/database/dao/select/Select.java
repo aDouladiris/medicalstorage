@@ -13,12 +13,10 @@ import java.util.*;
 
 public class Select extends SessionManager implements SelectInterface {
 
-//    public Select(){
-//        if ( !session.isOpen() ) { session = sessionFactory.openSession(); }
-//    }
 
     @Override
     public DbResult findAllProducts(){
+        //TODO parsing needs review
 
         String select = "SELECT " +         // returns a list of objects
                 "st.substance, " +  // Substance Object

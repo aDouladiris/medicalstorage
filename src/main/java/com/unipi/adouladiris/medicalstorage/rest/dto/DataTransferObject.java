@@ -4,14 +4,13 @@ import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
+//TODO needs interface
 public class DataTransferObject {
 
     private Set<JSONObject> jsonSet;
+    private Set<Product> productSet;
 
     public DataTransferObject(Product product){
         TreeSet<Product> products = new TreeSet<>(){{add(product);}};
@@ -20,6 +19,65 @@ public class DataTransferObject {
 
     public DataTransferObject(TreeSet<Product> products){
         this.jsonSet = productSetToJsonObject(products);
+    }
+    public DataTransferObject(ArrayList<Object> body)    { this.productSet = payloadToProductSet(body);     }
+
+    private Set<Product> payloadToProductSet(ArrayList<Object> body){
+        Set<Product> productSet = new HashSet<>();
+        for(int i=0; i<body.size(); i++){
+            Product product = new Product();
+            Map<String, HashMap> subMap = Map.class.cast(body.get(i));
+            HashMap<String, HashMap> nameTabMap = subMap.get("Substance");
+            for (Map.Entry e : nameTabMap.entrySet() ){
+
+//                System.out.println(e.getKey());
+                Substance substance = new Substance(e.getKey().toString());
+                TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ArrayList<HashMap> tabValueJSONList = ArrayList.class.cast(HashMap.class.cast(e.getValue()).get("Tab"));
+                for(HashMap<String, HashMap> tabValueJSON : tabValueJSONList ){
+                    for (Map.Entry tabValueJSONEntry : tabValueJSON.entrySet() ){
+
+//                        System.out.println(tabValueJSONEntry.getKey());
+                        Tab tab = new Tab(tabValueJSONEntry.getKey().toString());
+                        TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        ArrayList<HashMap> categoryValueJSONList = ArrayList.class.cast(HashMap.class.cast(tabValueJSONEntry.getValue()).get("Category"));
+                        for(HashMap<String, HashMap> categoryValueJSON : categoryValueJSONList ){
+                            for (Map.Entry categoryValueJSONEntry : categoryValueJSON.entrySet() ){
+
+//                                System.out.println(categoryValueJSONEntry.getKey());
+                                Category category = new Category(categoryValueJSONEntry.getKey().toString());
+                                TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
+                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                ArrayList<HashMap> itemValueJSONList = ArrayList.class.cast(HashMap.class.cast(categoryValueJSONEntry.getValue()).get("Item"));
+                                for (HashMap itemValueJSON : itemValueJSONList){
+
+//                                    System.out.println(itemValueJSON.get("Title"));
+//                                    System.out.println(itemValueJSON.get("Description"));
+                                    ArrayList<String> tagList = ArrayList.class.cast(itemValueJSON.get("Tag"));
+                                    TreeSet<Tag> tagSet = new TreeSet<>();
+                                    for(String tag: tagList ){
+//                                        System.out.println(tag);
+                                        Tag newTag = new Tag(tag);
+                                        tagSet.add(newTag);
+                                    }
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    Item newItem = new Item(itemValueJSON.get("Title").toString(), itemValueJSON.get("Description").toString() );
+                                    itemMap.put(newItem, tagSet);
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                }
+                                categoryMap.put(category, itemMap);
+                            }
+                        }
+                        tabMap.put(tab, categoryMap);
+                    }
+                }
+                product.getProduct().put(substance, tabMap);
+            }
+            productSet.add(product);
+        }
+        return productSet;
     }
 
     private Set<JSONObject> productSetToJsonObject(TreeSet<Product> products){
@@ -73,10 +131,5 @@ public class DataTransferObject {
     public Set<JSONObject> getJsonSet() {
         return jsonSet;
     }
-
-    public void setJsonSet(Set<JSONObject> jsonSet) {
-        this.jsonSet = jsonSet;
-    }
-
-
+    public Set<Product> getProductSet() { return productSet; }
 }

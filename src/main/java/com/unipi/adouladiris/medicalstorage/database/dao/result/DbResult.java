@@ -5,17 +5,21 @@ import com.sun.istack.NotNull;
 //TODO create constructor
 public class DbResult implements DbResultInterface {
 
-    private Boolean empty;
-    private Object result;
-    private Exception exception;
+    private Boolean empty = true;
+    private Object result = null;
+    private Exception exception = null;
 
     public DbResult() { this.empty = true; }
-    public DbResult(@NotNull Object result){ this.result = result; this.empty = false; }
+    public DbResult(@NotNull Object result){
+        if(result instanceof Exception ) this.exception = (Exception)result;
+        else this.result = result;
+        this.empty = false;
+    }
 
     @Override
     public Boolean isEmpty() {
-        if (this.result == null) this.empty = true;
-        else this.empty = this.exception != null;
+        if (this.result == null && this.exception == null) this.empty = true;
+        else this.empty = false;
         return empty;
     }
 

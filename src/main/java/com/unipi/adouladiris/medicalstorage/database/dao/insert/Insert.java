@@ -9,16 +9,11 @@ import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 
+import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.HashMap;
 
 public class Insert extends SessionManager implements InsertInterface {
-
-    private DbResult dbResult;
-
-//    public Insert(){
-//        if ( !session.isOpen() ) { session = sessionFactory.openSession(); }
-//    }
 
     @Override
     public DbResult product(@NotNull Product product) {
@@ -60,22 +55,16 @@ public class Insert extends SessionManager implements InsertInterface {
 
     @Override
     public DbResult queryableEntity(Queryable queryable) {
-        dbResult = new DbResult();
-
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Serializable insertedId =  session.save(queryable);
             session.getTransaction().commit();
-            dbResult.setResult( insertedId );
+            return new DbResult(insertedId);
         }
-        catch ( Exception ex ) {
+        catch ( PersistenceException ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
-            dbResult.setException( ex );
+            return new DbResult(ex);
         }
-        finally {
-//            session.close();
-        }
-        return dbResult;
     }
 
     @Override
@@ -83,7 +72,7 @@ public class Insert extends SessionManager implements InsertInterface {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
 
         //TODO extract method
-        dbResult = new Select().findOperableEntityByName( Substance.class, substance.getName() );
+        DbResult dbResult = new Select().findOperableEntityByName( Substance.class, substance.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(substance); substance = session.find(Substance.class, dbResult.getResult( Integer.class ) ); }
         else substance = dbResult.getResult( Substance.class );
 

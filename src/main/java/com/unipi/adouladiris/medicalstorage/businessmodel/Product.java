@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.util.*;
 
+//TODO check extends. Why???
 public class Product extends Operable {
 
     private TreeMap<Substance, TreeMap<Tab,TreeMap<Category, TreeMap<Item, TreeSet<Tag>>>>> product;
@@ -54,6 +55,11 @@ public class Product extends Operable {
                 }
             }
         }
+    }
+
+    public Substance getEntityContainingName(){
+        for ( Object substanceKey : this.getProduct().keySet() ){ return Substance.class.cast(substanceKey); }
+        return null;
     }
 
 }

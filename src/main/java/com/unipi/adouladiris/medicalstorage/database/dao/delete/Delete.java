@@ -9,6 +9,8 @@ import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
+import javax.persistence.PersistenceException;
+
 public class Delete extends SessionManager implements DeleteInterface {
 
     @Override
@@ -18,11 +20,12 @@ public class Delete extends SessionManager implements DeleteInterface {
             Object object = session.find(typeClass, id);
             session.remove(object);
             session.getTransaction().commit();
-        } catch (Exception ex ) {
+            return new DbResult(true);
+        } catch (PersistenceException ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
             return new DbResult(ex);
         }
-        return new DbResult();
+
     }
 
     @Override
@@ -32,7 +35,6 @@ public class Delete extends SessionManager implements DeleteInterface {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             session.remove( objectToDelete );
             session.getTransaction().commit();
-            session.refresh(objectToDelete);
             return new DbResult(true);
         } catch (Exception ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
@@ -44,8 +46,6 @@ public class Delete extends SessionManager implements DeleteInterface {
     @Override
     public DbResult deleteProduct(@NotNull Product product) {
         if ( product.getProduct().keySet().size() > 1 ) return new DbResult();
-        Substance substance = null;
-        for ( Object substanceKey : product.getProduct().keySet() ){ substance = Substance.class.cast(substanceKey); }
-        return deleteEntityByName(Substance.class, substance.getName());
+        return deleteEntityByName(product.getEntityContainingName().getClass(), product.getEntityContainingName().getName());
     }
 }
