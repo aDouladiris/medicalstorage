@@ -1,9 +1,8 @@
-package com.unipi.adouladiris.medicalstorage.businessmodel;
+package com.unipi.adouladiris.medicalstorage.business;
 
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 //import net.minidev.json.JSONObject;
-import org.json.simple.JSONObject;
 
 import java.util.*;
 

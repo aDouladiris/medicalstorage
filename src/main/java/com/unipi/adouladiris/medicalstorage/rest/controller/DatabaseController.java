@@ -1,14 +1,12 @@
 package com.unipi.adouladiris.medicalstorage.rest.controller;
-import com.unipi.adouladiris.medicalstorage.businessmodel.Product;
+import com.unipi.adouladiris.medicalstorage.business.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -18,18 +16,16 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.*;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 
 @RestController
-public class Storage {
+public class DatabaseController {
 
     //TODO need parent class
 
     @ApiIgnore
     @GetMapping("")
     public ModelAndView redirectWithUsingRedirectPrefix(ModelMap model) {
-        return new ModelAndView("redirect:/swagger-ui.html#/"+this.getClass().getSimpleName().toLowerCase(), model);
+        return new ModelAndView("redirect:/swagger-ui.html#/database-controller", model);
     }
 
     @GetMapping("/product/{name}")

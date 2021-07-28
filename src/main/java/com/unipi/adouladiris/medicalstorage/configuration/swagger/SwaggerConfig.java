@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.configuration;
+package com.unipi.adouladiris.medicalstorage.configuration.swagger;
 
 import io.swagger.annotations.Api;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("public-api-endpoints")
+                .groupName("Public API")
                 .apiInfo(apiInfo())
                 .select()
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage" ) )
@@ -36,9 +36,9 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("MedicalStorage API")
-                .description("A Java RestFul API web application utilizing Spring Boot and Hibernate frameworks")
+                .description("A Java RestFul API web application utilizing Spring Boot and Hibernate frameworks.")
                 .license("No License")
-                .licenseUrl("cloudaros@homail.com").version("1.0").build();
+                .licenseUrl("cloudaros@homail.com").version("1").build();
     }
 
 }
