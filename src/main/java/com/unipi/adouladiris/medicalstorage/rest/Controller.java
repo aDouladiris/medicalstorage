@@ -10,7 +10,9 @@ import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 
 import java.util.*;
@@ -22,6 +24,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class Controller {
 
     //TODO need parent class
+    @GetMapping("")
+    public ModelAndView redirectWithUsingRedirectPrefix(ModelMap model) {
+        return new ModelAndView("redirect:/swagger-ui.html#/controller", model);
+    }
 
     @GetMapping("/product/{name}")
     public ResponseEntity<String> getProduct(@PathVariable String name) {
