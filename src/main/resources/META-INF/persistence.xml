@@ -3,15 +3,23 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
              http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-    <persistence-unit name="org.hibernate.medical_storage.jpa">
+    <persistence-unit name="org.hibernate.medical_storage.jpa" transaction-type="RESOURCE_LOCAL">
+        <description>Persistence unit for Hibernate</description>
 
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/pharmastore"/>
-            <property name="javax.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="root"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="packagesToScan" value="com.unipi.adouladiris.medicalstorage"/>
+
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/pharmastore"/>-->
+<!--            <property name="javax.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>-->
+
+            <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file:C:/Users/Rg/IdeaProjects/medicalstorage/src/main/resources/database/medicalstorage"/>
+            <property name="javax.persistence.jdbc.user" value="medical"/>
+            <property name="javax.persistence.jdbc.password" value="123"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
+
             <property name="javax.persistence.schema-generation.database.action" value="update"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
             <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
             <property name="hibernate.id.new_generator_mappings" value="false"/>
             <property name="hibernate.show_sql" value="false"/>

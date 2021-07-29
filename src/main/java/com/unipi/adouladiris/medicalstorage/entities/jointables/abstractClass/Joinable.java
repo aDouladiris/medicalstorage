@@ -8,7 +8,7 @@ import javax.persistence.*;
 //@Inheritance(strategy = InheritanceType.JOINED) ????
 public abstract class Joinable extends Queryable {
 
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // A.I. not working within embedded keys
     @Column(name = "Id")
     private Integer Id;
