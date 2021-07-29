@@ -8,6 +8,8 @@ import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
+import com.unipi.adouladiris.medicalstorage.entities.users.Role;
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
@@ -144,6 +146,25 @@ public class Insert extends SessionManager implements InsertInterface {
 
         dbResult.setResult( idMap );
         return dbResult;
+    }
+
+    public DbResult user(@NotNull String username, @NotNull String password, @NotNull String authority ){
+        try {
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+            Role userRole = new Role(authority);
+            Serializable insertedRoleUserId =  session.save(userRole);
+            session.getTransaction().commit();
+            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+            userRole = session.find(Role.class, insertedRoleUserId);
+            User user = new User(username, password, userRole );
+            Serializable insertedUserId =  session.save(user);
+            session.getTransaction().commit();
+            return new DbResult(insertedUserId);
+        }
+        catch ( PersistenceException ex ) {
+            if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
+            return new DbResult(ex);
+        }
     }
 
 

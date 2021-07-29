@@ -14,13 +14,6 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
 @SpringBootApplication
 public class MedicalStorageApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MedicalStorageApplication.class, args);
-    }
+    public static void main(String[] args) { SpringApplication.run(MedicalStorageApplication.class, args); }
 
-//    @Bean
-//    RouterFunction<ServerResponse> routerFunction() {
-//        return route(GET(), req ->
-//                ServerResponse.temporaryRedirect(URI.create("/swagger-ui.html")).build());
-//    }
 }
