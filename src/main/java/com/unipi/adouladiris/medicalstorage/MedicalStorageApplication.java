@@ -19,6 +19,7 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
 public class MedicalStorageApplication {
 
     public static void main(String[] args) {
+//        new Insert().user("arg", "123", "admin");
 //        DbResult dbResult = new Select().findUser("arg");
 //        User user = dbResult.getResult(User.class);
 //

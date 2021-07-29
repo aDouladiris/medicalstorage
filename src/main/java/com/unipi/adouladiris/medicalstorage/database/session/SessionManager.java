@@ -23,7 +23,7 @@ public abstract class SessionManager {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUsername("medical");
+        dataSource.setUsername("root");
         dataSource.setPassword("123");
         dataSource.setUrl("jdbc:hsqldb:file:C:/Users/Rg/IdeaProjects/medicalstorage/src/main/resources/database/medicalstorage");
 

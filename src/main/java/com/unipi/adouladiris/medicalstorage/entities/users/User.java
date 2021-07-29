@@ -14,6 +14,9 @@ public class User extends UserRole {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "enabled", nullable = false, length = 1)
+    private char enabled;
+
     // For bidirectional relationship with Users.
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_Id", nullable = false, referencedColumnName = "Id")
@@ -24,6 +27,7 @@ public class User extends UserRole {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.enabled = 'Y';
     }
 
     public String getUsername() {return username;}
@@ -36,4 +40,6 @@ public class User extends UserRole {
     public void setRole(Role role) {this.role = role;}
 
     public String getAuthority() {return this.role.getAuthority();}
+
+    public char getEnabled() {return enabled;}
 }
