@@ -7,6 +7,7 @@ import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -407,6 +408,23 @@ public class Select extends SessionManager implements SelectInterface {
             Substance substance = (Substance)o;
             return findProduct( substance.getName() );
         }
+        return new DbResult();
+    }
+
+
+    public DbResult findUser(String username){
+        String select = "SELECT " +
+                "user " +               // User Object
+                "FROM User user " +
+                "INNER JOIN user.role AS role " +
+//                "INNER JOIN role.authority " +
+                "WHERE user.username = :username ";
+
+        Query query = session.createQuery(select);
+        query.setParameter("username", username);
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+        for( Object o : queryResultList ) { return new DbResult(User.class.cast(o)); }
         return new DbResult();
     }
 

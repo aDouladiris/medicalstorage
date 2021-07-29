@@ -1,5 +1,9 @@
 package com.unipi.adouladiris.medicalstorage;
 
+import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
+import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +18,14 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
 @SpringBootApplication
 public class MedicalStorageApplication {
 
-    public static void main(String[] args) { SpringApplication.run(MedicalStorageApplication.class, args); }
+    public static void main(String[] args) {
+//        DbResult dbResult = new Select().findUser("arg");
+//        User user = dbResult.getResult(User.class);
+//
+//        System.out.println("username: " + user.getUsername());
+//        System.out.println("password: " + user.getPassword());
+//        System.out.println("role:     " + user.getAuthority());
+
+        SpringApplication.run(MedicalStorageApplication.class, args); }
 
 }

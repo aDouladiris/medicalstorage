@@ -14,6 +14,13 @@ import org.springframework.web.servlet.ModelAndView;
 import springfox.documentation.annotations.ApiIgnore;
 
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -81,6 +88,19 @@ public class DatabaseController {
         Product product = dbResult.getResult(Product.class);
         return new ResponseEntity(HttpStatus.OK);
     }
+
+//    @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
+//    public class LogoutServlet extends HttpServlet {
+//        @Override
+//        protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//            HttpSession session = request.getSession(false);
+//            // Destroys the session for this user.
+//            if (session != null)
+//                session.invalidate();
+//            // Redirects back to the initial page.
+//            response.sendRedirect(request.getContextPath());
+//        }
+//    }
 
 
 

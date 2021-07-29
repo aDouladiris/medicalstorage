@@ -7,7 +7,7 @@ import java.util.Set;
 @Table(name="role")
 public class Role  extends UserRole {
 
-    @Column(name = "rolename", nullable = false, unique = true)
+    @Column(name = "authority", nullable = false, unique = true)
     private String authority;
 
     // Manages bidirectional relationship with Role.

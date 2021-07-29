@@ -34,4 +34,6 @@ public class User extends UserRole {
 
     public Role getRole() {return role;}
     public void setRole(Role role) {this.role = role;}
+
+    public String getAuthority() {return this.role.getAuthority();}
 }
