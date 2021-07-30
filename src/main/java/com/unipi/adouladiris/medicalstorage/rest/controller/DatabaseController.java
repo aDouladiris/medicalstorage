@@ -27,7 +27,7 @@ import java.util.*;
 
 
 @RestController
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('admin')")
 public class DatabaseController {
 
     //TODO need parent class
@@ -38,7 +38,7 @@ public class DatabaseController {
         return new ModelAndView("redirect:/swagger-ui.html#/database-controller", model);
     }
 
-    @PreAuthorize("hasAuthority('admin')")
+//    @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/product/all")
     public ResponseEntity<String> getAllProducts() {
         DbResult dbResult = new Select().findAllProducts();

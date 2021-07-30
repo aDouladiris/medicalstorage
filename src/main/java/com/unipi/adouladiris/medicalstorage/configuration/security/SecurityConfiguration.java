@@ -6,6 +6,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -35,7 +36,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-//https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
+// https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
+// https://stackoverflow.com/questions/58995870/why-do-we-need-to-call-http-addfilterbefore-method-in-spring-security-configur
+
 
 @Configuration
 @EnableWebSecurity
@@ -43,21 +46,17 @@ import java.util.Map;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     // TODO get properties from JPA file
-    private DataSource getDataSource() {
+    // Authentication
+    // Validate credentials from database.
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
         dataSource.setUsername("root");
         dataSource.setPassword("123");
         dataSource.setUrl("jdbc:hsqldb:file:C:/Users/Rg/IdeaProjects/medicalstorage/src/main/resources/database/medicalstorage");
-        return dataSource;
-    }
-
-    // Authentication
-    @Override
-    // Validate credentials from database.
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
-                .dataSource(getDataSource())
+                .dataSource(dataSource)
                 .passwordEncoder(new BCryptPasswordEncoder())
                 .usersByUsernameQuery("select USER.USERNAME, USER.PASSWORD, USER.ENABLED from USER where USER.USERNAME=?")
                 .authoritiesByUsernameQuery("select U.USERNAME, R.AUTHORITY from ROLE R inner join USER U on R.ID = U.ROLE_ID where U.USERNAME=?");
@@ -74,25 +73,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .csrf()
                 .disable()
             .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/v1/product/all").hasRole("admin")
+//                .antMatchers(HttpMethod.GET, "/api/v1/product/all").hasRole("admin")
+                .antMatchers("/api/v1/**").hasRole("admin")
                 .and()
-                .formLogin();
+                .formLogin()
+                .and()
+                .httpBasic();
 
-
-
-//        http.authorizeRequests()
-////                .antMatchers("/**").hasRole("admin")
-//                .antMatchers("/admin/").hasRole("admin")
-//                .antMatchers("/customer/").hasRole("customer")
-////                .antMatchers("/").permitAll()
-//                .and()
-//                .formLogin();
-
-
-//                //.httpBasic();
     }
 
-
 }
+
+
+
 
 
