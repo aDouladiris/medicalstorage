@@ -6,11 +6,14 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -58,16 +61,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(new BCryptPasswordEncoder())
                 .usersByUsernameQuery("select USER.USERNAME, USER.PASSWORD, USER.ENABLED from USER where USER.USERNAME=?")
                 .authoritiesByUsernameQuery("select U.USERNAME, R.AUTHORITY from ROLE R inner join USER U on R.ID = U.ROLE_ID where U.USERNAME=?");
+
     }
 
     // Authorization
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // TODO better path: /api/. CORS at tomcat server. Need solution
-        http.cors().and().csrf().disable();
-        http.authorizeRequests()
-                .anyRequest()
-                .authenticated()
+        http
+            .cors()
+            .and()
+            .csrf()
+                .disable()
+            .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/api/v1/product/all").hasRole("admin")
                 .and()
                 .formLogin();
 

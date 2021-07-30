@@ -1,7 +1,3 @@
-/*C5*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C6*/SET SCHEMA PUBLIC
-DISCONNECT
 /*C7*/SET SCHEMA PUBLIC
 \u000d\u000a    alter table substance_tab \u000d\u000a       drop constraint UK4rj1095c539f4t05wcw54j8ok
 \u000d\u000a    alter table substance_tab \u000d\u000a       add constraint UK4rj1095c539f4t05wcw54j8ok unique (substance_Id, tab_Id)
@@ -11,3 +7,7 @@ DISCONNECT
 \u000d\u000a    alter table substance_tab_category_item \u000d\u000a       add constraint UK3paw0lw2v3b46v3u2m94qgu1v unique (item_Id, substanceTabCategory_Id)
 \u000d\u000a    alter table substance_tab_category_item_tag \u000d\u000a       drop constraint UKnx5rvikrobuwvmtjbj94172o0
 \u000d\u000a    alter table substance_tab_category_item_tag \u000d\u000a       add constraint UKnx5rvikrobuwvmtjbj94172o0 unique (substanceTabCategoryItem_Id, tag_Id)
+/*C8*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C9*/SET SCHEMA PUBLIC
+DISCONNECT
