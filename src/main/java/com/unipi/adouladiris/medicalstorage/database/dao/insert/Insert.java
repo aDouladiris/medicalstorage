@@ -156,7 +156,7 @@ public class Insert extends SessionManager implements InsertInterface {
             session.getTransaction().commit();
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             userRole = session.find(Role.class, insertedRoleUserId);
-            User user = new User(username, password, userRole );
+            User user = new User(username, passwordEncoder().encode(password), userRole );
             Serializable insertedUserId =  session.save(user);
             session.getTransaction().commit();
             return new DbResult(insertedUserId);
