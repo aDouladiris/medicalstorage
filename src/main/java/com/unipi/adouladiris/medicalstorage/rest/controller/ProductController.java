@@ -5,7 +5,9 @@ import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
+import com.unipi.adouladiris.medicalstorage.rest.controller.abstractClass.RoutingController;
 import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
+import io.swagger.annotations.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -25,21 +27,13 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
-
 @RestController
-@PreAuthorize("hasRole('admin')")
-public class DatabaseController {
-
-    //TODO need parent class
-
-    @ApiIgnore
-    @GetMapping("")
-    public ModelAndView redirecUsingRedirectPrefix(ModelMap model) {
-        return new ModelAndView("redirect:/swagger-ui.html#/database-controller", model);
-    }
+//@PreAuthorize("hasRole('admin')")
+public class ProductController extends RoutingController {
 
 //    @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/product/all")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> getAllProducts() {
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);

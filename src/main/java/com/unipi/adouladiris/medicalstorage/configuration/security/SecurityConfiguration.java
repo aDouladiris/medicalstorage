@@ -36,6 +36,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 // https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
 // https://stackoverflow.com/questions/58995870/why-do-we-need-to-call-http-addfilterbefore-method-in-spring-security-configur
 
@@ -55,12 +57,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         dataSource.setUsername("root");
         dataSource.setPassword("123");
         dataSource.setUrl("jdbc:hsqldb:file:C:/Users/Rg/IdeaProjects/medicalstorage/src/main/resources/database/medicalstorage");
+
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
                 .passwordEncoder(new BCryptPasswordEncoder())
                 .usersByUsernameQuery("select USER.USERNAME, USER.PASSWORD, USER.ENABLED from USER where USER.USERNAME=?")
-                .authoritiesByUsernameQuery("select U.USERNAME, R.AUTHORITY from ROLE R inner join USER U on R.ID = U.ROLE_ID where U.USERNAME=?");
-
+                .authoritiesByUsernameQuery("select U.USERNAME, R.AUTHORITY from ROLE R inner join USER U on R.ID = U.ROLE_ID where U.USERNAME=?")
+                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
     }
 
     // Authorization
@@ -71,16 +74,45 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .cors()
             .and()
             .csrf()
-                .disable()
-            .authorizeRequests()
-//                .antMatchers(HttpMethod.GET, "/api/v1/product/all").hasRole("admin")
-                .antMatchers("/api/v1/**").hasRole("admin")
-                .and()
-                .formLogin()
+                .disable().
+            authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/api/v1/user").hasRole("admin")
                 .and()
                 .httpBasic();
 
+
+//        http.antMatcher("/api/v1/user")
+//                .authorizeRequests(authorize -> authorize
+//                        .anyRequest().hasRole("admin")
+//                )
+//                .httpBasic(withDefaults());
+
+
+//            .and()
+//            .authorizeRequests()
+////                .antMatchers(HttpMethod.GET, "/api/v1/product/all").hasRole("admin")
+//                //.antMatchers("/api/v1/**").hasRole("admin")
+//                .anyRequest().permitAll()
+//                .and()
+//                .formLogin()
+//                .and()
+//                .httpBasic();
+
+
+
+//        http.csrf()
+//                .ignoringAntMatchers("/h2-console/**");
+//        http.headers()
+//                .frameOptions()
+//                .sameOrigin();
+
     }
+
+
+
+
+
+
 
 }
 
