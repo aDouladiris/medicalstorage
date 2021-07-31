@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,12 +31,10 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController
-//@PreAuthorize("hasRole('admin')")
 public class ProductController extends RoutingController {
 
-//    @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/product/all")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('admin', 'customer')")
     public ResponseEntity<String> getAllProducts() {
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
@@ -43,6 +44,7 @@ public class ProductController extends RoutingController {
     }
 
     @GetMapping("/product/{name}")
+    @PreAuthorize("hasAnyRole('admin', 'customer')")
     public ResponseEntity<String> getProduct(@PathVariable String name) {
         DbResult dbResult = new Select().findProduct(name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
@@ -52,6 +54,7 @@ public class ProductController extends RoutingController {
     }
 
     @DeleteMapping("/product/{name}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
         DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
@@ -61,8 +64,8 @@ public class ProductController extends RoutingController {
         return new ResponseEntity(dbResult.getResult(), HttpStatus.OK);
     }
 
-
     @PostMapping("/product/")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
         Map<String, Integer> results = new HashMap();
@@ -78,8 +81,9 @@ public class ProductController extends RoutingController {
 
     }
 
-
+    // TODO needs fix. Not working.
     @PutMapping("/product/{name}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> updateProduct(@PathVariable String name22, @RequestBody String name) {
 
         DbResult dbResult = new Select().findProduct(name);
