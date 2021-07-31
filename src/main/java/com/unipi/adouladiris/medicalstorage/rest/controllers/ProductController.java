@@ -1,33 +1,18 @@
-package com.unipi.adouladiris.medicalstorage.rest.controller;
+package com.unipi.adouladiris.medicalstorage.rest.controllers;
 import com.unipi.adouladiris.medicalstorage.business.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import com.unipi.adouladiris.medicalstorage.rest.controller.abstractClass.RoutingController;
+import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
 import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
-import io.swagger.annotations.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import springfox.documentation.annotations.ApiIgnore;
 
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.*;
 
 @RestController

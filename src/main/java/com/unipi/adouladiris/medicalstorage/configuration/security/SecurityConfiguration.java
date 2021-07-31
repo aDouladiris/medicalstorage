@@ -1,5 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -60,19 +61,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//                .formLogin()
-//                .loginPage("/login.html")
-//                .loginProcessingUrl("/perform_login")
-//                .defaultSuccessUrl("/homepage.html", true)
-//                .failureUrl("/login.html?error=true")
-////                .failureHandler(authenticationFailureHandler())
-//                .and()
-//                .logout()
-//                .logoutUrl("/perform_logout")
-//                .deleteCookies("JSESSIONID")
-//                .and()
-//                .logoutSuccessHandler(logoutSuccessHandler());
-
                 .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
                 .and()
                 .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
@@ -80,8 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
                 .and()
                 .httpBasic();
-
-
     }
 
 
