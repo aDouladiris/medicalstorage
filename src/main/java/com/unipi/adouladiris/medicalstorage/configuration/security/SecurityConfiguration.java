@@ -1,24 +1,23 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-
 import javax.sql.DataSource;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+
 
 // https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
 // https://stackoverflow.com/questions/58995870/why-do-we-need-to-call-http-addfilterbefore-method-in-spring-security-configur
+// checkhttps://www.toptal.com/spring/spring-security-tutorial
+// newest????https://www.baeldung.com/spring-security-oauth-resource-server
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +26,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 // Override Spring Security default configuration by extending WebSecurityConfigurerAdapter.
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static DataSource dataSource(){
+    public static DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
         dataSource.setUsername("root");
@@ -46,7 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return queryAuthorities;
     }
 
-    // Authentication
+   // Authentication
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
@@ -65,10 +64,38 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
                 .and()
+                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
+                .and()
                 .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
                 .and()
-                .httpBasic();
+                .httpBasic()
+                .and()
+                .logout()
+//                .logoutUrl("/perform_logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID");
+
+
     }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
+    @Bean
+    public UserDetailsService userDetailsServiceBean() throws Exception {
+        return super.userDetailsServiceBean();
+    }
+
+//    @Bean
+//    public HttpSecurity httpSecurityBean () throws Exception{
+//        return super.getHttp();
+//    }
+
+
 
 
 }
