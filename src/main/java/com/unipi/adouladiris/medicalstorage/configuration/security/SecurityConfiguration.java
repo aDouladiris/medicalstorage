@@ -206,7 +206,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
 
-
+        // TODO needs 2nd extension for multiple http auths.
 //    @Override
 //    @Bean("myDS")
 //    public UserDetailsService userDetailsServiceBean() throws Exception {
