@@ -1,8 +1,8 @@
 package com.unipi.adouladiris.medicalstorage.rest.dto;
 
-import com.unipi.adouladiris.medicalstorage.business.Product;
+import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.*;
 

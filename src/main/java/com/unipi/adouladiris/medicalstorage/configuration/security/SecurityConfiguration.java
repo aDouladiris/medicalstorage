@@ -1,6 +1,8 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,12 +10,20 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.token.ClientTokenServices;
+import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import com.unipi.adouladiris.medicalstorage.configuration.security.JwtTokenFilter;
 
+import static java.lang.String.format;
 
 
 // https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
@@ -48,45 +58,117 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
    // Authentication
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.jdbcAuthentication()
+//                .dataSource(dataSource())
+//                .passwordEncoder(new BCryptPasswordEncoder())
+//                .usersByUsernameQuery(getQueryFromUserTable())
+//                .authoritiesByUsernameQuery(getQueryFromRoleTable())
+//                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
+//
+//    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
         auth.jdbcAuthentication()
                 .dataSource(dataSource())
-                .passwordEncoder(new BCryptPasswordEncoder())
-                .usersByUsernameQuery(getQueryFromUserTable())
-                .authoritiesByUsernameQuery(getQueryFromRoleTable())
-                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
+                .getUserDetailsService();
 
+//        auth.userDetailsService(username -> userRepo
+//                .findByUsername(username)
+//                .orElseThrow(
+//                        () -> new UsernameNotFoundException(
+//                                format("User: %s, not found", username)
+//                        )
+//                ));
+    }
+
+
+    private final JwtTokenFilter jwtTokenFilter;
+
+    public SecurityConfiguration(JwtTokenFilter jwtTokenFilter) {
+        super();
+        this.jwtTokenFilter = jwtTokenFilter;
+        // Inherit security context in async function calls
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
     // Authorization
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//
+//        http
+//                .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
+//                .and()
+//                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
+//                .and()
+//                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
+//                .and()
+//                .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
+//                .and()
+//                .httpBasic();
+//
+//                // Set unauthorized requests exception handler
+//                http = http
+//                        .exceptionHandling()
+//                        .authenticationEntryPoint(
+//                                (request, response, ex) -> {
+//                                    response.sendError(
+//                                            HttpServletResponse.SC_UNAUTHORIZED,
+//                                            ex.getMessage()
+//                                    );
+//                                }
+//                        )
+//                        .and();
+//
+//
+//        // Add JWT token filter
+//        http.addFilterBefore( jwtTokenFilter, UsernamePasswordAuthenticationFilter.class );
+//    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
-                .and()
-                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
-                .and()
-                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
-                .and()
-                .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
-                .and()
-                .httpBasic()
-                .and()
-                .logout()
-//                .logoutUrl("/perform_logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
+        // Enable CORS and disable CSRF
+        http = http.cors().and().csrf().disable();
 
+        // Set session management to stateless
+        http = http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and();
+
+        // Set unauthorized requests exception handler
+        http = http
+                .exceptionHandling()
+                .authenticationEntryPoint(
+                        (request, response, ex) -> {
+                            response.sendError(
+                                    HttpServletResponse.SC_UNAUTHORIZED,
+                                    ex.getMessage()
+                            );
+                        }
+                )
+                .and();
+
+        // Set permissions on endpoints
+        http.authorizeRequests()
+                // Our public endpoints
+                .antMatchers("/api/v1/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
+                // Our private endpoints
+                .anyRequest().authenticated();
 
         // Add JWT token filter
         http.addFilterBefore(
                 jwtTokenFilter,
                 UsernamePasswordAuthenticationFilter.class
         );
-
-
     }
+
+
 
     @Override
     @Bean
@@ -95,18 +177,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    @Bean
+    @Bean("myDS")
     public UserDetailsService userDetailsServiceBean() throws Exception {
         return super.userDetailsServiceBean();
     }
-
-//    @Bean
-//    public HttpSecurity httpSecurityBean () throws Exception{
-//        return super.getHttp();
-//    }
-
-
-
 
 }
 

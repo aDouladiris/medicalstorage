@@ -1,7 +1,7 @@
 package com.unipi.adouladiris.medicalstorage.database.dao.insert;
 
 import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.business.Product;
+import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;

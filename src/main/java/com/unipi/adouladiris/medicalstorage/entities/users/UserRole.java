@@ -1,10 +1,5 @@
 package com.unipi.adouladiris.medicalstorage.entities.users;
 
-import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.business.Product;
-import com.unipi.adouladiris.medicalstorage.entities.Queryable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
-
 import javax.persistence.*;
 
 @MappedSuperclass

@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.business;
+package com.unipi.adouladiris.medicalstorage.domain;
 
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;

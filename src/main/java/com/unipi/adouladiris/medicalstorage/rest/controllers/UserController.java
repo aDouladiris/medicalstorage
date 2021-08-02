@@ -1,86 +1,127 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
+import com.sun.security.auth.UserPrincipal;
+import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.unipi.adouladiris.medicalstorage.business.Product;
-import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
-import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sql.DataSource;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.sql.Array;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static java.lang.String.format;
 
 @RestController
-public class UserController extends RoutingController {
+public class UserController extends RoutingController implements UserDetailsService {
 
     private AuthenticationManager authenticationManager;
     private HttpSecurity http;
+    private UserDetailsService userDetailsService;
 
     private final String jwtSecret = "zdtlD3JK56m6wTTgsNFhqzjqP";
     private final String jwtIssuer = "example.io";
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, HttpSecurity http){
+    public UserController(AuthenticationManager authenticationManager, HttpSecurity http, @Qualifier("myDS") UserDetailsService userDetailsService){
         this.authenticationManager = authenticationManager;
         this.http = http;
+        this.userDetailsService = userDetailsService;
     }
 
 
     @GetMapping(value = "/userInformation")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    public Object retrieveAuthentication() throws JsonProcessingException {
+    public Object retrieveAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return objectToJSON(authentication.getPrincipal());
+        return authentication.getPrincipal();
     }
 
 
     @PostMapping(value = "/login")
     @PreAuthorize("permitAll()")
-    public String login(@RequestBody JSONObject body) throws JsonProcessingException {
+    public String login(@RequestBody Map<String, Object> body) throws JsonProcessingException, NoSuchAlgorithmException, SQLException {
+
+        JSONObject parsedBody = new JSONObject();
+
+        for (Map.Entry entry : body.entrySet()){
+            parsedBody.put( entry.getKey().toString(), entry.getValue() );
+        }
 
         Authentication authenticate = authenticationManager
-                .authenticate( new UsernamePasswordAuthenticationToken(body.get("username"), body.get("password")) );
+                .authenticate( new UsernamePasswordAuthenticationToken(parsedBody.get("username"), parsedBody.get("password")) );
 
-        User user = new Select().findUser(body.get("username").toString()).getResult(User.class);
+        userDetailsService.loadUserByUsername(parsedBody.get("username").toString());
 
-        return Jwts.builder()
-                .setSubject(format("%s,%s", user.getId(), user.getUsername()))
-                .setIssuer(jwtIssuer)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 1 week
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
 
+        //Create the token from username.
+        JSONObject jwtPayload = new JSONObject();
+        jwtPayload.put("sub", parsedBody.get("username"));
+
+        ArrayList<String> aud = new ArrayList();
+        authenticate.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
+        jwtPayload.put("aud", aud);
+
+        LocalDateTime ldt = LocalDateTime.now().plusDays(60);
+        jwtPayload.put("exp", ldt.toEpochSecond(ZoneOffset.UTC)); //this needs to be configured
+
+        String bearerToken = new JWToken(jwtPayload).toString();
+        System.out.println("bearerToken: " + bearerToken);
+
+
+
+        //receive the bearer token
+        JWToken incomingToken = new JWToken(bearerToken);
+
+        JSONObject response = new JSONObject();
+        response.put("isValid", incomingToken.isValid());
+        response.put("message", incomingToken.getSubject());
+
+        return response.toString();
 
         //return new ResponseEntity(objectToJSON(), HttpStatus.OK);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+
+//        User user = userRepository.findByUsername(username);
+//        if (user == null) {
+//            throw new UsernameNotFoundException(username);
+//        }
+//        return new UserPrincipal(user);
+
+        return new InMemoryUserDetailsManager(
+                org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder()
+                        .username("cs")
+                        .password("456")
+                        .roles("ROLE_customer")
+                        .build()).loadUserByUsername("cs");
+
     }
 
 

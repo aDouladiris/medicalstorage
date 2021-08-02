@@ -1,5 +1,5 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
-import com.unipi.adouladiris.medicalstorage.business.Product;
+import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;

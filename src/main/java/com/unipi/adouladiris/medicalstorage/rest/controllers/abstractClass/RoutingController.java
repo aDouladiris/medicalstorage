@@ -15,11 +15,11 @@ public abstract class RoutingController {
 //        return new ModelAndView("redirect:/swagger-ui.html#/product-controller", model);
 //    }
 
-    protected String objectToJSON(Object object) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
-        return json;
-    }
+//    protected String objectToJSON(Object object) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+//        return json;
+//    }
 
 
 
