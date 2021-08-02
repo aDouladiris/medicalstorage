@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,16 +42,16 @@ public class UserController extends RoutingController implements UserDetailsServ
 
     private AuthenticationManager authenticationManager;
     private HttpSecurity http;
-    private UserDetailsService userDetailsService;
+//    private UserDetailsService userDetailsService;
 
     private final String jwtSecret = "zdtlD3JK56m6wTTgsNFhqzjqP";
     private final String jwtIssuer = "example.io";
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, HttpSecurity http, @Qualifier("myDS") UserDetailsService userDetailsService){
+    public UserController(AuthenticationManager authenticationManager, HttpSecurity http){ //, @Qualifier("myDS") UserDetailsService userDetailsService){
         this.authenticationManager = authenticationManager;
         this.http = http;
-        this.userDetailsService = userDetailsService;
+//        this.userDetailsService = userDetailsService;
     }
 
 
@@ -75,7 +76,7 @@ public class UserController extends RoutingController implements UserDetailsServ
         Authentication authenticate = authenticationManager
                 .authenticate( new UsernamePasswordAuthenticationToken(parsedBody.get("username"), parsedBody.get("password")) );
 
-        userDetailsService.loadUserByUsername(parsedBody.get("username").toString());
+        //userDetailsService.loadUserByUsername(parsedBody.get("username").toString());
 
 
         //Create the token from username.
@@ -109,18 +110,24 @@ public class UserController extends RoutingController implements UserDetailsServ
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-//        User user = userRepository.findByUsername(username);
-//        if (user == null) {
-//            throw new UsernameNotFoundException(username);
-//        }
-//        return new UserPrincipal(user);
+        User customUser = new Select().findUser(username).getResult(User.class);
 
-        return new InMemoryUserDetailsManager(
-                org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder()
-                        .username("cs")
-                        .password("456")
-                        .roles("ROLE_customer")
-                        .build()).loadUserByUsername("cs");
+        org.springframework.security.core.userdetails.User.UserBuilder builder = null;
+        if (customUser != null) {
+            builder = org.springframework.security.core.userdetails.User.withUsername(username);
+            builder.password(new BCryptPasswordEncoder().encode(customUser.getPassword()));
+
+            String[] roles = new String[1];
+            roles[0] = customUser.getRole().getAuthority();
+
+            builder.roles( roles );
+        } else {
+            throw new UsernameNotFoundException("User not found.");
+        }
+
+        System.out.println("User: " + builder.toString());
+
+        return builder.build();
 
     }
 

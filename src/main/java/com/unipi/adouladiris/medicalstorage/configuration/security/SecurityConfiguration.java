@@ -2,9 +2,9 @@ package com.unipi.adouladiris.medicalstorage.configuration.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,15 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.token.ClientTokenServices;
-import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import com.unipi.adouladiris.medicalstorage.configuration.security.JwtTokenFilter;
 
 import static java.lang.String.format;
 
@@ -30,7 +25,7 @@ import static java.lang.String.format;
 // https://stackoverflow.com/questions/58995870/why-do-we-need-to-call-http-addfilterbefore-method-in-spring-security-configur
 // checkhttps://www.toptal.com/spring/spring-security-tutorial
 // newest????https://www.baeldung.com/spring-security-oauth-resource-server
-
+// readhttps://medium.com/javarevisited/spring-security-jwt-authentication-in-detail-bb98b5055b50
 @Configuration
 @EnableWebSecurity
 // TODO "generated security password" message need to be removed.
@@ -72,9 +67,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        auth.jdbcAuthentication()
-                .dataSource(dataSource())
-                .getUserDetailsService();
+        auth.userDetailsService(userDetailService);
+//        auth.jdbcAuthentication()
+//                .dataSource(dataSource())
+//                .passwordEncoder(new BCryptPasswordEncoder())
+//                .usersByUsernameQuery(getQueryFromUserTable())
+//                .authoritiesByUsernameQuery(getQueryFromRoleTable())
+//                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
 
 //        auth.userDetailsService(username -> userRepo
 //                .findByUsername(username)
@@ -87,12 +86,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
     private final JwtTokenFilter jwtTokenFilter;
+    private DatabaseUserDetailService userDetailService;
 
-    public SecurityConfiguration(JwtTokenFilter jwtTokenFilter) {
+    @Autowired
+    public SecurityConfiguration(JwtTokenFilter jwtTokenFilter, DatabaseUserDetailService userDetailService) {
         super();
         this.jwtTokenFilter = jwtTokenFilter;
+        this.userDetailService = userDetailService;
         // Inherit security context in async function calls
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+        //SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
     // Authorization
@@ -131,56 +133,85 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Enable CORS and disable CSRF
-        http = http.cors().and().csrf().disable();
+//        http = http.cors().and().csrf().disable();
+//
+//        // Set session management to stateless
+////        http = http
+////                .sessionManagement()
+////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+////                .and();
+////
+////        // Set unauthorized requests exception handler
+////        http = http
+////                .exceptionHandling()
+////                .authenticationEntryPoint(
+////                        (request, response, ex) -> {
+////                            response.sendError(
+////                                    HttpServletResponse.SC_UNAUTHORIZED,
+////                                    ex.getMessage()
+////                            );
+////                        }
+////                )
+////                .and();
+//
+//        // Set permissions on endpoints
+//        http.authorizeRequests()
+//                // Our public endpoints
+//                .antMatchers("/api/v1/**").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .oauth2ResourceServer()
+//                .jwt();
+//
+//
+//        // Add JWT token filter
+//        http.addFilterBefore(
+//                jwtTokenFilter,
+//                UsernamePasswordAuthenticationFilter.class
+//        );
 
-        // Set session management to stateless
-        http = http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+//        http
+//                .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
+//                .and()
+//                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
+//                .and()
+//                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
+//                .and()
+//                .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
+//                .and()
+//                .httpBasic();
 
-        // Set unauthorized requests exception handler
-        http = http
-                .exceptionHandling()
-                .authenticationEntryPoint(
-                        (request, response, ex) -> {
-                            response.sendError(
-                                    HttpServletResponse.SC_UNAUTHORIZED,
-                                    ex.getMessage()
-                            );
-                        }
-                )
-                .and();
+        http.csrf().disable().authorizeRequests().antMatchers("/api/v1/**").permitAll().anyRequest()
+                .authenticated().and().exceptionHandling().and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Set permissions on endpoints
-        http.authorizeRequests()
-                // Our public endpoints
-                .antMatchers("/api/v1/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
-                // Our private endpoints
-                .anyRequest().authenticated();
 
-        // Add JWT token filter
-        http.addFilterBefore(
-                jwtTokenFilter,
-                UsernamePasswordAuthenticationFilter.class
-        );
+
     }
+
+//    @Bean
+//    JwtDecoder jwtDecoder(OAuth2ResourceServerProperties properties) {
+//        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.getJwt().getJwkSetUri()).build();
+//        jwtDecoder.setClaimSetConverter(new OrganizationSubClaimAdapter());
+//        return jwtDecoder;
+//    }
 
 
 
     @Override
-    @Bean
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    @Override
-    @Bean("myDS")
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-        return super.userDetailsServiceBean();
-    }
+
+
+//    @Override
+//    @Bean("myDS")
+//    public UserDetailsService userDetailsServiceBean() throws Exception {
+//        return super.userDetailsServiceBean();
+//    }
 
 }
 

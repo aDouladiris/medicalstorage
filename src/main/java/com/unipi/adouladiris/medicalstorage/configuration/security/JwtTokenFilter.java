@@ -10,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,17 +34,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         // Get authorization header and validate
-
+        System.out.println("JwtFilter Start");
         System.out.println(httpServletRequest.getHeader("Bearer"));
 //        final String header = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-//        System.out.println("header: " + header);
-
-
-
-//        if ( header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
-//            filterChain.doFilter(httpServletRequest, httpServletResponse);
-//            return;
-//        }
 
         if( httpServletRequest.getHeader("Bearer") == null ){
             filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -63,16 +57,20 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // Get user identity and set it on the spring security context
-        User user = new Select().findUser(jwToken.getSubject()).getResult(User.class);
+        UserDetails user = new Select().findUser(jwToken.getSubject()).getResult(User.class);
+
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
+        System.out.println(user.getAuthorities().toString());
 
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 
-        authentication
-                .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-
-        System.out.println(authentication.getPrincipal());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         filterChain.doFilter(httpServletRequest, httpServletResponse);
+        System.out.println("JwtFilter End");
 
     }
 }
