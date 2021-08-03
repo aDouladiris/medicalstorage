@@ -79,6 +79,7 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
 
             System.out.println("Session Http Config has been build!");
+            http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
 
             http
                     .csrf().ignoringAntMatchers("/api/v1/login") // TODO These security options need explanation instead of disabled them.
@@ -130,7 +131,7 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             System.out.println("Http Interceptor TokenFilter has been build!");
-
+            http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
             // TODO configuration for different users.
             http.csrf().disable()
                     .authorizeRequests().antMatchers("/api/v1/product/**").permitAll().anyRequest()

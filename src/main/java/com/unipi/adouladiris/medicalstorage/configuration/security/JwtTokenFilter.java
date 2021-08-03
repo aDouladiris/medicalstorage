@@ -1,11 +1,13 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Set.of;
 
@@ -64,19 +68,34 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //        }
 
         if( httpServletRequest.getHeader("Bearer" ) == null ){
-            System.out.println("JwtFilter End NOT");
+            System.out.println("JwtFilter End Bearer not in headers");
+            //System.out.println(SecurityContextHolder.getContext().getAuthentication());
+            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
 
         // Get jwt token and validate
         final String token = httpServletRequest.getHeader("Bearer") ; //header.split(" ")[1].trim();
+
+        if (token == null) {
+            System.out.println("JwtFilter End Bearer not in headers 2nd check");
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
+        }
+
         JWToken jwToken = null;
         try {
             jwToken = new JWToken(token);
             if (!jwToken.isValid()) {
-                System.out.println("JwtFilter End NOT");
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
+                System.out.println("JwtFilter End Invalid token");
+                //filterChain.doFilter(httpServletRequest, httpServletResponse);
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> errorDetails = new HashMap<>();
+                errorDetails.put("message", "Invalid token");
+                httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
+                httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -95,12 +114,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             System.out.println("JwtFilter End OK");
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
 
         }catch (UsernameNotFoundException exception){
-            System.out.println("JwtFilter End NOT");
+            System.out.println("JwtFilter End User not found");
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> errorDetails = new HashMap<>();
+            errorDetails.put("message", "Invalid token");
+            httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
+            httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+
 
     }
 }

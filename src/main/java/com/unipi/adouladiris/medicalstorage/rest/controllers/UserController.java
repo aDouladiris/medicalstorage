@@ -80,21 +80,14 @@ public class UserController extends RoutingController {
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
 
         //Create the token from username.
-//        JSONObject jwtPayload = new JSONObject();
-//        jwtPayload.put("sub", authenticatedUser.getName());
-//        ArrayList<String> aud = new ArrayList();
-//        authentication.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
-//        jwtPayload.put("aud", aud);
-//        LocalDateTime ldt = LocalDateTime.now().plusDays(60);
-//        jwtPayload.put("exp", ldt.toEpochSecond(ZoneOffset.UTC)); //this needs to be configured
-//        String bearerToken = new JWToken(jwtPayload).toString();
-
         String bearerToken = new JWToken(authenticatedUser).toString();
 
         JSONObject response = new JSONObject();
         response.put("Username", authenticatedUser.getName() );
         response.put("Authorities", authenticatedUser.getAuthorities().toString() );
         response.put("bearerToken", bearerToken);
+
+        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
 
         System.out.println("-------Login End-----------------------");
         return new ResponseEntity(response.toString(), HttpStatus.OK);
