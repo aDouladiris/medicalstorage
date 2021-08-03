@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,82 +33,63 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
+
 import static java.lang.String.format;
 
 @RestController
-public class UserController extends RoutingController implements UserDetailsService {
+//@RequestMapping("/user/")
+public class UserController extends RoutingController {
 
     private AuthenticationManager authenticationManagerUser;
-//    private HttpSecurity http;
-//    private UserDetailsService userDetailsService;
-//    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(@Qualifier("UserSessionAuthManager") AuthenticationManager authenticationManagerUser,
-                          HttpSecurity http,
-                          @Qualifier("UserSessionDetailsService") UserDetailsService userDetailsService,
-                          PasswordEncoder passwordEncoder){
+    public UserController(@Qualifier("UserSessionAuthManager") AuthenticationManager authenticationManagerUser){
         this.authenticationManagerUser = authenticationManagerUser;
-//        this.http = http;
-//        this.userDetailsService = userDetailsService;
-//        this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping(value = "/userInformation")
+    @GetMapping(value = "information")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     public Object retrieveAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getPrincipal();
     }
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "login")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<String> login(@RequestBody Map<String, Object> body) throws NoSuchAlgorithmException {
+    public ResponseEntity<String> login(@RequestBody Map<String, Object> body) {
         System.out.println("-------Login Start-----------------------");
 
         if(!body.containsKey("username") || !body.containsKey("password") ) {
             return new ResponseEntity("Username or password missing.", HttpStatus.BAD_REQUEST);
         }
 
-        String username = String.class.cast(body.get("username"));
-        String password = String.class.cast(body.get("password"));
+        String username = (String) body.get("username");
+        String password = (String) body.get("password");
 
-//        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//
-//        System.out.println(passwordEncoder.matches(password, passwordEncoder.encode(userDetails.getPassword()))  );
-//
-//        if ( userDetails.getPassword().equals(passwordEncoder.encode(password)) ){
-//            System.out.println("Correct pass!");
-//        }
-//
-////        System.out.println("userDetails Start");
-////        System.out.println(userDetails.getUsername());
-////        System.out.println(userDetails.getPassword());
-////        System.out.println(userDetails.getAuthorities().toString());
-////        System.out.println("userDetails End");
-//
-//        UsernamePasswordAuthenticationToken authentication =
-//                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
-
-
-        // Use the authenticationManager that we built in SecurityConfiguration.
-        Authentication authentication = authenticationManagerUser.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        //System.out.println(SecurityContextHolder.getContext().getAuthentication());
-
-        //Create the token from username.
-        JSONObject jwtPayload = new JSONObject();
-        jwtPayload.put("sub", username);
-        ArrayList<String> aud = new ArrayList();
-        authentication.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
-        jwtPayload.put("aud", aud);
-        LocalDateTime ldt = LocalDateTime.now().plusDays(60);
-        jwtPayload.put("exp", ldt.toEpochSecond(ZoneOffset.UTC)); //this needs to be configured
-        String bearerToken = new JWToken(jwtPayload).toString();
+        // Use the authenticationManagerUser that we built in SecurityConfiguration.
+        Authentication authentication;
+        try {
+            authentication = authenticationManagerUser
+                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }catch (AuthenticationException exception){
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+
+        //Create the token from username.
+//        JSONObject jwtPayload = new JSONObject();
+//        jwtPayload.put("sub", authenticatedUser.getName());
+//        ArrayList<String> aud = new ArrayList();
+//        authentication.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
+//        jwtPayload.put("aud", aud);
+//        LocalDateTime ldt = LocalDateTime.now().plusDays(60);
+//        jwtPayload.put("exp", ldt.toEpochSecond(ZoneOffset.UTC)); //this needs to be configured
+//        String bearerToken = new JWToken(jwtPayload).toString();
+
+        String bearerToken = new JWToken(authenticatedUser).toString();
 
         JSONObject response = new JSONObject();
         response.put("Username", authenticatedUser.getName() );
@@ -117,30 +100,47 @@ public class UserController extends RoutingController implements UserDetailsServ
         return new ResponseEntity(response.toString(), HttpStatus.OK);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        System.out.println("Session: loadUserByUsername");
+//    @Override
+//    public UserDetails loadUserByUsername(String username) {
+//        System.out.println("Session: loadUserByUsername");
+//
+//        User customUser = new Select().findUser(username).getResult(User.class);
+//
+//        org.springframework.security.core.userdetails.User.UserBuilder builder = null;
+//        if (customUser != null) {
+//            builder = org.springframework.security.core.userdetails.User.withUsername(username);
+//            builder.password(new BCryptPasswordEncoder().encode(customUser.getPassword()));
+//
+//            String[] roles = new String[1];
+//            roles[0] = customUser.getRole().getAuthority();
+//
+//            builder.roles( roles );
+//        } else {
+//            throw new UsernameNotFoundException("User not found.");
+//        }
+//
+//        System.out.println("User: " + builder.toString());
+//
+//        return builder.build();
+//
+//    }
 
-        User customUser = new Select().findUser(username).getResult(User.class);
 
-        org.springframework.security.core.userdetails.User.UserBuilder builder = null;
-        if (customUser != null) {
-            builder = org.springframework.security.core.userdetails.User.withUsername(username);
-            builder.password(new BCryptPasswordEncoder().encode(customUser.getPassword()));
 
-            String[] roles = new String[1];
-            roles[0] = customUser.getRole().getAuthority();
 
-            builder.roles( roles );
-        } else {
-            throw new UsernameNotFoundException("User not found.");
-        }
 
-        System.out.println("User: " + builder.toString());
-
-        return builder.build();
-
-    }
+    //    @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
+//    public class LogoutServlet extends HttpServlet {
+//        @Override
+//        protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//            HttpSession session = request.getSession(false);
+//            // Destroys the session for this user.
+//            if (session != null)
+//                session.invalidate();
+//            // Redirects back to the initial page.
+//            response.sendRedirect(request.getContextPath());
+//        }
+//    }
 
 
 

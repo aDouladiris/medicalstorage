@@ -79,38 +79,25 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
 
             System.out.println("Session Http Config has been build!");
-//        http
-//                .requestMatchers().antMatchers("/api/v1/login")
-//                .and()
-//                .httpBasic();
 
-        http
-                .csrf().ignoringAntMatchers("/api/v1/login") // TODO These security options need explanation instead of disabled them.
-                .and()
-                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
-                .and()
-                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
-                .and()
-//                .authorizeRequests().antMatchers("/api/v1/login").hasAnyRole("admin", "customer")
-//                .and()
-                .httpBasic();
+            http
+                    .csrf().ignoringAntMatchers("/api/v1/login") // TODO These security options need explanation instead of disabled them.
+                    .and()
+                    .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
+                    .and()
+                    .authorizeRequests().antMatchers("/api/v1/login").permitAll()
+                    .and()
+                    .httpBasic();
 
         }
 
-        @Override
-        @Bean("UserSessionDetailsService")
-        public UserDetailsService userDetailsServiceBean() throws Exception {
-            return super.userDetailsServiceBean();
-        }
-
+        // TODO review with Qualifiers.
         @Override
         @Primary
         @Bean("UserSessionAuthManager")
         public AuthenticationManager authenticationManagerBean() throws Exception {
             return super.authenticationManagerBean();
         }
-
-
 
     }
 
@@ -119,32 +106,25 @@ public class SecurityConfiguration {
     @Order(2)
     public static class UserTokenConfiguration extends WebSecurityConfigurerAdapter{
 
-        private JwtTokenFilter jwtTokenFilter;
-        private DatabaseUserDetailService userDetailService;
-
+        private DatabaseUserDetailService databaseUserDetailService;
         @Autowired
-        public UserTokenConfiguration(DatabaseUserDetailService userDetailService) {
-            super();
-            this.userDetailService = userDetailService;
-        }
+        public void userDetailService(DatabaseUserDetailService databaseUserDetailService) { this.databaseUserDetailService = databaseUserDetailService; }
 
+        private JwtTokenFilter jwtTokenFilter;
         @Autowired
         public void jwtTokenFilter(JwtTokenFilter jwtTokenFilter){
             this.jwtTokenFilter = jwtTokenFilter;
         }
 
+//        @Override
+//        public void init(WebSecurity web) throws Exception {
+//            web.ignoring().antMatchers("/api/v1/login");
+//        }
+
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             System.out.println("Token AuthenticateManager has been build!");
-            auth.userDetailsService(userDetailService);
-
-
-//            auth.jdbcAuthentication()
-//                    .dataSource(dataSource()).getUserDetailsService();
-//                    .passwordEncoder(passwordEncoder())
-//                    .usersByUsernameQuery(getQueryFromUserTable());
-//                    .authoritiesByUsernameQuery(getQueryFromRoleTable());
-                    //.rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database.
+            auth.userDetailsService(databaseUserDetailService);
         }
 
         @Override
@@ -161,178 +141,21 @@ public class SecurityConfiguration {
         }
 
         @Override
-        @Bean("UserTokenAuthManager")
+        @Bean(value = "UserTokenAuthManager")
         public AuthenticationManager authenticationManagerBean() throws Exception {
             return super.authenticationManagerBean();
         }
 
+        // TODO review with Qualifiers.
         @Override
+        @Primary
         @Bean("UserTokenDetailsService")
         public UserDetailsService userDetailsServiceBean() throws Exception {
             return super.userDetailsServiceBean();
         }
 
-
-
     }
 
-   // Authentication
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.jdbcAuthentication()
-//                .dataSource(dataSource())
-//                .passwordEncoder(new BCryptPasswordEncoder())
-//                .usersByUsernameQuery(getQueryFromUserTable())
-//                .authoritiesByUsernameQuery(getQueryFromRoleTable())
-//                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
-//
-//    }
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//
-//        auth.userDetailsService(userDetailService);
-////        auth.jdbcAuthentication()
-////                .dataSource(dataSource())
-////                .passwordEncoder(new BCryptPasswordEncoder())
-////                .usersByUsernameQuery(getQueryFromUserTable())
-////                .authoritiesByUsernameQuery(getQueryFromRoleTable())
-////                .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
-//
-////        auth.userDetailsService(username -> userRepo
-////                .findByUsername(username)
-////                .orElseThrow(
-////                        () -> new UsernameNotFoundException(
-////                                format("User: %s, not found", username)
-////                        )
-////                ));
-//    }
-
-
-//    private final JwtTokenFilter jwtTokenFilter;
-//    private DatabaseUserDetailService userDetailService;
-//
-//    @Autowired
-//    public SecurityConfiguration(JwtTokenFilter jwtTokenFilter, DatabaseUserDetailService userDetailService) {
-//        super();
-//        this.jwtTokenFilter = jwtTokenFilter;
-//        this.userDetailService = userDetailService;
-//        // Inherit security context in async function calls
-//        //SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-//    }
-
-    // Authorization
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//
-//        http
-//                .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
-//                .and()
-//                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
-//                .and()
-//                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
-//                .and()
-//                .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
-//                .and()
-//                .httpBasic();
-//
-//                // Set unauthorized requests exception handler
-//                http = http
-//                        .exceptionHandling()
-//                        .authenticationEntryPoint(
-//                                (request, response, ex) -> {
-//                                    response.sendError(
-//                                            HttpServletResponse.SC_UNAUTHORIZED,
-//                                            ex.getMessage()
-//                                    );
-//                                }
-//                        )
-//                        .and();
-//
-//
-//        // Add JWT token filter
-//        http.addFilterBefore( jwtTokenFilter, UsernamePasswordAuthenticationFilter.class );
-//    }
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        // Enable CORS and disable CSRF
-////        http = http.cors().and().csrf().disable();
-////
-////        // Set session management to stateless
-//////        http = http
-//////                .sessionManagement()
-//////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//////                .and();
-//////
-//////        // Set unauthorized requests exception handler
-//////        http = http
-//////                .exceptionHandling()
-//////                .authenticationEntryPoint(
-//////                        (request, response, ex) -> {
-//////                            response.sendError(
-//////                                    HttpServletResponse.SC_UNAUTHORIZED,
-//////                                    ex.getMessage()
-//////                            );
-//////                        }
-//////                )
-//////                .and();
-////
-////        // Set permissions on endpoints
-////        http.authorizeRequests()
-////                // Our public endpoints
-////                .antMatchers("/api/v1/**").permitAll()
-////                .anyRequest().authenticated()
-////                .and()
-////                .oauth2ResourceServer()
-////                .jwt();
-////
-////
-////        // Add JWT token filter
-////        http.addFilterBefore(
-////                jwtTokenFilter,
-////                UsernamePasswordAuthenticationFilter.class
-////        );
-//
-//        http
-//                .csrf().ignoringAntMatchers("/api/v1/**") // TODO These security options need explanation instead of disabled them.
-//                .and()
-//                .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
-//                .and()
-//                .authorizeRequests().antMatchers("/api/v1/login").permitAll()
-//                .and()
-//                .authorizeRequests().antMatchers("/api/v1/**").hasAnyRole("admin", "customer")
-//                .and()
-//                .httpBasic();
-//
-//        http.csrf().disable().authorizeRequests().antMatchers("/api/v1/**").permitAll().anyRequest()
-//                .authenticated().and().exceptionHandling().and().sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        //http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//    }
-
-//    @Bean
-//    JwtDecoder jwtDecoder(OAuth2ResourceServerProperties properties) {
-//        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.getJwt().getJwkSetUri()).build();
-//        jwtDecoder.setClaimSetConverter(new OrganizationSubClaimAdapter());
-//        return jwtDecoder;
-//    }
-
-
-
-//    @Override
-//    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
-
-
-        // TODO needs 2nd extension for multiple http auths.
-//    @Override
-//    @Bean("myDS")
-//    public UserDetailsService userDetailsServiceBean() throws Exception {
-//        return super.userDetailsServiceBean();
-//    }
 
 }
 

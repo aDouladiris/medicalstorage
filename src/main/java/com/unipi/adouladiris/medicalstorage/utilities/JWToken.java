@@ -3,6 +3,7 @@ package com.unipi.adouladiris.medicalstorage.utilities;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 
 import javax.crypto.Mac;
@@ -13,10 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +35,18 @@ public class JWToken {
         encodedHeader = encode(new JSONObject(JWT_HEADER));
     }
 
+    public JWToken(Authentication authenticatedUser) {
+        this(authenticatedUser.getName(),
+                collectionToJson(authenticatedUser.getAuthorities()),
+                LocalDateTime.now().plusDays(60).toEpochSecond(ZoneOffset.UTC));
+    }
+
+    private static JSONArray collectionToJson(Collection collection) throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        collection.forEach( role -> jsonArray.put(role) );
+        return jsonArray;
+    }
+
     public JWToken(JSONObject payload) {
         this(payload.getString("sub"), payload.getJSONArray("aud"), payload.getLong("exp"));
     }
@@ -52,12 +62,6 @@ public class JWToken {
         signature = hmacSha256(encodedHeader + "." + encode(payload), SECRET_KEY);
     }
 
-    /**
-     * For verification
-     *
-     * @param token
-     * @throws java.security.NoSuchAlgorithmException
-     */
     public JWToken(String token) throws NoSuchAlgorithmException {
         this();
         String[] parts = token.split("\\.");
@@ -115,13 +119,6 @@ public class JWToken {
         return new String(Base64.getUrlDecoder().decode(encodedString));
     }
 
-    /**
-     * Sign with HMAC SHA256 (HS256)
-     *
-     * @param data
-     * @return
-     * @throws Exception
-     */
     private String hmacSha256(String data, String secret) {
         try {
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+//@RequestMapping("/product/")
 public class ProductController extends RoutingController {
 
     @GetMapping("/product/all")
@@ -33,7 +34,7 @@ public class ProductController extends RoutingController {
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         TreeSet<Product> productSet = dbResult.getResult(TreeSet.class);
         DataTransferObject dto = new DataTransferObject(productSet);
-        return new ResponseEntity("Hello!", HttpStatus.OK);
+        return new ResponseEntity(dto.getJsonSet(), HttpStatus.OK);
     }
 
     @GetMapping("/product/{name}")
@@ -43,6 +44,7 @@ public class ProductController extends RoutingController {
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         DataTransferObject dto = new DataTransferObject(product);
+        System.out.println(dto.getJsonSet());
         return new ResponseEntity(dto.getJsonSet(), HttpStatus.OK);
     }
 
@@ -57,7 +59,7 @@ public class ProductController extends RoutingController {
         return new ResponseEntity(dbResult.getResult(), HttpStatus.OK);
     }
 
-    @PostMapping("/product/")
+    @PostMapping("/product")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
@@ -85,20 +87,6 @@ public class ProductController extends RoutingController {
         Product product = dbResult.getResult(Product.class);
         return new ResponseEntity(HttpStatus.OK);
     }
-
-//    @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
-//    public class LogoutServlet extends HttpServlet {
-//        @Override
-//        protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//            HttpSession session = request.getSession(false);
-//            // Destroys the session for this user.
-//            if (session != null)
-//                session.invalidate();
-//            // Redirects back to the initial page.
-//            response.sendRedirect(request.getContextPath());
-//        }
-//    }
-
 
 
 

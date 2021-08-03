@@ -5,13 +5,17 @@ import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -60,7 +64,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //        }
 
         if( httpServletRequest.getHeader("Bearer" ) == null ){
-            System.out.println("JwtFilter End");
+            System.out.println("JwtFilter End NOT");
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
@@ -71,6 +75,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             jwToken = new JWToken(token);
             if (!jwToken.isValid()) {
+                System.out.println("JwtFilter End NOT");
                 filterChain.doFilter(httpServletRequest, httpServletResponse);
                 return;
             }
@@ -78,38 +83,24 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             e.printStackTrace();
         }
 
-        System.out.println(jwToken.getSubject());
-        System.out.println(jwToken.getAudience());
-
         // Get user identity and set it on the spring security context
-        UserDetails userDetails = new Select().findUser(jwToken.getSubject()).getResult(User.class);
+//        UserDetails userDetails = new Select().findUser(jwToken.getSubject()).getResult(User.class);
+        UserDetails userDetails;
 
-        //UserDetails userDetails  = userDetailsService.loadUserByUsername(jwToken.getSubject());
+        try {
+            userDetails  = userDetailsService.loadUserByUsername(jwToken.getSubject());
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            usernamePasswordAuthenticationToken
+                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            System.out.println("JwtFilter End OK");
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        usernamePasswordAuthenticationToken
-                .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-//        System.out.println(user.getUsername());
-//        System.out.println(user.getPassword());
-//        System.out.println(user.getAuthorities().toString());
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(
-//                user.getUsername(),
-//                user.getPassword(),
-//                user.getAuthorities()
-//        );
-//        System.out.println(authentication);
-//        SecurityContextHolder.getContext().setAuthentication(authenticationManagerToken.authenticate(authentication));
-//        System.out.println("Build ready: " + SecurityContextHolder.getContext().getAuthentication());
-//
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication());
-//
-
+        }catch (UsernameNotFoundException exception){
+            System.out.println("JwtFilter End NOT");
+        }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
-        System.out.println("JwtFilter End");
 
     }
 }
