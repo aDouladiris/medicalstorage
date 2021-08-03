@@ -1,15 +1,10 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
-import com.sun.security.auth.UserPrincipal;
-import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import org.json.JSONObject;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -24,13 +19,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.sql.Array;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -40,20 +36,21 @@ import static java.lang.String.format;
 @RestController
 public class UserController extends RoutingController implements UserDetailsService {
 
-    private AuthenticationManager authenticationManager;
-    private HttpSecurity http;
+    private AuthenticationManager authenticationManagerUser;
+//    private HttpSecurity http;
 //    private UserDetailsService userDetailsService;
-
-    private final String jwtSecret = "zdtlD3JK56m6wTTgsNFhqzjqP";
-    private final String jwtIssuer = "example.io";
+//    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, HttpSecurity http){ //, @Qualifier("myDS") UserDetailsService userDetailsService){
-        this.authenticationManager = authenticationManager;
-        this.http = http;
+    public UserController(@Qualifier("UserSessionAuthManager") AuthenticationManager authenticationManagerUser,
+                          HttpSecurity http,
+                          @Qualifier("UserSessionDetailsService") UserDetailsService userDetailsService,
+                          PasswordEncoder passwordEncoder){
+        this.authenticationManagerUser = authenticationManagerUser;
+//        this.http = http;
 //        this.userDetailsService = userDetailsService;
+//        this.passwordEncoder = passwordEncoder;
     }
-
 
     @GetMapping(value = "/userInformation")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
@@ -62,53 +59,67 @@ public class UserController extends RoutingController implements UserDetailsServ
         return authentication.getPrincipal();
     }
 
-
     @PostMapping(value = "/login")
     @PreAuthorize("permitAll()")
-    public String login(@RequestBody Map<String, Object> body) throws JsonProcessingException, NoSuchAlgorithmException, SQLException {
+    public ResponseEntity<String> login(@RequestBody Map<String, Object> body) throws NoSuchAlgorithmException {
+        System.out.println("-------Login Start-----------------------");
 
-        JSONObject parsedBody = new JSONObject();
-
-        for (Map.Entry entry : body.entrySet()){
-            parsedBody.put( entry.getKey().toString(), entry.getValue() );
+        if(!body.containsKey("username") || !body.containsKey("password") ) {
+            return new ResponseEntity("Username or password missing.", HttpStatus.BAD_REQUEST);
         }
 
-        Authentication authenticate = authenticationManager
-                .authenticate( new UsernamePasswordAuthenticationToken(parsedBody.get("username"), parsedBody.get("password")) );
+        String username = String.class.cast(body.get("username"));
+        String password = String.class.cast(body.get("password"));
 
-        //userDetailsService.loadUserByUsername(parsedBody.get("username").toString());
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//
+//        System.out.println(passwordEncoder.matches(password, passwordEncoder.encode(userDetails.getPassword()))  );
+//
+//        if ( userDetails.getPassword().equals(passwordEncoder.encode(password)) ){
+//            System.out.println("Correct pass!");
+//        }
+//
+////        System.out.println("userDetails Start");
+////        System.out.println(userDetails.getUsername());
+////        System.out.println(userDetails.getPassword());
+////        System.out.println(userDetails.getAuthorities().toString());
+////        System.out.println("userDetails End");
+//
+//        UsernamePasswordAuthenticationToken authentication =
+//                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
 
+
+        // Use the authenticationManager that we built in SecurityConfiguration.
+        Authentication authentication = authenticationManagerUser.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password)
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        //System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
         //Create the token from username.
         JSONObject jwtPayload = new JSONObject();
-        jwtPayload.put("sub", parsedBody.get("username"));
-
+        jwtPayload.put("sub", username);
         ArrayList<String> aud = new ArrayList();
-        authenticate.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
+        authentication.getAuthorities().forEach( item -> aud.add(item.getAuthority()) );
         jwtPayload.put("aud", aud);
-
         LocalDateTime ldt = LocalDateTime.now().plusDays(60);
         jwtPayload.put("exp", ldt.toEpochSecond(ZoneOffset.UTC)); //this needs to be configured
-
         String bearerToken = new JWToken(jwtPayload).toString();
-        System.out.println("bearerToken: " + bearerToken);
 
-
-
-        //receive the bearer token
-        JWToken incomingToken = new JWToken(bearerToken);
+        Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
 
         JSONObject response = new JSONObject();
-        response.put("isValid", incomingToken.isValid());
-        response.put("message", incomingToken.getSubject());
+        response.put("Username", authenticatedUser.getName() );
+        response.put("Authorities", authenticatedUser.getAuthorities().toString() );
+        response.put("bearerToken", bearerToken);
 
-        return response.toString();
-
-        //return new ResponseEntity(objectToJSON(), HttpStatus.OK);
+        System.out.println("-------Login End-----------------------");
+        return new ResponseEntity(response.toString(), HttpStatus.OK);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) {
+        System.out.println("Session: loadUserByUsername");
 
         User customUser = new Select().findUser(username).getResult(User.class);
 
@@ -163,18 +174,18 @@ public class UserController extends RoutingController implements UserDetailsServ
 
 
 
-    @GetMapping(value = "/logout")
-    @PreAuthorize("hasAnyRole('admin', 'customer')")
-    public ResponseEntity<Object> logoutUser() throws Exception {
-        http
-                .logout()
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
-
-        SecurityContextHolder.getContext().setAuthentication(null);
-
-        return new ResponseEntity("User logout", HttpStatus.OK);
-    }
+//    @GetMapping(value = "/logout")
+//    @PreAuthorize("hasAnyRole('admin', 'customer')")
+//    public ResponseEntity<Object> logoutUser() throws Exception {
+//        http
+//                .logout()
+//                .invalidateHttpSession(true)
+//                .deleteCookies("JSESSIONID");
+//
+//        SecurityContextHolder.getContext().setAuthentication(null);
+//
+//        return new ResponseEntity("User logout", HttpStatus.OK);
+//    }
 
 
 }
