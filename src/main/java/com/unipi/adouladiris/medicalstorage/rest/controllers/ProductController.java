@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -21,18 +22,18 @@ import java.util.*;
 @RestController
 public class ProductController extends RoutingController {
 
-
     @GetMapping("/product/all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     public ResponseEntity<String> getAllProducts() {
 
         // Http request will be intercepted by Token filter before proceeding.
 
+
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         TreeSet<Product> productSet = dbResult.getResult(TreeSet.class);
         DataTransferObject dto = new DataTransferObject(productSet);
-        return new ResponseEntity(dto.getJsonSet(), HttpStatus.OK);
+        return new ResponseEntity("Hello!", HttpStatus.OK);
     }
 
     @GetMapping("/product/{name}")

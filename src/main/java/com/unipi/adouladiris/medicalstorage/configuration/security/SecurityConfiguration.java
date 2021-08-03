@@ -136,9 +136,11 @@ public class SecurityConfiguration {
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             System.out.println("Token AuthenticateManager has been build!");
-            //auth.userDetailsService(userDetailService);
-            auth.jdbcAuthentication()
-                    .dataSource(dataSource()).getUserDetailsService();
+            auth.userDetailsService(userDetailService);
+
+
+//            auth.jdbcAuthentication()
+//                    .dataSource(dataSource()).getUserDetailsService();
 //                    .passwordEncoder(passwordEncoder())
 //                    .usersByUsernameQuery(getQueryFromUserTable());
 //                    .authoritiesByUsernameQuery(getQueryFromRoleTable());
@@ -165,7 +167,7 @@ public class SecurityConfiguration {
         }
 
         @Override
-        @Bean("myDS")
+        @Bean("UserTokenDetailsService")
         public UserDetailsService userDetailsServiceBean() throws Exception {
             return super.userDetailsServiceBean();
         }

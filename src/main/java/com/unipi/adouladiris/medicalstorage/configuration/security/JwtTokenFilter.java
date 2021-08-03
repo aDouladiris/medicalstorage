@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,6 +34,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     public void authenticationManagerToken(@Qualifier("UserTokenAuthManager") AuthenticationManager authenticationManagerToken) {
         this.authenticationManagerToken = authenticationManagerToken;
+    }
+
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private void userDetailsService(@Qualifier("UserTokenDetailsService") UserDetailsService userDetailsService){
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -74,24 +82,31 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         System.out.println(jwToken.getAudience());
 
         // Get user identity and set it on the spring security context
-        UserDetails user = new Select().findUser(jwToken.getSubject()).getResult(User.class);
+        UserDetails userDetails = new Select().findUser(jwToken.getSubject()).getResult(User.class);
 
-        String pass = "$2y$12$2IipZAG3JJF7fF4Pwf0LKO/I5MK46MG8rU.4zi8Ai.dbCTgkJZSJq";
+        //UserDetails userDetails  = userDetailsService.loadUserByUsername(jwToken.getSubject());
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        usernamePasswordAuthenticationToken
+                .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
 //        System.out.println(user.getUsername());
 //        System.out.println(user.getPassword());
 //        System.out.println(user.getAuthorities().toString());
-        UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(
-                user.getUsername(),
-                user.getPassword(),
-                user.getAuthorities()
-        );
-        System.out.println(userToken);
-        Authentication authentication = authenticationManagerToken.authenticate(userToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("Build ready: " + SecurityContextHolder.getContext().getAuthentication());
+//        Authentication authentication = new UsernamePasswordAuthenticationToken(
+//                user.getUsername(),
+//                user.getPassword(),
+//                user.getAuthorities()
+//        );
+//        System.out.println(authentication);
+//        SecurityContextHolder.getContext().setAuthentication(authenticationManagerToken.authenticate(authentication));
+//        System.out.println("Build ready: " + SecurityContextHolder.getContext().getAuthentication());
+//
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication());
+//
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
         System.out.println("JwtFilter End");
