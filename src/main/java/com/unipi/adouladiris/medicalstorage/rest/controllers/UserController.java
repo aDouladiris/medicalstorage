@@ -49,15 +49,18 @@ public class UserController extends RoutingController {
     }
 
     @GetMapping(value = "information")
-    @PreAuthorize("hasAnyRole('admin', 'customer')")
-    public Object retrieveAuthentication() {
+//    @PreAuthorize("hasAnyRole('admin', 'customer')")
+//    @PreAuthorize("isFullyAuthenticated()")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<String> getUserInformation() {
+        System.out.println("Register!");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getPrincipal();
+        return new ResponseEntity(authentication.getPrincipal(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "login")
+    @PostMapping(value = "requestToken")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<String> login(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<String> requestToken(@RequestBody Map<String, Object> body) {
         System.out.println("-------Login Start-----------------------");
 
         if(!body.containsKey("username") || !body.containsKey("password") ) {
@@ -87,36 +90,20 @@ public class UserController extends RoutingController {
         response.put("Authorities", authenticatedUser.getAuthorities().toString() );
         response.put("bearerToken", bearerToken);
 
-        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+//        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
 
         System.out.println("-------Login End-----------------------");
         return new ResponseEntity(response.toString(), HttpStatus.OK);
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) {
-//        System.out.println("Session: loadUserByUsername");
-//
-//        User customUser = new Select().findUser(username).getResult(User.class);
-//
-//        org.springframework.security.core.userdetails.User.UserBuilder builder = null;
-//        if (customUser != null) {
-//            builder = org.springframework.security.core.userdetails.User.withUsername(username);
-//            builder.password(new BCryptPasswordEncoder().encode(customUser.getPassword()));
-//
-//            String[] roles = new String[1];
-//            roles[0] = customUser.getRole().getAuthority();
-//
-//            builder.roles( roles );
-//        } else {
-//            throw new UsernameNotFoundException("User not found.");
-//        }
-//
-//        System.out.println("User: " + builder.toString());
-//
-//        return builder.build();
-//
-//    }
+    @PostMapping(value = "register")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<String>  registerUser(@RequestBody Map<String, Object> body) {
+        System.out.println("Register!");
+
+        return new ResponseEntity(body.toString(), HttpStatus.OK);
+    }
+
 
 
 
@@ -134,37 +121,6 @@ public class UserController extends RoutingController {
 //            response.sendRedirect(request.getContextPath());
 //        }
 //    }
-
-
-
-
-//
-//    @PostMapping(value = "/loginp")
-//    @PreAuthorize("permitAll()")
-//    public Object login(@RequestBody body) {
-//
-//            Authentication authenticate = authenticationManager
-//                    .authenticate( new UsernamePasswordAuthenticationToken(username, password) );
-//
-//
-//
-//            return user;
-//
-////            user
-////
-////            Jwt jwt = new Jwt();
-////
-////            return ResponseEntity.ok()
-////                    .header(
-////                            HttpHeaders.AUTHORIZATION,
-////                            jwtTokenUtil.generateAccessToken(user)
-////                    )
-////                    .body(userViewMapper.toUserView(user));
-////        } catch (BadCredentialsException ex) {
-////            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//
-//    }
-
 
 
 //    @GetMapping(value = "/logout")

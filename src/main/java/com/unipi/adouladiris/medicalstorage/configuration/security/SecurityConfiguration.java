@@ -82,11 +82,17 @@ public class SecurityConfiguration {
             http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
 
             http
-                    .csrf().ignoringAntMatchers("/api/v1/login") // TODO These security options need explanation instead of disabled them.
+                    .csrf() // TODO These security options need explanation instead of disabled them.
+                        .ignoringAntMatchers("/api/v1/information")
+                        .ignoringAntMatchers("/api/v1/requestToken")
+                        .ignoringAntMatchers("/api/v1/register")
                     .and()
                     .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
                     .and()
-                    .authorizeRequests().antMatchers("/api/v1/login").permitAll()
+                    .authorizeRequests()
+                        .antMatchers("/api/v1/information").permitAll()
+                        .antMatchers("/api/v1/requestToken").permitAll()
+                        .antMatchers("/api/v1/register").permitAll()
                     .and()
                     .httpBasic();
 

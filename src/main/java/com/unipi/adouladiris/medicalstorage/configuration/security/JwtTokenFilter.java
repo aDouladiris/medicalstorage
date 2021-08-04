@@ -28,9 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Set.of;
 
@@ -49,6 +47,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private void userDetailsService(@Qualifier("UserTokenDetailsService") UserDetailsService userDetailsService){
         this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        Set<String> pathToIgnore = new HashSet();
+        pathToIgnore.add("/api/v1/information");
+        pathToIgnore.add("/api/v1/requestToken");
+        pathToIgnore.add("/api/v1/register");
+
+        return pathToIgnore.contains(request.getRequestURI());
     }
 
     @Override
