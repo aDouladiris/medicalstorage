@@ -1,8 +1,13 @@
 package com.unipi.adouladiris.medicalstorage.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 
 import java.lang.reflect.Array;
+
 
 
 public class RegisterUserRequestBody {
@@ -25,14 +30,12 @@ public class RegisterUserRequestBody {
     )
     private String password;
 
-
     @ApiModelProperty(
             notes = "Authority of the User",
             name="Authority",
             dataType = "array",
             required=true,
             example =  "[\"admin\", \"customer\"]"
-
     )
     private String[] authorities;
 

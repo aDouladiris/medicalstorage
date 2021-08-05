@@ -55,7 +55,7 @@ public class SwaggerConfiguration  {
                 .apiInfo(apiInfo())
                 .select()
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers.users" ) )
-                .paths(PathSelectors.ant("/**"))
+                .paths(PathSelectors.ant("/user/**"))
                 .build();
     }
 
@@ -121,7 +121,7 @@ public class SwaggerConfiguration  {
 //        SwaggerResource wsResource = new SwaggerResource();
 //        wsResource.setName(resource);
 //        wsResource.setSwaggerVersion("2.0");
-//        wsResource.setLocation("/swagger-apis/" + resource + "/swagger.yaml");
+//        wsResource.setLocation("/swagger-apis/" + resource + "/swaggerTTT.yamlkjdhgfklfd");
 //        return wsResource;
 //    }
 

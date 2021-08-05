@@ -44,7 +44,7 @@ import static java.lang.String.format;
 @RestController
 @Api(value = "Swagger2DemoRestController", description = "REST APIs related to Student Entity!!!!")
 //@RequestMapping("/api/v1")
-//@RequestMapping("/user/")
+@RequestMapping("/user/")
 public class UserController {
 
     private AuthenticationManager authenticationManagerUser;
