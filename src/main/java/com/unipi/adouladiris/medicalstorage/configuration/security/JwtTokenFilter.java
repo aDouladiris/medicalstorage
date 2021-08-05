@@ -55,9 +55,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         System.out.println("Should filter: " + request.getRequestURI());
 
         Set<String> pathToIgnore = new HashSet();
-        pathToIgnore.add("/api/v1/information");
-        pathToIgnore.add("/api/v1/requestToken");
-        pathToIgnore.add("/api/v1/register");
+        pathToIgnore.add("/information");
+        pathToIgnore.add("/requestToken");
+        pathToIgnore.add("/register");
         pathToIgnore.add("/webjars/springfox-swagger-ui/fonts/titillium-web-v6-latin-700.woff2");
         pathToIgnore.add("/swagger-ui.html");
 

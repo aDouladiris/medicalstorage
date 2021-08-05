@@ -1,8 +1,13 @@
 package com.unipi.adouladiris.medicalstorage.configuration.swagger;
 
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
+import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
+import com.unipi.adouladiris.medicalstorage.rest.dto.UserRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.parameters.PathParameter;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.config.annotation.*;
@@ -22,31 +27,35 @@ import springfox.documentation.swagger.web.InMemorySwaggerResourcesProvider;
 import springfox.documentation.swagger.web.SwaggerResource;
 import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import com.fasterxml.classmate.TypeResolver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 //https://www.javainuse.com/spring/boot_swagger
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration extends WebMvcConfigurerAdapter {
+public class SwaggerConfiguration  {
+
+    private TypeResolver typeResolver;
+
+    @Autowired
+    public void setTypeResolver(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     @Bean
     public Docket UserConfiguration() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("Medical Storage - User")
+                .additionalModels(
+                        typeResolver.resolve(UserRequestBody.class),
+                        typeResolver.resolve(RegisterUserRequestBody.class)
+                )
                 .apiInfo(apiInfo())
                 .select()
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers.users" ) )
-                .paths(
-                        PathSelectors
-                                .ant("/information")
-                                .or(PathSelectors.ant("/requestToken"))
-                                .or(PathSelectors.ant("/register"))
-                )
+                .paths(PathSelectors.ant("/**"))
                 .build();
     }
 
@@ -85,13 +94,13 @@ public class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry)
-    {
-        //enabling swagger-ui part for visual documentation
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        //registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry)
+//    {
+//        //enabling swagger-ui part for visual documentation
+//        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+//        //registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+//    }
 
 
 

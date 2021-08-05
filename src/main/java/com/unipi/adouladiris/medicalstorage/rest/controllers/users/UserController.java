@@ -1,13 +1,13 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers.users;
 
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
+import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
+import com.unipi.adouladiris.medicalstorage.rest.dto.UserRequestBody;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,15 +67,16 @@ public class UserController {
 
     @PostMapping(value = "requestToken")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<String> requestToken(@RequestBody Map<String, Object> body) {
+    @ApiImplicitParam(name = "body", dataTypeClass = UserRequestBody.class)
+    public ResponseEntity<String> requestToken(@RequestBody UserRequestBody body) {
         System.out.println("-------Login Start-----------------------");
 
-        if(!body.containsKey("username") || !body.containsKey("password") ) {
+        if(body.getUsername() == null || body.getPassword() == null ) {
             return new ResponseEntity("Username or password missing.", HttpStatus.BAD_REQUEST);
         }
 
-        String username = (String) body.get("username");
-        String password = (String) body.get("password");
+        String username = body.getUsername();
+        String password = body.getPassword();
 
         // Use the authenticationManagerUser that we built in SecurityConfiguration.
         Authentication authentication;
@@ -111,11 +112,11 @@ public class UserController {
             @ApiResponse(code = 401, message = "not authorized!"),
             @ApiResponse(code = 403, message = "forbidden!!!"),
             @ApiResponse(code = 404, message = "not found!!!") })
-    public ResponseEntity<String>  registerUser(@RequestBody Map<String, Object> body) {
+    @ApiImplicitParam(name = "body", dataTypeClass = RegisterUserRequestBody.class)
+    public ResponseEntity<RegisterUserRequestBody>  registerUser(@RequestBody RegisterUserRequestBody body) {
         System.out.println("Register!");
-        User newUser = new User();
 
-        return new ResponseEntity(body.toString(), HttpStatus.OK);
+        return new ResponseEntity(body, HttpStatus.OK);
     }
 
 

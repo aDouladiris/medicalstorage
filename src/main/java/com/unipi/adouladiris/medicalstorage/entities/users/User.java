@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.*;
 import java.security.Principal;
@@ -18,20 +21,9 @@ import java.util.Collection;
 public class User extends UserRole implements UserDetails {
 
     @Column(name = "username", nullable = false, unique = true)
-    @ApiModelProperty(
-            notes = "Name of the User",
-            name="Username",
-            dataType = "String",
-            required=true
-            )
     private String username;
 
-    @ApiModelProperty(
-            notes = "Password of the User",
-            name="Password",
-            dataType = "String",
-            required=true
-    )
+
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -45,12 +37,6 @@ public class User extends UserRole implements UserDetails {
     private Role role;
 
     @Transient
-    @ApiModelProperty(
-            notes = "Role of the User",
-            name="Role",
-            dataType = "Array<String>",
-            required=true
-    )
     private String[] authorities;
 
     public User() {}

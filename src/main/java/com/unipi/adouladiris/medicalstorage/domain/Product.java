@@ -2,6 +2,7 @@ package com.unipi.adouladiris.medicalstorage.domain;
 
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import io.swagger.annotations.ApiModelProperty;
 //import net.minidev.json.JSONObject;
 
 import java.util.*;
@@ -9,6 +10,12 @@ import java.util.*;
 //TODO check extends. Why???
 public class Product extends Operable {
 
+    @ApiModelProperty(
+            notes = "Role of the User",
+            name="Role",
+            dataType = "Array<String>",
+            required=true
+    )
     private TreeMap<Substance, TreeMap<Tab,TreeMap<Category, TreeMap<Item, TreeSet<Tag>>>>> product;
 
     public Product (){ product = new TreeMap<>(); }
