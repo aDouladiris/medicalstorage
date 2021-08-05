@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.controllers;
+package com.unipi.adouladiris.medicalstorage.rest.controllers.products;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+@RequestMapping("/api/v1")
 //@RequestMapping("/product/")
-public class ProductController extends RoutingController {
+public class ProductController {
 
     @GetMapping("/product/all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
+    // When we name a header specifically, the header is required by default.
     public ResponseEntity<String> getAllProducts() {
         // Http request will be intercepted by Token filter before proceeding.
         DbResult dbResult = new Select().findAllProducts();

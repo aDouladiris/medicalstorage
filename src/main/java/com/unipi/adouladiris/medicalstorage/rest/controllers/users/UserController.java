@@ -1,9 +1,13 @@
-package com.unipi.adouladiris.medicalstorage.rest.controllers;
+package com.unipi.adouladiris.medicalstorage.rest.controllers.users;
 
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,8 +42,10 @@ import org.springframework.security.authentication.event.InteractiveAuthenticati
 import static java.lang.String.format;
 
 @RestController
+@Api(value = "Swagger2DemoRestController", description = "REST APIs related to Student Entity!!!!")
+//@RequestMapping("/api/v1")
 //@RequestMapping("/user/")
-public class UserController extends RoutingController {
+public class UserController {
 
     private AuthenticationManager authenticationManagerUser;
 
@@ -49,9 +55,10 @@ public class UserController extends RoutingController {
     }
 
     @GetMapping(value = "information")
+    @ApiOperation(value = "Get list of Students in the System ", response = String.class)
 //    @PreAuthorize("hasAnyRole('admin', 'customer')")
 //    @PreAuthorize("isFullyAuthenticated()")
-    @PreAuthorize("permitAll()")
+//    @PreAuthorize("permitAll()")
     public ResponseEntity<String> getUserInformation() {
         System.out.println("Register!");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -98,8 +105,15 @@ public class UserController extends RoutingController {
 
     @PostMapping(value = "register")
     @PreAuthorize("permitAll()")
+    @ApiOperation(value = "Get list of Students in the System ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Succeed|OK"),
+            @ApiResponse(code = 401, message = "not authorized!"),
+            @ApiResponse(code = 403, message = "forbidden!!!"),
+            @ApiResponse(code = 404, message = "not found!!!") })
     public ResponseEntity<String>  registerUser(@RequestBody Map<String, Object> body) {
         System.out.println("Register!");
+        User newUser = new User();
 
         return new ResponseEntity(body.toString(), HttpStatus.OK);
     }

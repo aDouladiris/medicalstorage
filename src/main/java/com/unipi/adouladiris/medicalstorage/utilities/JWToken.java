@@ -38,7 +38,7 @@ public class JWToken {
     public JWToken(Authentication authenticatedUser) {
         this(authenticatedUser.getName(),
                 collectionToJson(authenticatedUser.getAuthorities()),
-                LocalDateTime.now().plusMinutes(1).toEpochSecond(ZoneOffset.UTC));
+                LocalDateTime.now().plusDays(1).toEpochSecond(ZoneOffset.UTC));
     }
 
     private static JSONArray collectionToJson(Collection collection) throws JSONException {

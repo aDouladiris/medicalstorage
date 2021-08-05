@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,8 +18,20 @@ import java.util.Collection;
 public class User extends UserRole implements UserDetails {
 
     @Column(name = "username", nullable = false, unique = true)
+    @ApiModelProperty(
+            notes = "Name of the User",
+            name="Username",
+            dataType = "String",
+            required=true
+            )
     private String username;
 
+    @ApiModelProperty(
+            notes = "Password of the User",
+            name="Password",
+            dataType = "String",
+            required=true
+    )
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -31,12 +44,33 @@ public class User extends UserRole implements UserDetails {
     @JsonIgnore
     private Role role;
 
+    @Transient
+    @ApiModelProperty(
+            notes = "Role of the User",
+            name="Role",
+            dataType = "Array<String>",
+            required=true
+    )
+    private String[] authorities;
+
     public User() {}
     public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
         this.enabled = 'Y';
+
+        this.authorities[0] = role.getAuthority();
+    }
+
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        Role newRoleObject = new Role(role);
+        this.role = newRoleObject;
+        this.enabled = 'Y';
+
+        this.authorities[0] = role;
     }
 
     // TODO needs review
@@ -46,6 +80,8 @@ public class User extends UserRole implements UserDetails {
         this.password = userCustom.getPassword();
         this.role = userCustom.getRole();
         this.enabled = 'Y';
+
+        this.authorities[0] = role.getAuthority();
     }
 
     public String getUsername() {return username;}

@@ -79,20 +79,20 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
 
             System.out.println("Session Http Config has been build!");
-            http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
+//            http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
 
             http
                     .csrf() // TODO These security options need explanation instead of disabled them.
-                        .ignoringAntMatchers("/api/v1/information")
-                        .ignoringAntMatchers("/api/v1/requestToken")
-                        .ignoringAntMatchers("/api/v1/register")
+                        .ignoringAntMatchers("/information")
+                        .ignoringAntMatchers("/requestToken")
+                        .ignoringAntMatchers("/register")
                     .and()
                     .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
                     .and()
                     .authorizeRequests()
-                        .antMatchers("/api/v1/information").permitAll()
-                        .antMatchers("/api/v1/requestToken").permitAll()
-                        .antMatchers("/api/v1/register").permitAll()
+                        .antMatchers("/information").permitAll()
+                        .antMatchers("/requestToken").permitAll()
+                        .antMatchers("/register").permitAll()
                     .and()
                     .httpBasic();
 
