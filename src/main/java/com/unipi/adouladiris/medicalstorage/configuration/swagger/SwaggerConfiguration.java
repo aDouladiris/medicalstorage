@@ -47,7 +47,7 @@ public class SwaggerConfiguration  {
     @Bean
     public Docket UserConfiguration() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("Medical Storage - User")
+                .groupName("Medical Storage Api v1 - User")
                 .additionalModels(
                         typeResolver.resolve(UserRequestBody.class),
                         typeResolver.resolve(RegisterUserRequestBody.class)
@@ -55,14 +55,14 @@ public class SwaggerConfiguration  {
                 .apiInfo(apiInfo())
                 .select()
                 .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers.users" ) )
-                .paths(PathSelectors.ant("/user/**"))
+                .paths(PathSelectors.ant("/api/v1/user/**"))
                 .build();
     }
 
     @Bean
     public Docket ProductConfiguration() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("Medical Storage API v1 - Product")
+                .groupName("Medical Storage Api v1 - Product")
                 .apiInfo(apiInfo())
                 .globalRequestParameters(authorizationParameter())
                 .select()

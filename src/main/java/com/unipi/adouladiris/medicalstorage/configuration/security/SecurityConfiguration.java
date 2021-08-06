@@ -83,18 +83,15 @@ public class SecurityConfiguration {
 
             http
                     .csrf() // TODO These security options need explanation instead of disabled them.
-                        .ignoringAntMatchers("/information")
-                        .ignoringAntMatchers("/requestToken")
-                        .ignoringAntMatchers("/register")
+                        .ignoringAntMatchers("/**")
                     .and()
                     .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
                     .and()
                     .authorizeRequests()
-                        .antMatchers("/information").permitAll()
-                        .antMatchers("/requestToken").permitAll()
-                        .antMatchers("/register").permitAll()
-                    .and()
-                    .httpBasic();
+                        .antMatchers("/api/v1/user/**").permitAll();
+//                    .and()
+//                    .httpBasic();
+            http.httpBasic().disable();
 
         }
 
@@ -145,6 +142,7 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
             http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            http.httpBasic().disable();
         }
 
         @Override

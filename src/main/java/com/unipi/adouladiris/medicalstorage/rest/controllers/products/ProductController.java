@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/product/")
 //@RequestMapping("/product/")
 public class ProductController {
 
-    @GetMapping("/product/all")
+    @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     // When we name a header specifically, the header is required by default.
     public ResponseEntity<String> getAllProducts() {
@@ -36,7 +36,7 @@ public class ProductController {
         return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
     }
 
-    @GetMapping("/product/{name}")
+    @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     public ResponseEntity<String> getProduct(@PathVariable String name) {
         DbResult dbResult = new Select().findProduct(name);
@@ -46,7 +46,7 @@ public class ProductController {
         return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/product/{name}")
+    @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
         DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
@@ -57,7 +57,7 @@ public class ProductController {
         return new ResponseEntity(dbResult.getResult(), HttpStatus.OK);
     }
 
-    @PostMapping("/product")
+    @PostMapping("")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
@@ -75,7 +75,7 @@ public class ProductController {
     }
 
     // TODO needs fix. Not working.
-    @PutMapping("/product/{name}")
+    @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> updateProduct(@PathVariable String name22, @RequestBody String name) {
 

@@ -298,6 +298,8 @@ public class Select extends SessionManager implements SelectInterface {
     @Override
     public DbResult findOperableEntityByName(@NotNull Class<? extends Operable> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
+        System.out.println("Name  to Insert: " + name);
+        System.out.println("Class to Insert: " + entityClassName);
         // Tables cannot be parameter values
         StringBuilder select = new StringBuilder();
         if( entityClassName.equals( "Substance" ) ){
@@ -315,14 +317,21 @@ public class Select extends SessionManager implements SelectInterface {
         else if( entityClassName.equals( "Tag" ) ){
             select.append("FROM Tag as tag WHERE tag.name = :tmpName ");
         }
+        else if( entityClassName.equals( "Role" ) ){
+            select.append("FROM Role as role WHERE role.authority = :tmpName ");
+        }
 
         Query query = session.createQuery( select.toString() );
         query.setParameter("tmpName", name);
+//        System.out.println("Query: " + query.get);
+//        System.out.println("Query: " + query.getParameters());
         List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
 
+        System.out.println("Result class: " + queryResultList.get(0).toString() );
         DbResult dbResult = new DbResult();
         if( queryResultList.isEmpty() ){ return dbResult; }
         dbResult.setResult( queryResultList.get(0) );
+
         return dbResult;
     }
 

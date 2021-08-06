@@ -151,11 +151,17 @@ public class Insert extends SessionManager implements InsertInterface {
     public DbResult user(@NotNull String username, @NotNull String password, @NotNull String authority ){
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            Role userRole = new Role(authority);
-            Serializable insertedRoleUserId =  session.save(userRole);
+            Role userRole;
+            DbResult dbResult = new Select().findOperableEntityByName(Role.class, authority);
+            if ( dbResult.isEmpty() ){
+                //dbResult = queryableEntity(tag);
+                Serializable insertedRoleUserId =  session.save(new Role(authority));
+                userRole = session.find(Role.class, insertedRoleUserId );
+            }
+            else userRole = dbResult.getResult( Role.class );
             session.getTransaction().commit();
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            userRole = session.find(Role.class, insertedRoleUserId);
+            //userRole = session.find(Role.class, insertedRoleUserId);
             User user = new User(username, passwordEncoder().encode(password), userRole );
             Serializable insertedUserId =  session.save(user);
             session.getTransaction().commit();

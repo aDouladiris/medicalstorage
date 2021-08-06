@@ -55,11 +55,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         //System.out.println("Should filter: " + request.getRequestURI());
 
         if(request.getRequestURI().contains("swagger")) return true;
+        if(request.getRequestURI().contains("user/")) return true;
         Set<String> pathToIgnore = new HashSet();
         pathToIgnore.add("/");
-        pathToIgnore.add("/information");
-        pathToIgnore.add("/requestToken");
-        pathToIgnore.add("/register");
         pathToIgnore.add("/v2/api-docs");
         pathToIgnore.add("/csrf");
         return pathToIgnore.contains(request.getRequestURI());
