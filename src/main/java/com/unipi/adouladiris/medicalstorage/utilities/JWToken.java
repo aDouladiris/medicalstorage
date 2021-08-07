@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 
 import javax.crypto.Mac;
@@ -98,13 +100,19 @@ public class JWToken {
         return payload.getString("sub");
     }
 
-    public List<String> getAudience() {
+    public Collection<GrantedAuthority> getAudience() {
         JSONArray arr = payload.getJSONArray("aud");
-        List<String> list = new ArrayList<>();
+
+        StringBuilder audience = new StringBuilder();
         for (int i = 0; i < arr.length(); i++) {
-            list.add(arr.getString(i));
+            audience.append(arr.getString(i));
+            audience.append(", ");
+            //list.add(arr.getString(i));
+            //grantedAuthorities.add()
         }
-        return list;
+        String audsToAppend = audience.toString().trim().replace(',', ' ').trim();
+
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(audsToAppend);
     }
 
     private static String encode(JSONObject obj) {

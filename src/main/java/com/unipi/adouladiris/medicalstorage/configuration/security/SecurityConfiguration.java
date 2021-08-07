@@ -1,26 +1,31 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
+import com.unipi.adouladiris.medicalstorage.configuration.security.filters.AccessDeniedExceptionFilter;
+import com.unipi.adouladiris.medicalstorage.configuration.security.filters.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.session.SessionManagementFilter;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
+import java.io.IOException;
 
 import static java.lang.String.format;
 
@@ -37,7 +42,7 @@ import static java.lang.String.format;
 public class SecurityConfiguration {
 
     @Bean
-    public static PasswordEncoder passwordEncoder(){
+    public static BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -69,7 +74,7 @@ public class SecurityConfiguration {
             System.out.println("Session AuthenticateManager has been build!");
             auth.jdbcAuthentication()
                     .dataSource(dataSource())
-                    .passwordEncoder(passwordEncoder())
+                    .passwordEncoder(bCryptPasswordEncoder())
                     .usersByUsernameQuery(getQueryFromUserTable())
                     .authoritiesByUsernameQuery(getQueryFromRoleTable())
                     .rolePrefix("ROLE_"); // Framework needs ROLE_ prefix. Apply if there is not in database. TODO review db names and values
@@ -120,10 +125,11 @@ public class SecurityConfiguration {
             this.jwtTokenFilter = jwtTokenFilter;
         }
 
-//        @Override
-//        public void init(WebSecurity web) throws Exception {
-//            web.ignoring().antMatchers("/api/v1/login");
-//        }
+        private AccessDeniedExceptionFilter accessDeniedExceptionFilter;
+        @Autowired
+        public void accessDeniedExceptionFilter(AccessDeniedExceptionFilter accessDeniedExceptionFilter){ this.accessDeniedExceptionFilter = accessDeniedExceptionFilter; }
+
+
 
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -134,16 +140,37 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             System.out.println("Http Interceptor TokenFilter has been build!");
-            http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
+            //http.sessionManagement( ).maximumSessions(1). maxSessionsPreventsLogin(false);
             // TODO configuration for different users.
-            http.csrf().disable()
-                    .authorizeRequests().antMatchers("/api/v1/product/**").permitAll().anyRequest()
-                    .authenticated().and().exceptionHandling().and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-            http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-            http.httpBasic().disable();
+            //https://docs.spring.io/spring-security/site/docs/3.0.x/reference/security-filter-chain.html
+            http
+                    .addFilterBefore(jwtTokenFilter, SessionManagementFilter.class)
+                    //.addFilterBefore(accessDeniedExceptionFilter, AccessDeniedExceptionFilter.class)
+                    .csrf().disable()
+                    .antMatcher("/api/v1/product/**")
+                        .authorizeRequests().anyRequest().hasAnyRole("admin", "customer")
+                    .and()
+                    .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .httpBasic();
+
+            //http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);//
         }
+
+//        private AccessDeniedHandler accessDeniedHandler = new AccessDeniedHandler() {
+//            @Override
+//            public void handle(
+//                    HttpServletRequest httpServletRequest,
+//                    HttpServletResponse httpServletResponse,
+//                    AccessDeniedException e) throws IOException, ServletException {
+//
+//
+//
+//
+//            }
+//        };
 
         @Override
         @Bean(value = "UserTokenAuthManager")

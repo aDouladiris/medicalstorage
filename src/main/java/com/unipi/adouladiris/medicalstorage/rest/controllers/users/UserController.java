@@ -26,8 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -72,7 +70,6 @@ public class UserController {
 //    @PreAuthorize("isFullyAuthenticated()")
 //    @PreAuthorize("permitAll()")
     public ResponseEntity<String> getUserInformation() {
-        System.out.println("Register!");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return new ResponseEntity(authentication.getPrincipal(), HttpStatus.OK);
     }

@@ -1,19 +1,12 @@
 package com.unipi.adouladiris.medicalstorage.entities.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
-import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.*;
-import java.security.Principal;
 import java.util.Collection;
 
 @Entity
@@ -96,7 +89,7 @@ public class User extends UserRole implements UserDetails {
     public void setUsername(String username) {this.username = username;}
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<GrantedAuthority> getAuthorities() {
 
         return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_customer"); // TODO ROLE_ prefix
     }

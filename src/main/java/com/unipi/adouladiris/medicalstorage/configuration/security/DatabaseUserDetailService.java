@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class DatabaseUserDetailService implements UserDetailsService {
 
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public DatabaseUserDetailService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public DatabaseUserDetailService(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Database: loadUserByUsername");
         User user = new Select().findUser(username).getResult(User.class);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return user;
     }
 
