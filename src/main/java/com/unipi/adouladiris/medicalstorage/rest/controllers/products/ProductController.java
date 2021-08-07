@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 
 
 import java.util.*;
@@ -29,6 +31,7 @@ public class ProductController {
     // When we name a header specifically, the header is required by default.
     public ResponseEntity<String> getAllProducts() {
         // Http request will be intercepted by Token filter before proceeding.
+        SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         TreeSet<Product> productSet = dbResult.getResult(TreeSet.class);
@@ -39,6 +42,7 @@ public class ProductController {
     @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     public ResponseEntity<String> getProduct(@PathVariable String name) {
+        SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findProduct(name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
@@ -49,6 +53,7 @@ public class ProductController {
     @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
+        SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         if(dbResult.getException() != null) {
@@ -60,6 +65,7 @@ public class ProductController {
     @PostMapping("")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
+        SecurityContextHolder.getContext().setAuthentication(null);
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
         Map<String, Integer> results = new HashMap();
         for (Product p : productSet){
@@ -78,9 +84,8 @@ public class ProductController {
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> updateProduct(@PathVariable String name22, @RequestBody String name) {
-
+        SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findProduct(name);
-
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         return new ResponseEntity(HttpStatus.OK);

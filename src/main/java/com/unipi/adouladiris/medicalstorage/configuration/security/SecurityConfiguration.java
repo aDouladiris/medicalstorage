@@ -1,5 +1,4 @@
 package com.unipi.adouladiris.medicalstorage.configuration.security;
-import com.unipi.adouladiris.medicalstorage.configuration.security.filters.AccessDeniedExceptionFilter;
 import com.unipi.adouladiris.medicalstorage.configuration.security.filters.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -125,9 +124,9 @@ public class SecurityConfiguration {
             this.jwtTokenFilter = jwtTokenFilter;
         }
 
-        private AccessDeniedExceptionFilter accessDeniedExceptionFilter;
-        @Autowired
-        public void accessDeniedExceptionFilter(AccessDeniedExceptionFilter accessDeniedExceptionFilter){ this.accessDeniedExceptionFilter = accessDeniedExceptionFilter; }
+//        private AccessDeniedExceptionFilter accessDeniedExceptionFilter;
+//        @Autowired
+//        public void accessDeniedExceptionFilter(AccessDeniedExceptionFilter accessDeniedExceptionFilter){ this.accessDeniedExceptionFilter = accessDeniedExceptionFilter; }
 
 
 
