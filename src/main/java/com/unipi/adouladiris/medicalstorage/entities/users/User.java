@@ -46,7 +46,7 @@ public class User extends UserRole implements UserDetails {
         this.role = role;
         this.enabled = 'Y';
 
-        this.authorities[0] = role.getAuthority();
+        //this.authorities[0] = role.getAuthority();
     }
 
     public User(String username, String password, String role) {
@@ -56,7 +56,7 @@ public class User extends UserRole implements UserDetails {
         this.role = newRoleObject;
         this.enabled = 'Y';
 
-        this.authorities[0] = role;
+        //this.authorities[0] = role;
     }
 
     // TODO needs review
@@ -67,7 +67,7 @@ public class User extends UserRole implements UserDetails {
         this.role = userCustom.getRole();
         this.enabled = 'Y';
 
-        this.authorities[0] = role.getAuthority();
+        //this.authorities[0] = role.getAuthority();
     }
 
     public String getUsername() {return username;}

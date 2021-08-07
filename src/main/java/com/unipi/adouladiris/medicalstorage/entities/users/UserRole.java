@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @MappedSuperclass
 //@Inheritance(strategy = InheritanceType.JOINED) ????
-public abstract class UserRole extends Operable {
+public abstract class UserRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // A.I. not working within embedded keys

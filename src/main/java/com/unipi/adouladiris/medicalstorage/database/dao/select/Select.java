@@ -8,6 +8,7 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Jo
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
+import com.unipi.adouladiris.medicalstorage.entities.users.UserRole;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -317,17 +318,32 @@ public class Select extends SessionManager implements SelectInterface {
         else if( entityClassName.equals( "Tag" ) ){
             select.append("FROM Tag as tag WHERE tag.name = :tmpName ");
         }
-        else if( entityClassName.equals( "Role" ) ){
+
+        Query query = session.createQuery( select.toString() );
+        query.setParameter("tmpName", name);
+//        System.out.println("Query: " + query.unwrap(org.hibernate.Query.class).getQueryString());
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+//        System.out.println("Result class: " + queryResultList.get(0).toString() );
+        DbResult dbResult = new DbResult();
+        if( queryResultList.isEmpty() ){ return dbResult; }
+        dbResult.setResult( queryResultList.get(0) );
+
+        return dbResult;
+    }
+
+    public DbResult findRole(@NotNull Class<? extends UserRole> classType, @NotNull String name) {
+        String entityClassName = classType.getSimpleName();
+        // Tables cannot be parameter values
+        StringBuilder select = new StringBuilder();
+         if( entityClassName.equals( "Role" ) ){
             select.append("FROM Role as role WHERE role.authority = :tmpName ");
         }
 
         Query query = session.createQuery( select.toString() );
         query.setParameter("tmpName", name);
-//        System.out.println("Query: " + query.get);
-//        System.out.println("Query: " + query.getParameters());
         List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
 
-        System.out.println("Result class: " + queryResultList.get(0).toString() );
         DbResult dbResult = new DbResult();
         if( queryResultList.isEmpty() ){ return dbResult; }
         dbResult.setResult( queryResultList.get(0) );

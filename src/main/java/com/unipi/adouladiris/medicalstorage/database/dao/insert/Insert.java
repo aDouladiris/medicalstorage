@@ -152,7 +152,8 @@ public class Insert extends SessionManager implements InsertInterface {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Role userRole;
-            DbResult dbResult = new Select().findOperableEntityByName(Role.class, authority);
+            System.out.println("Insert class: " + authority);
+            DbResult dbResult = new Select().findRole(Role.class, authority);
             if ( dbResult.isEmpty() ){
                 //dbResult = queryableEntity(tag);
                 Serializable insertedRoleUserId =  session.save(new Role(authority));

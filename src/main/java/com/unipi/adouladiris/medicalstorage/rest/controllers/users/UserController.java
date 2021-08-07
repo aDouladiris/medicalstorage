@@ -145,7 +145,7 @@ public class UserController {
 
         if(dbResult.getException() != null) return new ResponseEntity(dbResult.getException().getCause().getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         System.out.println(dbResult.getResult().toString());
-        return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.OK);
+        return new ResponseEntity("User inserted at " + dbResult.getResult().toString(), HttpStatus.OK);
     }
 
     // https://stackoverflow.com/questions/3521290/logout-get-or-post
