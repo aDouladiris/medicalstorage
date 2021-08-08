@@ -19,7 +19,7 @@ public class RoutingController {
     @GetMapping(value = "")
     @PreAuthorize("permitAll()")
     public ModelAndView redirectUsingRedirectPrefix(ModelMap model) {
-        return new ModelAndView("redirect:/swagger-ui.html?urls.primaryName=Medical%20Storage%20API%20v1%20-%20User#/user-controller", model);
+        return new ModelAndView("redirect:/swagger-ui.html?urls.primaryName=Medical%20Storage%20Api%20v1%20-%20User#/User", model);
     }
 
 //    protected String objectToJSON(Object object) throws JsonProcessingException {

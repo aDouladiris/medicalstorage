@@ -1,28 +1,25 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers.products;
-import com.unipi.adouladiris.medicalstorage.domain.Product;
+
+import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import com.unipi.adouladiris.medicalstorage.rest.controllers.abstractClass.RoutingController;
+import com.unipi.adouladiris.medicalstorage.domain.Product;
+import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/product/")
+@Api(tags = { SwaggerConfiguration.ProductController })
 //@RequestMapping("/product/")
 public class ProductController {
 
