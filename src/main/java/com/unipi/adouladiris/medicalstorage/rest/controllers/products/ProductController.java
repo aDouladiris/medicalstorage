@@ -7,14 +7,15 @@ import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
-import com.unipi.adouladiris.medicalstorage.rest.dto.DataTransferObject;
-import io.swagger.annotations.Api;
+import com.unipi.adouladiris.medicalstorage.rest.dto.*;
+import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 @RestController
@@ -25,6 +26,14 @@ public class ProductController {
 
     @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
+    @ApiOperation(value = "Retrieve all available products.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Products received."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
     // When we name a header specifically, the header is required by default.
     public ResponseEntity<String> getAllProducts() {
         // Http request will be intercepted by Token filter before proceeding.
@@ -38,6 +47,14 @@ public class ProductController {
 
     @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
+    @ApiOperation(value = "Retrieve available product by name.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product received."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
     public ResponseEntity<String> getProduct(@PathVariable String name) {
         SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findProduct(name);
@@ -49,6 +66,14 @@ public class ProductController {
 
     @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
+    @ApiOperation(value = "Delete product by name.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product deleted."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
         SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
@@ -61,9 +86,24 @@ public class ProductController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> insertProduct(@RequestBody ArrayList<Object> body) {
+    @ApiOperation(value = "Insert product.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product inserted."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
+    public ResponseEntity<String> insertProduct(@RequestBody LinkedHashMap body) {
+
+        System.out.println("Body: " + body.getClass().getSimpleName() );
+        System.out.println("Body: " + body.toString() );
+//        System.out.println("Body: " + body.get(0).toString() );
         SecurityContextHolder.getContext().setAuthentication(null);
-        Set<Product> productSet = new DataTransferObject(body).getProductSet();
+//        return new ResponseEntity("Check", HttpStatus.OK);
+        ArrayList<Object> bodyInternal = (ArrayList<Object>) body.get("product");
+        Set<Product> productSet = new DataTransferObject(bodyInternal).getProductSet();
         Map<String, Integer> results = new HashMap();
         for (Product p : productSet){
             DbResult dbResult = new Insert().product(p);
@@ -80,11 +120,20 @@ public class ProductController {
     // TODO needs fix. Not working.
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> updateProduct(@PathVariable String name22, @RequestBody String name) {
-        SecurityContextHolder.getContext().setAuthentication(null);
-        DbResult dbResult = new Select().findProduct(name);
-        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
-        Product product = dbResult.getResult(Product.class);
+    @ApiOperation(value = "Update available product by name.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product updated."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductUpdateRequestBody.class)
+    public ResponseEntity<String> updateProduct(@RequestBody ProductUpdateRequestBody body) {
+//        SecurityContextHolder.getContext().setAuthentication(null);
+//        DbResult dbResult = new Select().findProduct(name);
+//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
+//        Product product = dbResult.getResult(Product.class);
         return new ResponseEntity(HttpStatus.OK);
     }
 

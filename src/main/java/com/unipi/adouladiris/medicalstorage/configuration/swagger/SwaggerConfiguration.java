@@ -1,6 +1,8 @@
 package com.unipi.adouladiris.medicalstorage.configuration.swagger;
 
 import com.fasterxml.classmate.TypeResolver;
+import com.unipi.adouladiris.medicalstorage.rest.dto.ProductInsertRequestBody;
+import com.unipi.adouladiris.medicalstorage.rest.dto.ProductUpdateRequestBody;
 import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
 import com.unipi.adouladiris.medicalstorage.rest.dto.UserRequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,10 @@ public class SwaggerConfiguration  {
         return new Docket(DocumentationType.SWAGGER_2)
                 .tags(new Tag(ProductController, "MedicalStorage Product API"))
                 .groupName("Medical Storage Api v1 - Product")
+                .additionalModels(
+                        typeResolver.resolve(ProductUpdateRequestBody.class),
+                        typeResolver.resolve(ProductInsertRequestBody.class)
+                )
                 .apiInfo(apiInfo())
                 .globalRequestParameters(authorizationParameter())
                 .select()

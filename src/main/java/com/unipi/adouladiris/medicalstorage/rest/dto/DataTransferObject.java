@@ -25,12 +25,13 @@ public class DataTransferObject {
     private Set<Product> payloadToProductSet(ArrayList<Object> body){
         Set<Product> productSet = new HashSet<>();
         for(int i=0; i<body.size(); i++){
+            System.out.println("Deserialize start");
             Product product = new Product();
             Map<String, HashMap> subMap = Map.class.cast(body.get(i));
             HashMap<String, HashMap> nameTabMap = subMap.get("Substance");
             for (Map.Entry e : nameTabMap.entrySet() ){
 
-//                System.out.println(e.getKey());
+                System.out.println(e.getKey());
                 Substance substance = new Substance(e.getKey().toString());
                 TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ public class DataTransferObject {
                 for(HashMap<String, HashMap> tabValueJSON : tabValueJSONList ){
                     for (Map.Entry tabValueJSONEntry : tabValueJSON.entrySet() ){
 
-//                        System.out.println(tabValueJSONEntry.getKey());
+                        System.out.println(tabValueJSONEntry.getKey());
                         Tab tab = new Tab(tabValueJSONEntry.getKey().toString());
                         TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
                         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,19 +47,19 @@ public class DataTransferObject {
                         for(HashMap<String, HashMap> categoryValueJSON : categoryValueJSONList ){
                             for (Map.Entry categoryValueJSONEntry : categoryValueJSON.entrySet() ){
 
-//                                System.out.println(categoryValueJSONEntry.getKey());
+                                System.out.println(categoryValueJSONEntry.getKey());
                                 Category category = new Category(categoryValueJSONEntry.getKey().toString());
                                 TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
                                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                 ArrayList<HashMap> itemValueJSONList = ArrayList.class.cast(HashMap.class.cast(categoryValueJSONEntry.getValue()).get("Item"));
                                 for (HashMap itemValueJSON : itemValueJSONList){
 
-//                                    System.out.println(itemValueJSON.get("Title"));
-//                                    System.out.println(itemValueJSON.get("Description"));
+                                    System.out.println(itemValueJSON.get("Title"));
+                                    System.out.println(itemValueJSON.get("Description"));
                                     ArrayList<String> tagList = ArrayList.class.cast(itemValueJSON.get("Tag"));
                                     TreeSet<Tag> tagSet = new TreeSet<>();
                                     for(String tag: tagList ){
-//                                        System.out.println(tag);
+                                        System.out.println(tag);
                                         Tag newTag = new Tag(tag);
                                         tagSet.add(newTag);
                                     }

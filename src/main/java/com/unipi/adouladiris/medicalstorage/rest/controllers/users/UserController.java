@@ -35,9 +35,9 @@ public class UserController {
     @GetMapping(value = "information")
     @ApiOperation(value = "Get User Information", response = String.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Authorized User was found!"),
-            @ApiResponse(code = 401, message = "Authorized User was not found!"),
-            @ApiResponse(code = 403, message = "Authorized User was found but Permission denied!"),
+            @ApiResponse(code = 200, message = "Authorized User found!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
@@ -53,9 +53,9 @@ public class UserController {
     @PreAuthorize("permitAll()")
     @ApiOperation(value = "Request Auth Token using credentials", response = String.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "JsonWebToken has been generated!"),
-            @ApiResponse(code = 401, message = "not authorized!"),
-            @ApiResponse(code = 403, message = "No User Logged In!"),
+            @ApiResponse(code = 200, message = "JsonWebToken generated!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
@@ -100,11 +100,11 @@ public class UserController {
     @PreAuthorize("permitAll()")
     @ApiOperation(value = "Don't have a account? Register here!")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "User has been created!"),
-            @ApiResponse(code = 401, message = "not authorized!"),
-            @ApiResponse(code = 403, message = "forbidden!!!"),
-            @ApiResponse(code = 404, message = "The requested resource could not be found!"),
-            @ApiResponse(code = 500, message = "Server Internal Error at executing request")
+            @ApiResponse(code = 200, message = "User has been created."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     @ApiImplicitParam(name = "registerUserRequestBody", dataTypeClass = RegisterUserRequestBody.class)
     public ResponseEntity<RegisterUserRequestBody>  registerUser(@RequestBody RegisterUserRequestBody registerUserRequestBody) {
@@ -130,8 +130,8 @@ public class UserController {
     @ApiOperation(value = "Perform User Logout", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Authenticated User logged out!"),
-            @ApiResponse(code = 401, message = "not authorized!"),
-            @ApiResponse(code = 403, message = "Authenticated User not logged in!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
