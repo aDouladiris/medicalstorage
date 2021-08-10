@@ -1,5 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.dto;
 
+import com.google.common.collect.Iterators;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import org.json.JSONObject;
@@ -21,6 +22,121 @@ public class DataTransferObject {
         this.jsonSet = productSetToJsonObject(products);
     }
     public DataTransferObject(ArrayList<Object> body)    { this.productSet = payloadToProductSet(body);     }
+    public DataTransferObject(LinkedHashMap body)    { this.productSet = payloadToProductSet(body);     }
+
+    private Set<Product> payloadToProductSet(LinkedHashMap body){
+
+        Set<Product> productSet = new HashSet<>();
+        Product product = new Product();
+//        TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
+//        TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
+//        TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
+//        Item item = new Item();
+
+        String previousKey=null;
+
+        Substance substance = null;
+        Tab tab = null;
+        Category category = null;
+        Item item = null;
+        Tag tag = null;
+
+
+        Iterator iterator = body.entrySet().iterator();
+
+        while (iterator.hasNext()){
+
+            Object object = iterator.next();
+
+            if(object.getClass().getSimpleName().equals("Entry")){
+
+                Map.Entry entry = (Map.Entry) object;
+                String key = (String) entry.getKey();
+
+                if(!entry.getValue().getClass().getSimpleName().equals("ArrayList") &&
+                        !entry.getValue().getClass().getSimpleName().equals("LinkedHashMap") ){
+                    System.out.println(key + ": " + entry.getValue().toString());
+
+                    if(key.equals("Title")){
+                        item = new Item();
+                        item.setName(entry.getValue().toString());
+                    }
+                    else if(key.equals("Description")){
+                        item.setDescription(entry.getValue().toString());
+                    }
+
+                }
+                else if (key.equals("Tag")){
+                    ArrayList<String> tagList = (ArrayList) entry.getValue();
+                    System.out.println(key + ": " + tagList.toString());
+
+//                    TreeSet<Tag> tagSet = new TreeSet<>();
+//                    for(String tag: tagList ){
+//                        System.out.println(tag);
+//                        Tag newTag = new Tag(tag);
+//                        tagSet.add(newTag);
+//                    }
+//
+//                    itemMap.put(item, tagSet);
+//                    item = new Item();
+                }
+                else {
+                    System.out.println(key);
+
+                    if(previousKey != null && previousKey.equals("Category")){
+                        category = new Category(key);
+//                        categoryMap.put(category, itemMap);
+//                        System.out.println("ItemMap" + itemMap.toString() );
+//                        System.out.println("categoryMap" + categoryMap.toString() );
+//                        itemMap = new TreeMap();
+                    }
+
+                    if(previousKey != null && previousKey.equals("Tab")){
+                        tab = new Tab(key);
+//                        tabMap.put(tab, categoryMap);
+//                        categoryMap = new TreeMap<>();
+                    }
+
+                    if(previousKey != null && previousKey.equals("Substance")){
+                        substance = new Substance(key);
+//
+//                        product.getProduct().put(substance, tabMap);
+//                        tabMap = new TreeMap();
+                    }
+
+                    if(previousKey != null && previousKey.equals("product")){
+//                        productSet.add(product);
+//                        product = new Product();
+                    }
+
+                    previousKey = key;
+                }
+
+                if(entry.getValue().getClass().getSimpleName().equals("ArrayList") ){
+                    ArrayList arrayList = (ArrayList) entry.getValue();
+                    Iterator outer = iterator;
+                    Iterator inner = arrayList.iterator();
+                    iterator = Iterators.concat(inner, outer);
+                }
+                else if(entry.getValue().getClass().getSimpleName().equals("LinkedHashMap")  ){
+                    LinkedHashMap linkedHashMap = (LinkedHashMap) entry.getValue();
+                    Iterator outer = iterator;
+                    Iterator inner = linkedHashMap.entrySet().iterator();
+                    iterator = Iterators.concat(inner, outer);
+                }
+            }
+            else if(object.getClass().getSimpleName().equals("LinkedHashMap") ){
+                LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+                Iterator outer = iterator;
+                Iterator inner = linkedHashMap.entrySet().iterator();
+                iterator = Iterators.concat(inner, outer);
+            }
+
+        }
+
+        return productSet;
+
+    }
 
     private Set<Product> payloadToProductSet(ArrayList<Object> body){
         Set<Product> productSet = new HashSet<>();

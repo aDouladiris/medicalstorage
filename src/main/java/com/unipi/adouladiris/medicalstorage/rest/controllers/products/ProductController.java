@@ -105,103 +105,64 @@ public class ProductController {
         SecurityContextHolder.getContext().setAuthentication(null);
 //        return new ResponseEntity("Check", HttpStatus.OK);
 
-        int depth=0;
 
-        Iterator iterator = body.entrySet().iterator();
-
-        while (iterator.hasNext()){
-
-            Object object = iterator.next();
-//            System.out.println("Object: " + object.getClass().getSimpleName());
-//            System.out.println("Object: " + object.toString());
-
-            if(object.getClass().getSimpleName().equals("Entry")){
-
-                Map.Entry entry = (Map.Entry) object;
-                String key = (String) entry.getKey();
-
-                System.out.println("class: " + entry.getValue().getClass().getSimpleName());
-                if(!entry.getValue().getClass().getSimpleName().equals("ArrayList") &&
-                        !entry.getValue().getClass().getSimpleName().equals("LinkedHashMap") ){
-                    System.out.println(key + ": " + entry.getValue().toString());
-
-                }
-                else if (key.equals("Tag")){
-                    System.out.println("Tag inner class: " + entry.getValue().getClass().getSimpleName());
-                    ArrayList arrayList = (ArrayList) entry.getValue();
-                    System.out.println(arrayList.toString());
-                }
-                else System.out.println("Key: " + key);
-
-                if(entry.getValue().getClass().getSimpleName().equals("ArrayList") ){
-                    ArrayList arrayList = (ArrayList) entry.getValue();
-                    Iterator outer = iterator;
-                    Iterator inner = arrayList.iterator();
-                    iterator = Iterators.concat(inner, outer);
-                }
-                else if(entry.getValue().getClass().getSimpleName().equals("LinkedHashMap")  ){
-                    LinkedHashMap linkedHashMap = (LinkedHashMap) entry.getValue();
-                    //System.out.println("Size1: " + linkedHashMap.size());
-                    //iterator = (linkedHashMap).entrySet().iterator();
-                    Iterator outer = iterator;
-                    Iterator inner = linkedHashMap.entrySet().iterator();
-                    iterator = Iterators.concat(inner, outer);
-                }
-            }
-            else if(object.getClass().getSimpleName().equals("LinkedHashMap") ){
-                LinkedHashMap linkedHashMap = (LinkedHashMap) object;
-                Iterator outer = iterator;
-                Iterator inner = linkedHashMap.entrySet().iterator();
-                iterator = Iterators.concat(inner, outer);
-            }
-
-
-
-
-
-
-//            Iterator iterator2 = entry.getValue().iterator();
-//            while (iterator2.hasNext()){
+//        Iterator iterator = body.entrySet().iterator();
 //
-//                ArrayList arrayList = (ArrayList) iterator2.next();
-//                entry = (Map.Entry) arrayList.get(0);
+//        while (iterator.hasNext()){
 //
-//                System.out.println(entry.getKey());
-//                System.out.println(entry.getValue().getClass().getSimpleName());
+//            Object object = iterator.next();
 //
+//            if(object.getClass().getSimpleName().equals("Entry")){
 //
+//                Map.Entry entry = (Map.Entry) object;
+//                String key = (String) entry.getKey();
+//
+//                if(!entry.getValue().getClass().getSimpleName().equals("ArrayList") &&
+//                        !entry.getValue().getClass().getSimpleName().equals("LinkedHashMap") ){
+//                    System.out.println(key + ": " + entry.getValue().toString());
+//
+//                }
+//                else if (key.equals("Tag")){
+//                    ArrayList arrayList = (ArrayList) entry.getValue();
+//                    System.out.println(key + ": " + arrayList.toString());
+//                }
+//                else System.out.println(key);
+//
+//                if(entry.getValue().getClass().getSimpleName().equals("ArrayList") ){
+//                    ArrayList arrayList = (ArrayList) entry.getValue();
+//                    Iterator outer = iterator;
+//                    Iterator inner = arrayList.iterator();
+//                    iterator = Iterators.concat(inner, outer);
+//                }
+//                else if(entry.getValue().getClass().getSimpleName().equals("LinkedHashMap")  ){
+//                    LinkedHashMap linkedHashMap = (LinkedHashMap) entry.getValue();
+//                    Iterator outer = iterator;
+//                    Iterator inner = linkedHashMap.entrySet().iterator();
+//                    iterator = Iterators.concat(inner, outer);
+//                }
 //            }
-
-
-        }
-
-
-//        if(entry.getKey().getClass().getSimpleName().equals("String") && entry.getValue().getClass().getSimpleName().equals("ArrayList") ){
-//
-//            String product = (String) entry.getKey();
-//            ArrayList arrayList = (ArrayList) entry.getValue();
-//            entry = (Map.Entry) arrayList.get(0);
-//
-//            System.out.println(entry.getKey());
-//            System.out.println(entry.getValue().getClass().getSimpleName());
+//            else if(object.getClass().getSimpleName().equals("LinkedHashMap") ){
+//                LinkedHashMap linkedHashMap = (LinkedHashMap) object;
+//                Iterator outer = iterator;
+//                Iterator inner = linkedHashMap.entrySet().iterator();
+//                iterator = Iterators.concat(inner, outer);
+//            }
 //
 //        }
 
 
-
-
-
-//        ArrayList<Object> bodyInternal = (ArrayList<Object>) body.get("product");
-//        Set<Product> productSet = new DataTransferObject(bodyInternal).getProductSet();
-//        Map<String, Integer> results = new HashMap();
-//        for (Product p : productSet){
+        Set<Product> productSet = new DataTransferObject(body).getProductSet();
+        Map<String, Integer> results = new HashMap();
+        System.out.println("pSet size: " + productSet.size());
+        for (Product p : productSet){
+            System.out.println(p.getProduct().toString());;
 //            DbResult dbResult = new Insert().product(p);
 //            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
 //            results = resultMap;
-//        }
-//
-//        //TODO review response format
-////        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
+        }
+
+        //TODO review response format
+//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
 //        return new ResponseEntity(results.toString(), HttpStatus.OK);
 
         return new ResponseEntity("hello", HttpStatus.OK);
