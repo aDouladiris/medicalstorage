@@ -50,19 +50,35 @@ public class Select extends SessionManager implements SelectInterface {
         Product product = null;
 
         for(Object[] row: queryResultList){
+
+//            System.out.println("==============================Insert=============================");
             Substance substance = (Substance)row[0];
-            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
+//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             Tab tab = (Tab)row[1];
-            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
+//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             Category category = (Category)row[2];
-            System.out.println("To insert: " + category.getId() + " " + category.getName());
+//            System.out.println("To insert: " + category.getId() + " " + category.getName());
             Item item = (Item)row[3];
-            System.out.println("To insert: " + item.getId() + " " + item.getName());
+//            System.out.println("To insert: " + item.getId() + " " + item.getName());
             Tag tag = (Tag)row[4];
-            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
+//            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
+//            System.out.println("==============================Insert=============================");
+//
+//            System.out.println("To insert: " + substance);
+//            if(product != null) System.out.println("Inside product" + product.getProduct().keySet().toString());
+
+            if(!productSet.isEmpty()) {
+                for (Product containedProduct : productSet){
+                    if(containedProduct.getProduct().containsKey( substance )){
+                        product = containedProduct;
+                    }
+                }
+            }
 
             // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
+//                System.out.println("New product");
+
                 // Create new Product.
                 product = new Product();
                 // Create new TreeSet of Tags.
@@ -130,9 +146,9 @@ public class Select extends SessionManager implements SelectInterface {
 //            product.printProduct();
 //            System.out.println("------------------ update review ----------------");
         }
-        System.out.println("*************Product found*************");
-        productSet.forEach(p -> p.printProduct() );
-        System.out.println("*************Product found*************");
+//        System.out.println("*************Product found*************");
+//        productSet.forEach(p -> p.printProduct() );
+//        System.out.println("*************Product found*************");
 
         dbResult.setResult(productSet);
         return dbResult;
@@ -188,6 +204,7 @@ public class Select extends SessionManager implements SelectInterface {
 
             // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
+//                System.out.println("New product");
                 // Create new Product.
                 product = new Product();
                 // Create new TreeSet of Tags.
