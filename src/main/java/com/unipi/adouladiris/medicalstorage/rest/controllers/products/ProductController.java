@@ -153,21 +153,19 @@ public class ProductController {
 
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
         Map<String, Integer> results = new HashMap();
-        System.out.println("pSet size: " + productSet.size());
+        //System.out.println("pSet size: " + productSet.size());
         for (Product p : productSet){
 //            System.out.println(p.getProduct().toString());
-            p.printProduct();
-            System.out.println("-------------------------------------");
-//            DbResult dbResult = new Insert().product(p);
-//            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
-//            results = resultMap;
+//            p.printProduct();
+//            System.out.println("-------------------------------------");
+            DbResult dbResult = new Insert().product(p);
+            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
+            results = resultMap;
         }
 
         //TODO review response format
-//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
-//        return new ResponseEntity(results.toString(), HttpStatus.OK);
-
-        return new ResponseEntity("hello", HttpStatus.OK);
+        //if (dbResult.isEmpty()) return new ResponseEntity("Product not created!", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(results.toString(), HttpStatus.OK);
 
     }
 
