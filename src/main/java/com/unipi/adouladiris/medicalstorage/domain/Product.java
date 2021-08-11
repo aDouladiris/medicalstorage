@@ -46,17 +46,22 @@ public class Product extends Operable {
             System.out.println("Substance : " + substance.getName() );
 
             for( Tab tab : this.product.get(substance).keySet() ){
-                System.out.println("Tab       : " + tab.getName() );
+                System.out.println("    Tab       : " + tab.getName() );
 
                 for ( Category category : this.product.get(substance).get(tab).keySet() ){
-                    System.out.println("Category  : " + category.getName() );
+                    System.out.println("        Category  : " + category.getName() );
 
                     for ( Item item : this.product.get(substance).get(tab).get(category).keySet() ){
-                        System.out.println("Item      : <" + item.getName() + "> " + item.getDescription() );
-
-                        for ( Tag tag : this.product.get(substance).get(tab).get(category).get( item ) ){
-                            System.out.println("Tag       : #" + tag.getName() );
+                        System.out.println("            Item      : <" + item.getName() + "> " + item.getDescription() );
+                        ArrayList<String> tagList = new ArrayList();
+                        for(Tag tag : this.product.get(substance).get(tab).get(category).get( item ) ){
+                            tagList.add(tag.getName());
                         }
+                        System.out.println("                Tag       : #" + tagList);
+
+
+
+
                     }
                 }
             }

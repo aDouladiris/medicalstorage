@@ -155,7 +155,9 @@ public class ProductController {
         Map<String, Integer> results = new HashMap();
         System.out.println("pSet size: " + productSet.size());
         for (Product p : productSet){
-            System.out.println(p.getProduct().toString());;
+//            System.out.println(p.getProduct().toString());
+            p.printProduct();
+            System.out.println("-------------------------------------");
 //            DbResult dbResult = new Insert().product(p);
 //            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
 //            results = resultMap;
