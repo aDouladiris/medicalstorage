@@ -50,17 +50,16 @@ public class Select extends SessionManager implements SelectInterface {
         Product product = null;
 
         for(Object[] row: queryResultList){
-
             Substance substance = (Substance)row[0];
-//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
+            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             Tab tab = (Tab)row[1];
-//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
+            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             Category category = (Category)row[2];
-//            System.out.println("To insert: " + category.getId() + " " + category.getName());
+            System.out.println("To insert: " + category.getId() + " " + category.getName());
             Item item = (Item)row[3];
-//            System.out.println("To insert: " + item.getId() + " " + item.getName());
+            System.out.println("To insert: " + item.getId() + " " + item.getName());
             Tag tag = (Tag)row[4];
-//            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
+            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
 
             // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
@@ -121,6 +120,9 @@ public class Select extends SessionManager implements SelectInterface {
                     TreeMap<Category, TreeMap<Item, TreeSet<Tag>> > categoryItemTagTreeMap = new TreeMap<>();
                     categoryItemTagTreeMap.put( category, itemTagTreeMap );
                     product.getProduct().get(substance).put( tab, categoryItemTagTreeMap );
+//                    System.out.println("*************Product found*************");
+//                    product.printProduct();
+//                    System.out.println("*************Product found*************");
                 }
             }
 
@@ -128,6 +130,9 @@ public class Select extends SessionManager implements SelectInterface {
 //            product.printProduct();
 //            System.out.println("------------------ update review ----------------");
         }
+        System.out.println("*************Product found*************");
+        productSet.forEach(p -> p.printProduct() );
+        System.out.println("*************Product found*************");
 
         dbResult.setResult(productSet);
         return dbResult;
@@ -299,8 +304,8 @@ public class Select extends SessionManager implements SelectInterface {
     @Override
     public DbResult findOperableEntityByName(@NotNull Class<? extends Operable> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
-        System.out.println("Name  to Insert: " + name);
-        System.out.println("Class to Insert: " + entityClassName);
+//        System.out.println("Name  to Insert: " + name);
+//        System.out.println("Class to Insert: " + entityClassName);
         // Tables cannot be parameter values
         StringBuilder select = new StringBuilder();
         if( entityClassName.equals( "Substance" ) ){

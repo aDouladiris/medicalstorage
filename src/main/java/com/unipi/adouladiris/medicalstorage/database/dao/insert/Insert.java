@@ -14,11 +14,15 @@ import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Insert extends SessionManager implements InsertInterface {
 
     @Override
     public DbResult product(@NotNull Product product) {
+
+        Set<HashMap> results = new HashSet();
 
         for( Substance substance: product.getProduct().keySet() ){
 //            System.out.println("Substance : " + substance.getName() );
@@ -36,23 +40,14 @@ public class Insert extends SessionManager implements InsertInterface {
 //                            System.out.println("Tag       : #" + tag.getName() );
 
                             // Insert keys with value at each iteration.
-                            DbResult dbResult = product(substance, tab, category, item, tag);
-
-//                            Map<String,Integer> map = dbResult.getResult( Map.class );
-//
-//                            for ( Map.Entry<String, Integer> entry : map.entrySet() ){
-//                                System.out.println(entry.getKey() + " => " + entry.getValue() );
-//                            }
-
-                            return dbResult;
-
+                            results.add(product(substance, tab, category, item, tag).getResult(HashMap.class));
                         }
                     }
                 }
             }
         }
 
-        return new DbResult();
+        return new DbResult(results);
     }
 
     @Override

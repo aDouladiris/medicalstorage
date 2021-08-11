@@ -98,75 +98,13 @@ public class ProductController {
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
     public ResponseEntity<String> insertProduct(@RequestBody LinkedHashMap body) {
-
-//        System.out.println("Body: " + body.getClass().getSimpleName() );
-//        System.out.println("Body: " + body.toString() );
-//        System.out.println("Body: " + body.get(0).toString() );
         SecurityContextHolder.getContext().setAuthentication(null);
-//        return new ResponseEntity("Check", HttpStatus.OK);
-
-
-//        Iterator iterator = body.entrySet().iterator();
-//
-//        while (iterator.hasNext()){
-//
-//            Object object = iterator.next();
-//
-//            if(object.getClass().getSimpleName().equals("Entry")){
-//
-//                Map.Entry entry = (Map.Entry) object;
-//                String key = (String) entry.getKey();
-//
-//                if(!entry.getValue().getClass().getSimpleName().equals("ArrayList") &&
-//                        !entry.getValue().getClass().getSimpleName().equals("LinkedHashMap") ){
-//                    System.out.println(key + ": " + entry.getValue().toString());
-//
-//                }
-//                else if (key.equals("Tag")){
-//                    ArrayList arrayList = (ArrayList) entry.getValue();
-//                    System.out.println(key + ": " + arrayList.toString());
-//                }
-//                else System.out.println(key);
-//
-//                if(entry.getValue().getClass().getSimpleName().equals("ArrayList") ){
-//                    ArrayList arrayList = (ArrayList) entry.getValue();
-//                    Iterator outer = iterator;
-//                    Iterator inner = arrayList.iterator();
-//                    iterator = Iterators.concat(inner, outer);
-//                }
-//                else if(entry.getValue().getClass().getSimpleName().equals("LinkedHashMap")  ){
-//                    LinkedHashMap linkedHashMap = (LinkedHashMap) entry.getValue();
-//                    Iterator outer = iterator;
-//                    Iterator inner = linkedHashMap.entrySet().iterator();
-//                    iterator = Iterators.concat(inner, outer);
-//                }
-//            }
-//            else if(object.getClass().getSimpleName().equals("LinkedHashMap") ){
-//                LinkedHashMap linkedHashMap = (LinkedHashMap) object;
-//                Iterator outer = iterator;
-//                Iterator inner = linkedHashMap.entrySet().iterator();
-//                iterator = Iterators.concat(inner, outer);
-//            }
-//
-//        }
-
-
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
-        Map<String, Integer> results = new HashMap();
-        //System.out.println("pSet size: " + productSet.size());
-        for (Product p : productSet){
-//            System.out.println(p.getProduct().toString());
-//            p.printProduct();
-//            System.out.println("-------------------------------------");
-            DbResult dbResult = new Insert().product(p);
-            HashMap<String, Integer> resultMap =  dbResult.getResult(HashMap.class);
-            results = resultMap;
-        }
-
+        Set<HashSet> results = new HashSet();
+        productSet.forEach(product -> {DbResult dbResult = new Insert().product(product); results.add( dbResult.getResult(HashSet.class) );});
         //TODO review response format
         //if (dbResult.isEmpty()) return new ResponseEntity("Product not created!", HttpStatus.NOT_FOUND);
         return new ResponseEntity(results.toString(), HttpStatus.OK);
-
     }
 
     // TODO needs fix. Not working.
