@@ -127,8 +127,7 @@ public class ProductController {
         }
     }
 
-    // TODO needs fix. Not working.
-    @PutMapping("{name}")
+    @PutMapping("")
     @PreAuthorize("hasRole('admin')")
     @ApiOperation(value = "Update available product by name.")
     @ApiResponses(value = {
@@ -138,12 +137,12 @@ public class ProductController {
             @ApiResponse(code = 404, message = "The requested resource could not be found."),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
-    @ApiImplicitParam(name = "body", dataTypeClass = ProductUpdateRequestBody.class)
-    public ResponseEntity<String> updateProduct(@RequestBody ProductUpdateRequestBody body) {
-//        SecurityContextHolder.getContext().setAuthentication(null);
-//        DbResult dbResult = new Select().findProduct(name);
-//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
-//        Product product = dbResult.getResult(Product.class);
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
+    public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        Set<Product> productSet = new DataTransferObject(body).getProductSet();
+
+
         return new ResponseEntity(HttpStatus.OK);
     }
 
