@@ -19,6 +19,8 @@ public class Delete extends SessionManager implements DeleteInterface {
             Object object = session.find(typeClass, id);
             session.remove(object);
             session.getTransaction().commit();
+            session.clear();
+            sessionFactory.getCache().evictAll();
             return new DbResult(true);
         } catch (PersistenceException ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
@@ -34,6 +36,8 @@ public class Delete extends SessionManager implements DeleteInterface {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             session.remove( objectToDelete );
             session.getTransaction().commit();
+            session.clear();
+            sessionFactory.getCache().evictAll();
             return new DbResult(true);
         } catch (Exception ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }

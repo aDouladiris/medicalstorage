@@ -13,6 +13,7 @@ import com.unipi.adouladiris.medicalstorage.entities.users.User;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,6 +22,15 @@ public class Insert extends SessionManager implements InsertInterface {
 
     @Override
     public DbResult product(@NotNull Product product) {
+
+        for (Substance newSubstance : product.getProduct().keySet() ){
+            if(!new Select().findProduct(newSubstance.getName()).isEmpty()){
+                System.out.println("newSubstance: " + newSubstance);
+                return new DbResult(newSubstance);
+            }
+        }
+
+        System.out.println("To insert: " + product.getProduct().keySet().toString());
 
         Set<HashMap> results = new HashSet();
 

@@ -9,6 +9,7 @@ import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
 import io.swagger.annotations.*;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -92,8 +93,9 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product inserted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
-            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)."),
             @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 409, message = "Product already exists."),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
@@ -101,10 +103,28 @@ public class ProductController {
         SecurityContextHolder.getContext().setAuthentication(null);
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
         Set<HashSet> results = new HashSet();
-        productSet.forEach(product -> {DbResult dbResult = new Insert().product(product); results.add( dbResult.getResult(HashSet.class) );});
-        //TODO review response format
-        //if (dbResult.isEmpty()) return new ResponseEntity("Product not created!", HttpStatus.NOT_FOUND);
-        return new ResponseEntity(results.toString(), HttpStatus.OK);
+        Set<String> failures = new HashSet();
+
+        productSet.forEach(product -> {
+            DbResult dbResult = new Insert().product(product);
+            if(dbResult.getResult().getClass().equals(Substance.class)) failures.add(dbResult.getResult(Substance.class).getName());
+            else results.add(dbResult.getResult(HashSet.class));
+        });
+
+        JSONObject response = new JSONObject();
+        if(results.isEmpty() && !failures.isEmpty()){
+            response.put("failures", failures);
+            return new ResponseEntity(response.toString() + " already exists.", HttpStatus.CONFLICT);
+        }
+        else if(!results.isEmpty() && failures.isEmpty()){
+            response.put("results", results);
+            return new ResponseEntity(response.toString() + " all products successfully inserted.", HttpStatus.OK);
+        }
+        else{
+            response.put("results", results);
+            response.put("failures", failures);
+            return new ResponseEntity(response.toString(), HttpStatus.OK);
+        }
     }
 
     // TODO needs fix. Not working.
