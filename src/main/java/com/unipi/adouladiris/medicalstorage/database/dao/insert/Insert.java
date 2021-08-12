@@ -60,8 +60,8 @@ public class Insert extends SessionManager implements InsertInterface {
         return new DbResult(results);
     }
 
-    @Override
-    public DbResult queryableEntity(Queryable queryable) {
+    //@Override
+    private DbResult queryableEntity(Queryable queryable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Serializable insertedId =  session.save(queryable);
@@ -74,8 +74,8 @@ public class Insert extends SessionManager implements InsertInterface {
         }
     }
 
-    @Override
-    public DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
+    //@Override
+    private DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
 
         //TODO extract method
