@@ -10,7 +10,6 @@ import java.util.*;
 public class ProductInsertRequestBody {
 
     @ApiModelProperty(
-            notes = "Name of the User",
             name="product",
             dataType = "array",
             required=true,

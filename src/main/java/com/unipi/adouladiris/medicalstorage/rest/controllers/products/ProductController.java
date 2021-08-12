@@ -5,6 +5,8 @@ import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.dao.update.Update;
+import com.unipi.adouladiris.medicalstorage.database.dao.update.UpdateInterface;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
@@ -129,6 +131,29 @@ public class ProductController {
 
     @PutMapping("")
     @PreAuthorize("hasRole('admin')")
+    @ApiOperation(value = "Update matching products.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product updated."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductUpdateRequestBody.class)
+    public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        UpdateInterface updateInterface = new Update();
+        Set<Product> productSet = new DataTransferObject(body).getProductSet();
+        productSet.forEach(product -> {
+            DbResult dbResult = updateInterface.product(product);
+            //if(dbResult.isEmpty())
+        });
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PutMapping("{name}")
+    @PreAuthorize("hasRole('admin')")
     @ApiOperation(value = "Update available product by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
@@ -137,11 +162,15 @@ public class ProductController {
             @ApiResponse(code = 404, message = "The requested resource could not be found."),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
-    @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
-    public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductReplaceRequestBody.class)
+    public ResponseEntity<String> replaceProduct(@PathVariable String name, @RequestBody LinkedHashMap body) {
         SecurityContextHolder.getContext().setAuthentication(null);
-        Set<Product> productSet = new DataTransferObject(body).getProductSet();
+        DbResult dbResult = new Select().findProduct(name);
+        if(dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
 
+        Product product = dbResult.getResult(Product.class);
+        UpdateInterface updateInterface = new Update();
+        updateInterface.replaceProduct(product, body);
 
         return new ResponseEntity(HttpStatus.OK);
     }

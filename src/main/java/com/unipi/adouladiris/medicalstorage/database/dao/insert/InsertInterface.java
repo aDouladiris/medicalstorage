@@ -11,7 +11,7 @@ public interface InsertInterface {
 
     //DbResult queryableEntity(@NotNull Queryable queryable);
     DbResult product(@NotNull Product product);
-    //DbResult product(@NotNull Substance substance, @NotNull Tab tab, @NotNull Category category, @NotNull Item item, @NotNull Tag tag);
+    DbResult product(@NotNull Substance substance, @NotNull Tab tab, @NotNull Category category, @NotNull Item item, @NotNull Tag tag);
     //TODO need review
 //    DbResult product(@NotNull Substance substance, @NotNull Tab tab, @NotNull Category category, @NotNull Item item, @NotNull TreeSet<Tag> tagSet);
 //    DbResult product(@NotNull Substance substance, @NotNull Tab tab, @NotNull Category category, @NotNull TreeSet<Item> itemTreeSet, @NotNull TreeSet<Tag> tagTreeSet);

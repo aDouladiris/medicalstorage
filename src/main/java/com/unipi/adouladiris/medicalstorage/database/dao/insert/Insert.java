@@ -30,8 +30,6 @@ public class Insert extends SessionManager implements InsertInterface {
             }
         }
 
-        System.out.println("To insert: " + product.getProduct().keySet().toString());
-
         Set<HashMap> results = new HashSet();
 
         for( Substance substance: product.getProduct().keySet() ){
@@ -74,8 +72,8 @@ public class Insert extends SessionManager implements InsertInterface {
         }
     }
 
-    //@Override
-    private DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
+    @Override
+    public DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
 
         //TODO extract method
