@@ -523,6 +523,8 @@ public class Select extends SessionManager implements SelectInterface {
     @Override
     public DbResult findByTag(String tag){
 
+        Set<Product> results = new HashSet();
+
         String select = "SELECT " +         // returns a list of objects
                 "st.substance " +  // Substance Object
                 "FROM SubstanceTabCategoryItemTag stcit " +
@@ -546,9 +548,9 @@ public class Select extends SessionManager implements SelectInterface {
 
         for( Object o : queryResultList ) {
             Substance substance = (Substance)o;
-            return findProduct( substance.getName() );
+            results.add(findProduct( substance.getName() ).getResult(Product.class));
         }
-        return new DbResult();
+        return new DbResult(results);
     }
 
 

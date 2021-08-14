@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-//TODO needs interface
+//TODO needs rename
 public class DataTransferObject {
 
     private Set<JSONObject> jsonSet;
@@ -25,7 +25,7 @@ public class DataTransferObject {
     public DataTransferObject(ArrayList<Object> body)    { this.productSet = payloadToProductSet(body);     }
     public DataTransferObject(LinkedHashMap body)    { this.productSet = payloadToProductSet(body);     }
 
-    private Set<Product> payloadToProductSet(LinkedHashMap body){
+    private Set<Product> payloadToProductSet(LinkedHashMap body) throws ClassCastException{
         //System.out.println("body: " + body.toString());
         ArrayList arrayListProducts = (ArrayList) body.get("product");
         //System.out.println("arrayList: " + arrayListProducts);
@@ -178,7 +178,7 @@ public class DataTransferObject {
                                 tagList.add(tag.getName());
                             }
                             itemJO.put("Tag", tagList);
-                            itemJO.put("Descrption", item.getDescription());
+                            itemJO.put("Description", item.getDescription());
                             itemList.add(itemJO);
                         }
 

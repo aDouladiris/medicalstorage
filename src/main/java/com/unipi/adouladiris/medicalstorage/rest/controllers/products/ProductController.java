@@ -60,13 +60,39 @@ public class ProductController {
             @ApiResponse(code = 404, message = "The requested resource could not be found."),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
-    public ResponseEntity<String> getProduct(@PathVariable String name) {
+    public ResponseEntity<String> getProductByName(@PathVariable String name) {
         SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findProduct(name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         DataTransferObject dto = new DataTransferObject(product);
         return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
+    }
+
+    //TODO implement
+    @GetMapping("tag/{tag}")
+    @PreAuthorize("hasAnyRole('admin', 'customer')")
+    @ApiOperation(value = "Retrieve all available products by tag.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Product received."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
+    public ResponseEntity<String> getProductByTag(@PathVariable String tag) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        Set<Product> results =  new Select().findByTag(tag).getResult(HashSet.class);
+//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
+        Set<String> resultNames = new HashSet<>();
+        results.forEach(product -> {
+            product.getProduct().keySet().forEach(
+                    substance -> resultNames.add(substance.getName())
+            );
+        });
+
+        if(resultNames.isEmpty()) return new ResponseEntity("Tag not found!", HttpStatus.NOT_FOUND);
+        else return new ResponseEntity(resultNames.toString(), HttpStatus.OK);
     }
 
     @DeleteMapping("{name}")
@@ -144,12 +170,12 @@ public class ProductController {
         SecurityContextHolder.getContext().setAuthentication(null);
         UpdateInterface updateInterface = new Update();
         Set<Product> productSet = new DataTransferObject(body).getProductSet();
+        Set<HashSet> results = new HashSet();
         productSet.forEach(product -> {
-            DbResult dbResult = updateInterface.product(product);
-            //if(dbResult.isEmpty())
+            results.add(updateInterface.product(product).getResult(HashSet.class));
         });
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(results.toString(), HttpStatus.OK);
     }
 
     @PutMapping("{name}")

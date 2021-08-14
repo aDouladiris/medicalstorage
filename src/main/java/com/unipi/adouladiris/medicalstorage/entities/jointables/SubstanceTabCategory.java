@@ -28,6 +28,11 @@ public class SubstanceTabCategory extends Joinable {
     public SubstanceTabCategory(SubstanceTab substanceTab, Category category){ this.substanceTab = substanceTab; this.category = category; }
 
     public Category getCategory() { return category; }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public SubstanceTab getSubstanceTab() { return substanceTab; }
 
 }
