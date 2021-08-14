@@ -89,60 +89,98 @@ public class Update extends SessionManager implements UpdateInterface {
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
-        //System.out.println("bodyMap: " + bodyMap.toString());
 
         product.getProduct().forEach(
-                (substanceKey, substanceValue)  -> {
-                    if(bodyMap.containsKey("Substance")) System.out.println("Replace substance");
+                (substanceKey, substanceValue) -> { if(bodyMap.containsKey("Substance")){ processBodyKey((ArrayList) bodyMap.get("Substance"), substanceKey); }
                     substanceValue.forEach(
-                            (tabKey, tabValue) -> {
-                                if(bodyMap.containsKey("Tab")){
-                                    System.out.println("Replace tab");
-                                    ArrayList<HashMap> tabList = (ArrayList) bodyMap.get("Tab");
-                                    tabList.forEach(
-                                            replaceTab -> {
-                                                replaceTab.forEach(
-                                                        (oldTabKey, newTabKey) -> {
-
-                                                            SubstanceTab substanceTab = new Select().findJoinableEntityByName(SubstanceTab.class, substanceKey, tabKey).getResult(SubstanceTab.class);
-
-                                                            if(!session.getTransaction().isActive()) session.getTransaction().begin();
-                                                            Tab newTab;
-                                                            DbResult dbResult = new Select().findOperableEntityByName(Tab.class, newTabKey.toString());
-                                                            if(dbResult.isEmpty()){
-                                                                newTab = new Tab(newTabKey.toString());
-                                                                Integer newInsertedId = new Insert().queryableEntity(newTab).getResult(Integer.class);
-                                                                newTab = session.find(Tab.class, newInsertedId);
-                                                            }
-                                                            else newTab = dbResult.getResult(Tab.class);
-
-                                                            if(!session.getTransaction().isActive()) session.getTransaction().begin();
-                                                            //session.getReference(SubstanceTab.class, )
-                                                            substanceTab.setTab(newTab);
-                                                            session.merge(substanceTab);
-                                                            session.getTransaction().commit();
-
-                                                            Integer oldKeyPopulation = getRecordsCount(oldTabKey.toString()).getResult(Integer.class);
-
-                                                            if(oldKeyPopulation == 0){
-                                                                new Delete().deleteEntityByName(Tab.class, oldTabKey.toString());
-                                                            }
-
-
-                                                        });
-                                            }
-                                    );
-//                                    Tab oldTab = new Select().findOperableEntityByName();
-//                                    Object value = ((HashMap) bodyMap.get(substanceKey)).remove();
-
-                                    product.printProduct();
-                                }
-
+                            (tabKey, tabValue) -> { if(bodyMap.containsKey("Tab")) processBodyKey((ArrayList) bodyMap.get("Tab"), substanceKey, tabKey);
+                                tabValue.forEach(
+                                        (categoryKey, categoryValue) -> { if(bodyMap.containsKey("Category")) processBodyKey((ArrayList) bodyMap.get("Category"), substanceKey, tabKey, categoryKey);
+                                        categoryValue.forEach(
+                                                (itemKey, itemValue) -> { if(bodyMap.containsKey("Item")) processBodyKey((ArrayList) bodyMap.get("Item"), substanceKey, tabKey, categoryKey, itemKey);
+                                                    itemValue.forEach(
+                                                            tag -> { if(bodyMap.containsKey("Tag")) processBodyKey((ArrayList) bodyMap.get("Tag"), substanceKey, tabKey, categoryKey, itemKey, tag); }
+                                                            );
+                                                });
+                                        });
                             });
                 });
 
 
         return null;
+    }
+
+    private void processBodyKey(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
+
+        bodyArrayToProcess.forEach(
+                replacement -> {
+                    replacement.forEach( (oldKey, newKey) -> { updateJoinTable(indexEntities); }); }
+        );
+    }
+
+    private void updateJoinTable(Operable... indexEntities){
+
+        HashMap<Class<? extends Operable>, Operable> operableSet = new HashMap();
+        for(Operable entity : indexEntities){ operableSet.put(entity.getClass(), entity); }
+
+        StringBuilder queryBuilder = new StringBuilder();
+
+        if( operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
+                operableSet.containsKey(Item.class) && operableSet.containsKey(Tag.class)){
+
+            String select = "SELECT " +         // returns a list of objects
+                    "st.substance, " +  // Substance Object
+                    "st.tab, " +        // Tab Object
+                    "stc.category, " +  // Category Object
+                    "stci.item, " +      // Item Object
+                    "stcit.tag " +      // Tag Object
+                    "FROM SubstanceTabCategoryItemTag stcit " +
+                    "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
+                    "INNER JOIN stcit.tag " +
+
+                    "INNER JOIN stci.substanceTabCategory AS stc " +
+                    "INNER JOIN stci.item " +
+
+                    "INNER JOIN stc.substanceTab AS st " +
+                    "INNER JOIN stc.category " +
+
+                    "INNER JOIN st.substance " +
+                    "INNER JOIN st.tab ";
+
+            Query query = session.createQuery(select);
+            List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+
+
+        }
+
+
+//            SubstanceTab substanceTab = new Select().findJoinableEntityByName(SubstanceTab.class, substanceKey, tabKey).getResult(SubstanceTab.class);
+//
+//            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+//            Tab newTab;
+//            DbResult dbResult = new Select().findOperableEntityByName(Tab.class, newTabKey.toString());
+//            if(dbResult.isEmpty()){
+//                newTab = new Tab(newTabKey.toString());
+//                Integer newInsertedId = new Insert().queryableEntity(newTab).getResult(Integer.class);
+//                newTab = session.find(Tab.class, newInsertedId);
+//            }
+//            else newTab = dbResult.getResult(Tab.class);
+//
+//            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+//            //session.getReference(SubstanceTab.class, )
+//            substanceTab.setTab(newTab);
+//            session.merge(substanceTab);
+//            session.getTransaction().commit();
+//
+//            Integer oldKeyPopulation = getRecordsCount(oldTabKey.toString()).getResult(Integer.class);
+//
+//            if(oldKeyPopulation == 0){
+//                new Delete().deleteEntityByName(Tab.class, oldTabKey.toString());
+//            }
+
+
+
     }
 
     private DbResult getRecordsCount(String oldKey){
