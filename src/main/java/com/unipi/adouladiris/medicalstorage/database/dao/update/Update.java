@@ -1,20 +1,22 @@
 package com.unipi.adouladiris.medicalstorage.database.dao.update;
 
 import com.sun.istack.NotNull;
+import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
+import com.unipi.adouladiris.medicalstorage.database.dao.delete.DeleteInterface;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.InsertInterface;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
+import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTab;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import javax.persistence.Query;
+import java.util.*;
 
 
 public class Update extends SessionManager implements UpdateInterface {
@@ -87,20 +89,68 @@ public class Update extends SessionManager implements UpdateInterface {
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
-        System.out.println("bodyMap: " + bodyMap.toString());
+        //System.out.println("bodyMap: " + bodyMap.toString());
 
         product.getProduct().forEach(
                 (substanceKey, substanceValue)  -> {
                     if(bodyMap.containsKey("Substance")) System.out.println("Replace substance");
                     substanceValue.forEach(
                             (tabKey, tabValue) -> {
-                                if(bodyMap.containsKey("Tab")) System.out.println("Replace tab");
-                            });
+                                if(bodyMap.containsKey("Tab")){
+                                    System.out.println("Replace tab");
+                                    ArrayList<HashMap> tabList = (ArrayList) bodyMap.get("Tab");
+                                    tabList.forEach(
+                                            replaceTab -> {
+                                                replaceTab.forEach(
+                                                        (oldTabKey, newTabKey) -> {
 
+                                                            SubstanceTab substanceTab = new Select().findJoinableEntityByName(SubstanceTab.class, substanceKey, tabKey).getResult(SubstanceTab.class);
+
+                                                            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+                                                            Tab newTab;
+                                                            DbResult dbResult = new Select().findOperableEntityByName(Tab.class, newTabKey.toString());
+                                                            if(dbResult.isEmpty()){
+                                                                newTab = new Tab(newTabKey.toString());
+                                                                Integer newInsertedId = new Insert().queryableEntity(newTab).getResult(Integer.class);
+                                                                newTab = session.find(Tab.class, newInsertedId);
+                                                            }
+                                                            else newTab = dbResult.getResult(Tab.class);
+
+                                                            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+                                                            //session.getReference(SubstanceTab.class, )
+                                                            substanceTab.setTab(newTab);
+                                                            session.merge(substanceTab);
+                                                            session.getTransaction().commit();
+
+                                                            Integer oldKeyPopulation = getRecordsCount(oldTabKey.toString()).getResult(Integer.class);
+
+                                                            if(oldKeyPopulation == 0){
+                                                                new Delete().deleteEntityByName(Tab.class, oldTabKey.toString());
+                                                            }
+
+
+                                                        });
+                                            }
+                                    );
+//                                    Tab oldTab = new Select().findOperableEntityByName();
+//                                    Object value = ((HashMap) bodyMap.get(substanceKey)).remove();
+
+                                    product.printProduct();
+                                }
+
+                            });
                 });
 
 
         return null;
+    }
+
+    private DbResult getRecordsCount(String oldKey){
+        String select = "FROM SubstanceTab st INNER JOIN st.tab WHERE st.tab.name =: name ";
+        Query query = session.createQuery(select);
+        query.setParameter("name", oldKey);
+        List<Object[]> queryResultList = query.getResultList();
+        return new DbResult(queryResultList.size());
     }
 
 }

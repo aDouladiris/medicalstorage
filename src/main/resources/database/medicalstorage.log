@@ -1,9 +1,4 @@
 /*C3*/SET SCHEMA PUBLIC
-\u000d\u000a    alter table substance_tab \u000d\u000a       drop constraint UK4rj1095c539f4t05wcw54j8ok
-\u000d\u000a    alter table substance_tab \u000d\u000a       add constraint UK4rj1095c539f4t05wcw54j8ok unique (substance_Id, tab_Id)
-\u000d\u000a    alter table substance_tab_category \u000d\u000a       drop constraint UK63tkff7aa1dj3jp57k2tsn2ju
-\u000d\u000a    alter table substance_tab_category \u000d\u000a       add constraint UK63tkff7aa1dj3jp57k2tsn2ju unique (category_Id, substanceTab_Id)
-\u000d\u000a    alter table substance_tab_category_item \u000d\u000a       drop constraint UK3paw0lw2v3b46v3u2m94qgu1v
-\u000d\u000a    alter table substance_tab_category_item \u000d\u000a       add constraint UK3paw0lw2v3b46v3u2m94qgu1v unique (item_Id, substanceTabCategory_Id)
-\u000d\u000a    alter table substance_tab_category_item_tag \u000d\u000a       drop constraint UKnx5rvikrobuwvmtjbj94172o0
-\u000d\u000a    alter table substance_tab_category_item_tag \u000d\u000a       add constraint UKnx5rvikrobuwvmtjbj94172o0 unique (substanceTabCategoryItem_Id, tag_Id)
+DISCONNECT
+/*C4*/SET SCHEMA PUBLIC
+DISCONNECT

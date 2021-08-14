@@ -58,8 +58,8 @@ public class Insert extends SessionManager implements InsertInterface {
         return new DbResult(results);
     }
 
-    //@Override
-    private DbResult queryableEntity(Queryable queryable) {
+    @Override
+    public DbResult queryableEntity(Queryable queryable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Serializable insertedId =  session.save(queryable);

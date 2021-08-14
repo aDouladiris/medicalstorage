@@ -31,4 +31,6 @@ public class SubstanceTab extends Joinable {
     public Substance getSubstance() { return substance; }
     public Tab getTab() { return tab; }
 
+    public void setSubstance(Substance substance) { this.substance = substance; }
+    public void setTab(Tab tab) { this.tab = tab; }
 }

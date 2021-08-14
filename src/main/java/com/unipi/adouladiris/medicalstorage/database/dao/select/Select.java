@@ -4,11 +4,13 @@ import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
+import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.entities.users.UserRole;
+import org.hibernate.mapping.Join;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -271,6 +273,97 @@ public class Select extends SessionManager implements SelectInterface {
         }
 
         dbResult.setResult(product);
+        return dbResult;
+    }
+
+    public DbResult findJoinTables(String name){
+
+        String select = "SELECT " +         // returns a list of objects
+                "st, stc, stci, stcit " +
+                "FROM SubstanceTabCategoryItemTag stcit " +
+                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
+                "INNER JOIN stcit.tag " +
+                "INNER JOIN stci.substanceTabCategory AS stc " +
+                "INNER JOIN stci.item " +
+                "INNER JOIN stc.substanceTab AS st " +
+                "INNER JOIN stc.category " +
+                "INNER JOIN st.substance " +
+                "INNER JOIN st.tab " +
+                "WHERE st.substance.name = :subName ";
+
+        Query query = session.createQuery(select);
+        query.setParameter("subName", name);
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+        DbResult dbResult = new DbResult();
+        if( queryResultList.isEmpty() ){ return dbResult; }
+
+        TreeSet<Joinable> joinableSet = new TreeSet<>();
+
+        for(Object[] row: queryResultList) {
+
+            SubstanceTab substanceTab = (SubstanceTab) row[0];
+//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
+            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
+//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
+            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
+//            System.out.println("To insert: " + category.getId() + " " + category.getName());
+            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
+//            System.out.println("To insert: " + item.getId() + " " + item.getName());
+
+            joinableSet.add(substanceTab);
+            joinableSet.add(substanceTabCategory);
+            joinableSet.add(substanceTabCategoryItem);
+            joinableSet.add(substanceTabCategoryItemTag);
+        }
+
+        dbResult.setResult(joinableSet);
+        return dbResult;
+    }
+
+    public DbResult findJoinTable(Class<? extends Joinable> joinClass, String name){
+
+        String select = "SELECT " +         // returns a list of objects
+                "st, stc, stci, stcit " +
+                "FROM SubstanceTabCategoryItemTag stcit " +
+                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
+                "INNER JOIN stcit.tag " +
+                "INNER JOIN stci.substanceTabCategory AS stc " +
+                "INNER JOIN stci.item " +
+                "INNER JOIN stc.substanceTab AS st " +
+                "INNER JOIN stc.category " +
+                "INNER JOIN st.substance " +
+                "INNER JOIN st.tab " +
+                "WHERE st.substance.name = :subName ";
+
+        Query query = session.createQuery(select);
+        query.setParameter("subName", name);
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+        DbResult dbResult = new DbResult();
+        if( queryResultList.isEmpty() ){ return dbResult; }
+
+        TreeSet<Joinable> joinableSet = new TreeSet<>();
+
+        for(Object[] row: queryResultList) {
+
+            SubstanceTab substanceTab = (SubstanceTab) row[0];
+//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
+            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
+//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
+            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
+//            System.out.println("To insert: " + category.getId() + " " + category.getName());
+            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
+//            System.out.println("To insert: " + item.getId() + " " + item.getName());
+
+            if(substanceTab.getClass().equals(joinClass)) joinableSet.add(substanceTab);
+            if(substanceTabCategory.getClass().equals(joinClass)) joinableSet.add(substanceTabCategory);
+            if(substanceTabCategoryItem.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItem);
+            if(substanceTabCategoryItemTag.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItemTag);
+
+        }
+
+        dbResult.setResult(joinableSet);
         return dbResult;
     }
 

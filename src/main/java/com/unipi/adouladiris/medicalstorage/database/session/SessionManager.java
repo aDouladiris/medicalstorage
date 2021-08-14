@@ -17,6 +17,7 @@ import javax.persistence.Persistence;
 import javax.sql.DataSource;
 
 public abstract class SessionManager {
+    //TODO review names. session -> em
     protected static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("org.hibernate.medical_storage.jpa");
     protected static SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
     protected static Session session = sessionFactory.openSession();
