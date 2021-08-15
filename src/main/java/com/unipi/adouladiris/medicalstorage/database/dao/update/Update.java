@@ -61,7 +61,7 @@ public class Update extends SessionManager implements UpdateInterface {
 
         for (Substance newSubstance : product.getProduct().keySet() ){
             if(new Select().findProduct(newSubstance.getName()).isEmpty()){
-                return new DbResult();
+                return new DbResult("Product not exists. Cannot update.");
             }
         }
 
@@ -96,43 +96,58 @@ public class Update extends SessionManager implements UpdateInterface {
     }
 
     @Override
-    public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) {
+    public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
+        Set<ArrayList<HashMap>> results = new HashSet();
 
         product.getProduct().forEach(
-                (substanceKey, substanceValue) -> { if(bodyMap.containsKey("Substance")){ processBodyKeys((ArrayList) bodyMap.get("Substance"), substanceKey); }
+                (substanceKey, substanceValue) -> { if(bodyMap.containsKey("Substance")){
+                    results.add(processBodyKeys((ArrayList) bodyMap.get("Substance"), substanceKey));
+                    }
                     substanceValue.forEach(
-                            (tabKey, tabValue) -> { if(bodyMap.containsKey("Tab")) processBodyKeys((ArrayList) bodyMap.get("Tab"), substanceKey, tabKey);
+                            (tabKey, tabValue) -> { if(bodyMap.containsKey("Tab")) {
+                                results.add(processBodyKeys((ArrayList) bodyMap.get("Tab"), substanceKey, tabKey));
+                            }
                                 tabValue.forEach(
-                                        (categoryKey, categoryValue) -> { if(bodyMap.containsKey("Category")) processBodyKeys((ArrayList) bodyMap.get("Category"), substanceKey, tabKey, categoryKey);
+                                        (categoryKey, categoryValue) -> { if(bodyMap.containsKey("Category")) {
+                                            results.add(processBodyKeys((ArrayList) bodyMap.get("Category"), substanceKey, tabKey, categoryKey));
+                                        }
                                         categoryValue.forEach(
                                                 (itemKey, itemValue) -> {
-                                                    if(bodyMap.containsKey("Item")) processBodyKeys((ArrayList) bodyMap.get("Item"), substanceKey, tabKey, categoryKey, itemKey);
+                                                    if(bodyMap.containsKey("Item")) {
+                                                        results.add(processBodyKeys((ArrayList) bodyMap.get("Item"), substanceKey, tabKey, categoryKey, itemKey));
+                                                    }
                                                     itemValue.forEach(
-                                                            tag -> { if(bodyMap.containsKey("Tag")) processBodyKeys((ArrayList) bodyMap.get("Tag"), substanceKey, tabKey, categoryKey, itemKey, tag);
+                                                            tag -> { if(bodyMap.containsKey("Tag")) {
+                                                                results.add(processBodyKeys((ArrayList) bodyMap.get("Tag"), substanceKey, tabKey, categoryKey, itemKey, tag));
+                                                            }
                                                             });
                                                 });
                                         });
                             });
                 });
 
-
-        return null;
+        if(results.isEmpty()) return new DbResult();
+        else return new DbResult(results);
     }
 
-    private void processBodyKeys(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
+    private ArrayList<HashMap> processBodyKeys(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
 
+        ArrayList<HashMap> results = new ArrayList();
         bodyArrayToProcess.forEach(
                 replacement -> {
-                    replacement.forEach( (oldKey, newKey) -> { updateJoinTable(bodyArrayToProcess, indexEntities); }); }
+                    replacement.forEach( (oldKey, newKey) -> { results.add(updateJoinTable(bodyArrayToProcess, indexEntities)); }); }
         );
+
+        return results;
     }
 
-    private void updateJoinTable(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
+    private HashMap<String, String> updateJoinTable(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
 
         HashMap<Class<? extends Operable>, Operable> operableSet = new HashMap();
         for(Operable entity : indexEntities){ operableSet.put(entity.getClass(), entity); }
+        HashMap<String, String> results = new HashMap();
 
         if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 operableSet.containsKey(Item.class) && operableSet.containsKey(Tag.class)){
@@ -173,16 +188,16 @@ public class Update extends SessionManager implements UpdateInterface {
                                     substanceTabCategoryItemTag.setTag(newTag);
                                     session.merge(substanceTabCategoryItemTag);
                                     session.getTransaction().commit();
+
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategoryItemTag.getClass(), newTag.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
                                         new Delete().deleteEntityByName(newTag.getClass(), oldKey.toString());
+                                        results.put(oldKey.toString()+"{removed}", newTag.getName());
                                     }
+                                    else results.put(oldKey.toString(), newTag.getName());
 
                                 });
                     });
-
-
-
         }
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
@@ -230,7 +245,9 @@ public class Update extends SessionManager implements UpdateInterface {
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategoryItem.getClass(), newItem.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
                                         new Delete().deleteEntityByName(newItem.getClass(), oldKey.toString());
+                                        results.put(oldKey.toString()+"{removed}", newItem.getName() + " " + newItem.getDescription());
                                     }
+                                    else results.put(oldKey.toString(), newItem.getName() + " " + newItem.getDescription());
 
                                 });
                     });
@@ -267,17 +284,20 @@ public class Update extends SessionManager implements UpdateInterface {
                                     substanceTabCategory.setCategory(newCategory);
                                     session.merge(substanceTabCategory);
                                     session.getTransaction().commit();
+
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategory.getClass(), newCategory.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
                                         new Delete().deleteEntityByName(newCategory.getClass(), oldKey.toString());
+                                        results.put(oldKey.toString()+"{removed}", newCategory.getName());
                                     }
+                                    else results.put(oldKey.toString(), newCategory.getName());
 
                                 });
                     });
 
         }
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && !operableSet.containsKey(Category.class) &&
-                !operableSet.containsKey(Item.class) && operableSet.containsKey(Tag.class)){
+                !operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
             SubstanceTab substanceTab =
                     new Select().findJoinableEntityByName(SubstanceTab.class, operableSet.get(Substance.class), operableSet.get(Tab.class))
@@ -303,17 +323,21 @@ public class Update extends SessionManager implements UpdateInterface {
                                     substanceTab.setTab(newTab);
                                     session.merge(substanceTab);
                                     session.getTransaction().commit();
+
+
                                     Integer oldKeyJoins = getRecordsCount(substanceTab.getClass(), newTab.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
                                         new Delete().deleteEntityByName(newTab.getClass(), oldKey.toString());
+                                        results.put(oldKey.toString()+"{removed}", newTab.getName());
                                     }
+                                    else results.put(oldKey.toString(), newTab.getName());
 
                                 });
                     });
 
         }
         else if(operableSet.containsKey(Substance.class) && !operableSet.containsKey(Tab.class) && !operableSet.containsKey(Category.class) &&
-                !operableSet.containsKey(Item.class) && operableSet.containsKey(Tag.class)){
+                !operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             bodyArrayToProcess.forEach(
@@ -330,10 +354,12 @@ public class Update extends SessionManager implements UpdateInterface {
                                     session.merge(oldSubstance);
                                     session.getTransaction().commit();
 
+                                    results.put(oldKey.toString(), newKey.toString());
                                 });
                     });
         }
 
+        return results;
 
     }
 

@@ -14,7 +14,7 @@ public interface UpdateInterface {
     DbResult entityById(@NotNull Integer id, @NotNull Operable operable);
     DbResult entityByName(@NotNull String name, @NotNull Operable operable);
     DbResult product(@NotNull Product product);
-    DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body);
+    DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception;
 
 //    DbResult product(@NotNull String name, Operable... operables);
 //    DbResult product(@NotNull String name, String... cols, Operable... operables);

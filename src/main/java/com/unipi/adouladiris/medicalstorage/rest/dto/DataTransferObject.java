@@ -14,78 +14,82 @@ public class DataTransferObject {
     private Set<JSONObject> jsonSet;
     private Set<Product> productSet;
 
-    public DataTransferObject(Product product){
+    public DataTransferObject(Product product) throws Exception {
         TreeSet<Product> products = new TreeSet<>(){{add(product);}};
         this.jsonSet = productSetToJsonObject(products);
     }
 
-    public DataTransferObject(TreeSet<Product> products){
-        this.jsonSet = productSetToJsonObject(products);
-    }
-    public DataTransferObject(ArrayList<Object> body)    { this.productSet = payloadToProductSet(body);     }
-    public DataTransferObject(LinkedHashMap body)    { this.productSet = payloadToProductSet(body);     }
+    public DataTransferObject(TreeSet<Product> products) throws Exception {this.jsonSet = productSetToJsonObject(products);}
+    public DataTransferObject(ArrayList<Object> body) throws Exception {this.productSet = payloadToProductSet(body);}
+    public DataTransferObject(LinkedHashMap body) throws Exception {this.productSet = payloadToProductSet(body);}
 
-    private Set<Product> payloadToProductSet(LinkedHashMap body) throws ClassCastException{
+    private Set<Product> payloadToProductSet(LinkedHashMap body) throws Exception {
         //System.out.println("body: " + body.toString());
         ArrayList arrayListProducts = (ArrayList) body.get("product");
         //System.out.println("arrayList: " + arrayListProducts);
         Set<Product> productSet = new HashSet<>();
-        arrayListProducts.forEach(
-                productIndex -> {
-                    ((HashMap) productIndex).values().forEach(
-                            productValue -> {
-                                Product product = new Product();
-                                TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag>>>> tabMap = new TreeMap();
-                                //System.out.println("productValue: " + productValue);
-                                ((HashMap) productValue).forEach(
-                                        (substanceKey, substanceValue) -> {
-                                            //System.out.println("substanceKey: " + substanceKey);
-                                            //System.out.println("substanceValue: " + substanceValue);
-                                            ((HashMap) substanceValue).values().forEach(
-                                                    tabArrayWrapped -> {
-                                                        //System.out.println("tabArrayWrapped: " + tabArrayWrapped);
-                                                        ((ArrayList) tabArrayWrapped).forEach(
-                                                                tabArrayUnwrapped -> {
-                                                                    //System.out.println("tabArrayUnwrapped: " + tabArrayUnwrapped);
-                                                                    ((HashMap) tabArrayUnwrapped).forEach(
-                                                                            (tabKey, tabValue) -> {
-                                                                                TreeMap<Category, TreeMap<Item, TreeSet<Tag>> > categoryMap = new TreeMap<>();
-                                                                                //System.out.println("tabValue: " + tabValue);
-                                                                                ((HashMap) tabValue).values().forEach(
-                                                                                        categoryWrapped -> {
-                                                                                            //System.out.println("categoryWrapped: " + categoryWrapped);
-                                                                                            ((ArrayList) categoryWrapped).forEach(
-                                                                                                    categoryUnwrapped -> {
-                                                                                                        //System.out.println("categoryUnwrapped: " + categoryUnwrapped);
-                                                                                                        ((HashMap) categoryUnwrapped).forEach(
-                                                                                                                (categoryKey, categoryValue) -> {
-                                                                                                                    TreeMap<Item, TreeSet<Tag>> itemMap = new TreeMap();
-                                                                                                                    //System.out.println("categoryValue: " + categoryValue);
-                                                                                                                    ((HashMap) categoryValue).values().forEach(
-                                                                                                                            itemWrapped -> {
-                                                                                                                                //System.out.println("itemWrapped: " + itemWrapped);
-                                                                                                                                ((ArrayList) itemWrapped).forEach(
-                                                                                                                                        itemUnwrapped -> {
+//        try {
+            arrayListProducts.forEach(
+                    productIndex -> {
+                        ((HashMap) productIndex).values().forEach(
+                                productValue -> {
+                                    Product product = new Product();
+                                    TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag>>>> tabMap = new TreeMap();
+                                    //System.out.println("productValue: " + productValue);
+                                    ((HashMap) productValue).forEach(
+                                            (substanceKey, substanceValue) -> {
+                                                //System.out.println("substanceKey: " + substanceKey);
+                                                //System.out.println("substanceValue: " + substanceValue);
+                                                ((HashMap) substanceValue).values().forEach(
+                                                        tabArrayWrapped -> {
+                                                            //System.out.println("tabArrayWrapped: " + tabArrayWrapped);
+                                                            ((ArrayList) tabArrayWrapped).forEach(
+                                                                    tabArrayUnwrapped -> {
+                                                                        //System.out.println("tabArrayUnwrapped: " + tabArrayUnwrapped);
+                                                                        ((HashMap) tabArrayUnwrapped).forEach(
+                                                                                (tabKey, tabValue) -> {
+                                                                                    TreeMap<Category, TreeMap<Item, TreeSet<Tag>>> categoryMap = new TreeMap<>();
+                                                                                    //System.out.println("tabValue: " + tabValue);
+                                                                                    ((HashMap) tabValue).values().forEach(
+                                                                                            categoryWrapped -> {
+                                                                                                //System.out.println("categoryWrapped: " + categoryWrapped);
+                                                                                                ((ArrayList) categoryWrapped).forEach(
+                                                                                                        categoryUnwrapped -> {
+                                                                                                            //System.out.println("categoryUnwrapped: " + categoryUnwrapped);
+                                                                                                            ((HashMap) categoryUnwrapped).forEach(
+                                                                                                                    (categoryKey, categoryValue) -> {
+                                                                                                                        TreeMap<Item, TreeSet<Tag>> itemMap = new TreeMap();
+                                                                                                                        //System.out.println("categoryValue: " + categoryValue);
+                                                                                                                        ((HashMap) categoryValue).values().forEach(
+                                                                                                                                itemWrapped -> {
+                                                                                                                                    //System.out.println("itemWrapped: " + itemWrapped);
+                                                                                                                                    ((ArrayList) itemWrapped).forEach(
+                                                                                                                                            itemUnwrapped -> {
 
-                                                                                                                                            Item item = new Item();
-                                                                                                                                            //System.out.println("itemUnwrapped: " + itemUnwrapped);
-                                                                                                                                            ((HashMap) itemUnwrapped).forEach(
-                                                                                                                                                    (itemKey, itemValue) -> {
-                                                                                                                                                        //System.out.println("itemKey: " + itemKey + " itemValue: " + itemValue);
-                                                                                                                                                        if(itemKey.equals("Title")) {item.setName(itemValue.toString());}
-                                                                                                                                                        if(itemKey.equals("Description")) {item.setDescription(itemValue.toString());}
-                                                                                                                                                        if(itemKey.equals("Tag")) {
-                                                                                                                                                            TreeSet<Tag> tagSet = new TreeSet();
-                                                                                                                                                            ((ArrayList) itemValue).forEach( tagName -> tagSet.add(new Tag(tagName.toString())) );
-                                                                                                                                                            itemMap.put(item, tagSet);
-                                                                                                                                                            categoryMap.put(new Category(categoryKey.toString()), itemMap);
-                                                                                                                                                            tabMap.put(new Tab(tabKey.toString()), categoryMap);
-                                                                                                                                                            product.getProduct().put(new Substance(substanceKey.toString()), tabMap);
-                                                                                                                                                            productSet.add(product);
-                                                                                                                                                        }
-                                                                                                                                                    });
-                                                                                                                            });
-                                                                                                                });
+                                                                                                                                                Item item = new Item();
+                                                                                                                                                //System.out.println("itemUnwrapped: " + itemUnwrapped);
+                                                                                                                                                ((HashMap) itemUnwrapped).forEach(
+                                                                                                                                                        (itemKey, itemValue) -> {
+                                                                                                                                                            //System.out.println("itemKey: " + itemKey + " itemValue: " + itemValue);
+                                                                                                                                                            if (itemKey.equals("Title")) {
+                                                                                                                                                                item.setName(itemValue.toString());
+                                                                                                                                                            }
+                                                                                                                                                            if (itemKey.equals("Description")) {
+                                                                                                                                                                item.setDescription(itemValue.toString());
+                                                                                                                                                            }
+                                                                                                                                                            if (itemKey.equals("Tag")) {
+                                                                                                                                                                TreeSet<Tag> tagSet = new TreeSet();
+                                                                                                                                                                ((ArrayList) itemValue).forEach(tagName -> tagSet.add(new Tag(tagName.toString())));
+                                                                                                                                                                itemMap.put(item, tagSet);
+                                                                                                                                                                categoryMap.put(new Category(categoryKey.toString()), itemMap);
+                                                                                                                                                                tabMap.put(new Tab(tabKey.toString()), categoryMap);
+                                                                                                                                                                product.getProduct().put(new Substance(substanceKey.toString()), tabMap);
+                                                                                                                                                                productSet.add(product);
+                                                                                                                                                            }
+                                                                                                                                                        });
+                                                                                                                                            });
+                                                                                                                                });
+                                                                                                                    });
                                                                                                         });
                                                                                             });
                                                                                 });
@@ -94,12 +98,15 @@ public class DataTransferObject {
                                             });
                                 });
                     });
-        });
+//        }
+//        catch (Exception ex){
+//            System.out.println("Ex: " + ex.getMessage());
+//        }
 
         return productSet;
     }
 
-    private Set<Product> payloadToProductSet(ArrayList<Object> body){
+    private Set<Product> payloadToProductSet(ArrayList<Object> body) throws Exception {
         Set<Product> productSet = new HashSet<>();
         for(int i=0; i<body.size(); i++){
             System.out.println("Deserialize start");
@@ -158,7 +165,7 @@ public class DataTransferObject {
         return productSet;
     }
 
-    private Set<JSONObject> productSetToJsonObject(TreeSet<Product> products){
+    private Set<JSONObject> productSetToJsonObject(TreeSet<Product> products) throws Exception {
         Set<JSONObject> productSet = new HashSet<>();
         for(Product product : products){
             JSONObject substanceJO = new JSONObject();
