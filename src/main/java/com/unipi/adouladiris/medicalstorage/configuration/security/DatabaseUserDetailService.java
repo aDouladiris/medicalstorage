@@ -10,22 +10,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
-public class DatabaseUserDetailService implements UserDetailsService {
-
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    public DatabaseUserDetailService(BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("Database: loadUserByUsername");
-        User user = new Select().findUser(username).getResult(User.class);
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return user;
-    }
-
-}
+//@Service
+//public class DatabaseUserDetailService implements UserDetailsService {
+//
+//    private BCryptPasswordEncoder bCryptPasswordEncoder;
+//
+//    @Autowired
+//    public DatabaseUserDetailService(BCryptPasswordEncoder bCryptPasswordEncoder) {
+//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+//    }
+//
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        System.out.println("Database: loadUserByUsername");
+//        User user = new Select().findUser(username).getResult(User.class);
+//        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+//        return user;
+//    }
+//
+//}

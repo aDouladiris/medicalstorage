@@ -35,7 +35,7 @@ public class RegisterUserRequestBody {
             name="Authority",
             dataType = "array",
             required=true,
-            example =  "[\"admin\", \"customer\"]"
+            example =  "[\"admin\"]"
     )
     private String[] authorities;
 

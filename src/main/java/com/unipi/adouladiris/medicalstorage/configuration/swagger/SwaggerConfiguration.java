@@ -90,49 +90,4 @@ public class SwaggerConfiguration  {
         return Collections.singletonList(tokenBuilder.build());
     }
 
-
-
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry)
-//    {
-//        //enabling swagger-ui part for visual documentation
-//        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-//        //registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-//    }
-
-
-
-
-//    @Primary
-//    @Bean
-//    public SwaggerResourcesProvider swaggerResourcesProvider(
-//            InMemorySwaggerResourcesProvider defaultResourcesProvider) {
-//        return () -> {
-//            List<SwaggerResource> resources = new ArrayList<>();
-//            Arrays.asList("api1")
-//                    .forEach(resourceName -> resources.add(loadResource(resourceName)));
-//            return resources;
-//        };
-//    }
-//
-//    private SwaggerResource loadResource(String resource) {
-//        SwaggerResource wsResource = new SwaggerResource();
-//        wsResource.setName(resource);
-//        wsResource.setSwaggerVersion("2.0");
-//        wsResource.setLocation("/swagger-apis/" + resource + "/swaggerTTT.yamlkjdhgfklfd");
-//        return wsResource;
-//    }
-
-
-
-
-//    @Primary
-//    @Bean
-//    public ApiListingScanner addExtraOperations(ApiDescriptionReader apiDescriptionReader, ApiModelReader apiModelReader,
-//                                                ApiModelSpecificationReader modelSpecificationReader,
-//                                                DocumentationPluginsManager pluginsManager)
-//    {
-//        return new FormLoginOperations(apiDescriptionReader, apiModelReader, modelSpecificationReader, pluginsManager);
-//    }
-
 }

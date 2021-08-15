@@ -114,9 +114,9 @@ public class SecurityConfiguration {
     @Order(2)
     public static class UserTokenConfiguration extends WebSecurityConfigurerAdapter{
 
-        private DatabaseUserDetailService databaseUserDetailService;
-        @Autowired
-        public void userDetailService(DatabaseUserDetailService databaseUserDetailService) { this.databaseUserDetailService = databaseUserDetailService; }
+//        private DatabaseUserDetailService databaseUserDetailService;
+//        @Autowired
+//        public void userDetailService(DatabaseUserDetailService databaseUserDetailService) { this.databaseUserDetailService = databaseUserDetailService; }
 
         private JwtTokenFilter jwtTokenFilter;
         @Autowired
@@ -130,11 +130,11 @@ public class SecurityConfiguration {
 
 
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            System.out.println("Token AuthenticateManager has been build!");
-            auth.userDetailsService(databaseUserDetailService);
-        }
+//        @Override
+//        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//            System.out.println("Token AuthenticateManager has been build!");
+//            auth.userDetailsService(databaseUserDetailService);
+//        }
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {

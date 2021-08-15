@@ -37,25 +37,8 @@ import static java.util.Set.of;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private AuthenticationManager authenticationManagerToken;
-
-    @Autowired
-    public void authenticationManagerToken(@Qualifier("UserTokenAuthManager") AuthenticationManager authenticationManagerToken) {
-        this.authenticationManagerToken = authenticationManagerToken;
-    }
-
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private void userDetailsService(@Qualifier("UserTokenDetailsService") UserDetailsService userDetailsService){
-        this.userDetailsService = userDetailsService;
-    }
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
-        //System.out.println("Should filter: " + request.getRequestURI());
-
         if(request.getRequestURI().contains("swagger")) return true;
         if(request.getRequestURI().contains("user")) return true;
         Set<String> pathToIgnore = new HashSet();
@@ -70,6 +53,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        //TODO check headers nulls to remove them.
         // Get authorization header and validate
         System.out.println("JwtFilter Start");
 
@@ -104,10 +88,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
                 return;
-                //filterChain.doFilter(httpServletRequest, httpServletResponse);
-            }
-            else {
-                //filterChain.doFilter(httpServletRequest, httpServletResponse);
             }
         } catch (NoSuchAlgorithmException e) {
             //e.printStackTrace();
@@ -120,7 +100,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
             httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
             mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
-//            filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
 
