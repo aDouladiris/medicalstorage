@@ -1,24 +1,27 @@
 package com.unipi.adouladiris.medicalstorage.database.dao.insert;
 
 import com.sun.istack.NotNull;
+import com.unipi.adouladiris.medicalstorage.configuration.security.SecurityConfiguration;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
+import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.users.Role;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Insert extends SessionManager implements InsertInterface {
+
+public class Insert extends DbEntitySessionManager implements InsertInterface {
 
     @Override
     public DbResult product(@NotNull Product product) {
@@ -166,7 +169,7 @@ public class Insert extends SessionManager implements InsertInterface {
             session.getTransaction().commit();
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             //userRole = session.find(Role.class, insertedRoleUserId);
-            User user = new User(username, passwordEncoder().encode(password), userRole );
+            User user = new User(username, new BCryptPasswordEncoder().encode(password), userRole );
             Serializable insertedUserId =  session.save(user);
             session.getTransaction().commit();
             return new DbResult(insertedUserId);

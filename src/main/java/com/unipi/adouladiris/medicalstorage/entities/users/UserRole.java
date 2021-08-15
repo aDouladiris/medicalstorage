@@ -5,7 +5,6 @@ import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Oper
 import javax.persistence.*;
 
 @MappedSuperclass
-//@Inheritance(strategy = InheritanceType.JOINED) ????
 public abstract class UserRole {
 
     @Id

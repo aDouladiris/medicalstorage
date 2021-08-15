@@ -129,7 +129,6 @@ public class JWToken {
 
     private String hmacSha256(String data, String secret) {
         try {
-
             //MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = secret.getBytes(StandardCharsets.UTF_8);//digest.digest(secret.getBytes(StandardCharsets.UTF_8));
 

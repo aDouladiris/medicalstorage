@@ -38,7 +38,6 @@ public class User extends UserRole implements UserDetails {
         this.password = password;
         this.role = role;
         this.enabled = 'Y';
-
         //this.authorities[0] = role.getAuthority();
     }
 
@@ -48,7 +47,6 @@ public class User extends UserRole implements UserDetails {
         Role newRoleObject = new Role(role);
         this.role = newRoleObject;
         this.enabled = 'Y';
-
         //this.authorities[0] = role;
     }
 
@@ -59,7 +57,6 @@ public class User extends UserRole implements UserDetails {
         this.password = userCustom.getPassword();
         this.role = userCustom.getRole();
         this.enabled = 'Y';
-
         //this.authorities[0] = role.getAuthority();
     }
 
@@ -90,7 +87,6 @@ public class User extends UserRole implements UserDetails {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-
         return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_customer"); // TODO ROLE_ prefix
     }
 

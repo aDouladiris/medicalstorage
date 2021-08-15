@@ -2,12 +2,11 @@ package com.unipi.adouladiris.medicalstorage.database.dao.update;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
-import com.unipi.adouladiris.medicalstorage.database.dao.delete.DeleteInterface;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.InsertInterface;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
+import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTab;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategory;
@@ -17,13 +16,12 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Jo
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.*;
 
 
-public class Update extends SessionManager implements UpdateInterface {
+public class Update extends DbEntitySessionManager implements UpdateInterface {
 
     @Override
     public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {

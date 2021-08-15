@@ -1,5 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers.users;
 
+import com.unipi.adouladiris.medicalstorage.configuration.security.SecurityConfiguration;
 import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,12 +28,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Api(tags = { SwaggerConfiguration.UserController })
 public class UserController {
 
-    private AuthenticationManager authenticationManagerUser;
-
+    private static AuthenticationManager authenticationManagerUser;
     @Autowired
-    public UserController(@Qualifier("UserSessionAuthManager") AuthenticationManager authenticationManagerUser){
-        this.authenticationManagerUser = authenticationManagerUser;
-    }
+    public UserController(AuthenticationManager authenticationManagerUser){UserController.authenticationManagerUser = authenticationManagerUser;}
 
     //************************** GET/ *************************
     @GetMapping(value = "information")

@@ -7,15 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.*;
 
-//TODO check extends. Why???
+// Compare product with the help of custom Substance comparator
 public class Product extends Operable {
 
-    @ApiModelProperty(
-            notes = "Role of the User",
-            name="Role",
-            dataType = "Array<String>",
-            required=true
-    )
     private TreeMap<Substance, TreeMap<Tab,TreeMap<Category, TreeMap<Item, TreeSet<Tag>>>>> product;
 
     public Product (){ product = new TreeMap<>(); }

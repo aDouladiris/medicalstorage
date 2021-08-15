@@ -39,13 +39,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        if(request.getRequestURI().contains("swagger")) return true;
-        if(request.getRequestURI().contains("user")) return true;
-        Set<String> pathToIgnore = new HashSet();
-        pathToIgnore.add("/");
-        pathToIgnore.add("/v2/api-docs");
-        pathToIgnore.add("/csrf");
-        return pathToIgnore.contains(request.getRequestURI());
+        // ShouldFilter
+        if(request.getRequestURI().contains("/api/v1/product/")) return false;
+        // ShouldNotFilter
+        else return true;
     }
 
     @Override
@@ -53,84 +50,35 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        //TODO check headers nulls to remove them.
-        // Get authorization header and validate
-        System.out.println("JwtFilter Start");
-
-        if( httpServletRequest.getHeader("Bearer" ) == null ){
-            System.out.println("JwtFilter End Bearer not in headers");
-            //System.out.println(SecurityContextHolder.getContext().getAuthentication());
-            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
-            //httpServletResponse.setStatus(403);
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-            return;
-        }
-
         // Get jwt token and validate
-        final String token = httpServletRequest.getHeader("Bearer") ; //header.split(" ")[1].trim();
-
-        if (token == null) {
-            System.out.println("JwtFilter End Bearer not in headers 2nd check");
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-            return;
-        }
-
+        final String token = httpServletRequest.getHeader("Bearer") ;
         JWToken jwToken = null;
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> errorDetails = new HashMap<>();
         try {
             jwToken = new JWToken(token);
             if (!jwToken.isValid()) {
-                System.out.println("JwtFilter End Invalid token");
-                //filterChain.doFilter(httpServletRequest, httpServletResponse);
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> errorDetails = new HashMap<>();
                 errorDetails.put("message", "Invalid token");
                 httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
                 httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
-                return;
+                return; // return without proceeding further to the next filter at the chain.
             }
         } catch (NoSuchAlgorithmException e) {
-            //e.printStackTrace();
-            System.out.println("JwtFilter End Invalid token");
-            //filterChain.doFilter(httpServletRequest, httpServletResponse);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> errorDetails = new HashMap<>();
             errorDetails.put("message", "Invalid token");
             errorDetails.put("exception", e.getMessage());
             httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
             httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
             mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
-            return;
+            return; // return without proceeding further to the next filter at the chain.
         }
 
-        // Get user identity and set it on the spring security context
-        //UserDetails userDetails = new Select().findUser(jwToken.getSubject()).getResult(User.class);
-        UserDetails userDetails;
-
-        System.out.println("User!");
-        try {
-            //userDetails  = userDetailsService.loadUserByUsername(jwToken.getSubject());
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(null, null,
-                            jwToken.getAudience());
-            System.out.println("Null User: " + usernamePasswordAuthenticationToken.toString());
-            usernamePasswordAuthenticationToken
-                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            System.out.println("JwtFilter End OK");
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-
-        }catch (UsernameNotFoundException exception){
-            System.out.println("JwtFilter End User not found");
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> errorDetails = new HashMap<>();
-            errorDetails.put("message", "Invalid token");
-            httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
-            httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            mapper.writeValue(httpServletResponse.getWriter(), errorDetails);
-        }
-
-
+        // If token is valid, create a null User with auths set it at the spring security context.
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(null, null, jwToken.getAudience());
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        filterChain.doFilter(httpServletRequest, httpServletResponse); // Proceeding further to the next filter at the chain.
 
     }
 }

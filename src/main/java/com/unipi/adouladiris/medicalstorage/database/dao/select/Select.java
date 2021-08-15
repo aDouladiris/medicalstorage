@@ -3,19 +3,18 @@ package com.unipi.adouladiris.medicalstorage.database.dao.select;
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.session.SessionManager;
+import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.entities.users.UserRole;
-import org.hibernate.mapping.Join;
 
 import javax.persistence.Query;
 import java.util.*;
 
-public class Select extends SessionManager implements SelectInterface {
+public class Select extends DbEntitySessionManager implements SelectInterface {
 
 
     @Override
