@@ -13,7 +13,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @Controller
 //@RequestMapping("/api/v1")
-public class RoutingController {
+public class RedirectController {
 
     @ApiIgnore
     @GetMapping(value = "")

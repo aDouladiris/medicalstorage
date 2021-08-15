@@ -27,7 +27,6 @@ import java.util.List;
 public class SwaggerConfiguration  {
 
     private TypeResolver typeResolver;
-
     @Autowired
     public void setTypeResolver(TypeResolver typeResolver) {
         this.typeResolver = typeResolver;
