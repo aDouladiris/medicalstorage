@@ -78,6 +78,7 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }catch (AuthenticationException exception){
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+            //throw new ResponseStatusException(HttpStatus.CONFLICT, exc.getMessage(), exc);
         }
 
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
@@ -108,20 +109,14 @@ public class UserController {
     })
     @ApiImplicitParam(name = "registerUserRequestBody", dataTypeClass = RegisterUserRequestBody.class)
     public ResponseEntity<RegisterUserRequestBody>  registerUser(@RequestBody RegisterUserRequestBody registerUserRequestBody) {
-        System.out.println("Register!");
         String username = registerUserRequestBody.getUsername();
         String password = registerUserRequestBody.getPassword();
         String authority = registerUserRequestBody.getAuthorities()[0];
-
-        System.out.println("Username: " + username);
-        System.out.println("Password: " + password);
-        System.out.println("Authority: " + authority);
-
         DbResult dbResult = new Insert().user(username, password, authority);
-
         if(dbResult.getException() != null) return new ResponseEntity(dbResult.getException().getCause().getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         System.out.println(dbResult.getResult().toString());
         return new ResponseEntity("User inserted at " + dbResult.getResult().toString(), HttpStatus.OK);
+        //throw new ResponseStatusException(HttpStatus.CONFLICT, exc.getMessage(), exc);
     }
 
     // https://stackoverflow.com/questions/3521290/logout-get-or-post
