@@ -13,6 +13,8 @@ import com.unipi.adouladiris.medicalstorage.entities.users.Role;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.lang.annotation.Target;
@@ -154,7 +156,7 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
         return dbResult;
     }
 
-    public DbResult user(@NotNull String username, @NotNull String password, @NotNull String authority ){
+    public DbResult user(@NotNull PasswordEncoder passwordEncoder, @NotNull String username, @NotNull String password, @NotNull String authority){
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Role userRole;
@@ -169,7 +171,7 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
             session.getTransaction().commit();
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             //userRole = session.find(Role.class, insertedRoleUserId);
-            User user = new User(username, new BCryptPasswordEncoder().encode(password), userRole );
+            User user = new User(username, passwordEncoder.encode(password), userRole ); //TODO take bean
             Serializable insertedUserId =  session.save(user);
             session.getTransaction().commit();
             return new DbResult(insertedUserId);

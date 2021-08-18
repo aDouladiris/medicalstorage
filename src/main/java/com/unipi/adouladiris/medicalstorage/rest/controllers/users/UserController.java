@@ -32,6 +32,10 @@ public class UserController {
     @Autowired
     public UserController(AuthenticationManager authenticationManagerUser){UserController.authenticationManagerUser = authenticationManagerUser;}
 
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder){this.bCryptPasswordEncoder = bCryptPasswordEncoder;}
+
     //************************** GET/ *************************
     @GetMapping(value = "information")
     @ApiOperation(value = "Get User Information", response = String.class)
@@ -85,7 +89,7 @@ public class UserController {
         String username = registerUserRequestBody.getUsername();
         String password = registerUserRequestBody.getPassword();
         String authority = registerUserRequestBody.getAuthorities()[0];
-        DbResult dbResult = new Insert().user(username, password, authority);
+        DbResult dbResult = new Insert().user(bCryptPasswordEncoder, username, password, authority);
 
         if(dbResult.getException() != null){
             String message = dbResult.getException().getCause().getMessage();
@@ -130,12 +134,10 @@ public class UserController {
 
             //Create the token from username.
             String bearerToken = new JWToken(authenticatedUser).toString();
-
             JSONObject response = new JSONObject();
             response.put("Username", authenticatedUser.getName() );
             response.put("Authorities", authenticatedUser.getAuthorities().toString() );
             response.put("bearerToken", bearerToken);
-//        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
             return new ResponseEntity(response.toString(), HttpStatus.OK);
         }catch (AuthenticationException exception){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
