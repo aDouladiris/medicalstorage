@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,9 +21,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static java.util.Set.of;
-
-//readhttps://www.baeldung.com/intercepting-filter-pattern-in-java
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
@@ -35,24 +31,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies){
-            System.out.println("getComment: " + cookie.getComment());
-            System.out.println("getName: " + cookie.getName());
-            System.out.println("getDomain: " + cookie.getDomain());
-            System.out.println("getPath: " + cookie.getPath());
-            System.out.println("getValue: " + cookie.getValue());
-            System.out.println("getSecure: " + cookie.getSecure());
-            System.out.println("*********************************");
-        }
         if(request.getRequestURI().contains("/api/v1/product/")) return false; // ShouldFilter
         else return true; // ShouldNotFilter
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest,
-                                    HttpServletResponse httpServletResponse,
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
         JWToken jwToken;
         ObjectMapper mapper = new ObjectMapper();

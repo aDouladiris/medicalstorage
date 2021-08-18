@@ -25,13 +25,14 @@ import java.util.logging.Logger;
 
 public class JWToken {
 
-    private static final String SECRET_KEY = "test_web_server"; // Add Signature here
-    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-    private static final String ISSUER = "adouladiris.unipi.com";
+//    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    private static final String ISSUER = "authServer.medicalstorage.adouladiris.unipi.com";
     private static final String JWT_HEADER = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+    private static final String SECRET_KEY = "test_web_server"; // For verifying signature
+
+    private String encodedHeader;
     private JSONObject payload = new JSONObject();
     private String signature;
-    private String encodedHeader;
 
     private JWToken() {
         encodedHeader = encode(new JSONObject(JWT_HEADER));
