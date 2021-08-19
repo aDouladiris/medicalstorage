@@ -1,8 +1,8 @@
-package com.unipi.adouladiris.medicalstorage.entities.operable;
+package com.unipi.adouladiris.medicalstorage.entities.operables;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategory;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
 import javax.persistence.*;
 import java.util.Set;

@@ -1,9 +1,9 @@
-package com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass;
+package com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
+import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 
 import javax.persistence.*;
 

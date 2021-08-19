@@ -6,8 +6,8 @@ import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.operables.*;
+import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
 import com.unipi.adouladiris.medicalstorage.entities.users.UserRole;
 

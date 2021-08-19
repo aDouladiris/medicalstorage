@@ -1,7 +1,7 @@
 package com.unipi.adouladiris.medicalstorage.entities.jointables;
 
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.Item;
+import com.unipi.adouladiris.medicalstorage.entities.operables.Item;
 
 import javax.persistence.*;
 import java.util.Set;

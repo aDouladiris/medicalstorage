@@ -1,11 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.dto;
 
-import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.mapping.Array;
-
-import java.util.*;
 
 public class ProductInsertRequestBody {
 

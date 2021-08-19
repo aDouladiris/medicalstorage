@@ -1,23 +1,19 @@
 package com.unipi.adouladiris.medicalstorage.database.dao.insert;
 
 import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.configuration.security.SecurityConfiguration;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
+import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.users.Role;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;

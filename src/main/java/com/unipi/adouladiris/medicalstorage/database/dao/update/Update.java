@@ -13,8 +13,8 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCate
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategoryItem;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategoryItemTag;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.operables.*;
+import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;

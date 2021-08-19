@@ -1,12 +1,10 @@
 package com.unipi.adouladiris.medicalstorage.rest.dto;
 
-import com.google.common.collect.Iterators;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.entities.operable.*;
+import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import org.json.JSONObject;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 //TODO needs rename
 public class DataTransferObject {

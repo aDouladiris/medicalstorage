@@ -4,7 +4,7 @@ import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
 public interface DeleteInterface {
 

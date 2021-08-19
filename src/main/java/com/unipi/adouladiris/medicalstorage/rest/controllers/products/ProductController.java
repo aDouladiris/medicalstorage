@@ -8,10 +8,9 @@ import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.database.dao.update.Update;
 import com.unipi.adouladiris.medicalstorage.database.dao.update.UpdateInterface;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.entities.operable.Substance;
+import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
 import io.swagger.annotations.*;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,8 @@ import java.util.*;
 @Api(tags = { SwaggerConfiguration.ProductController })
 public class ProductController {
 
+    // Http request will be intercepted by Token filter before proceeding.
+
     //************************** GET/ **************************
     @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
@@ -40,7 +41,6 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     public ResponseEntity<String> getAllProducts() {
-        // Http request will be intercepted by Token filter before proceeding.
         SecurityContextHolder.getContext().setAuthentication(null);
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);

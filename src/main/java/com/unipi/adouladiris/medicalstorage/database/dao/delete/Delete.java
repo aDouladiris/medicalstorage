@@ -6,7 +6,7 @@ import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
 import javax.persistence.PersistenceException;
 

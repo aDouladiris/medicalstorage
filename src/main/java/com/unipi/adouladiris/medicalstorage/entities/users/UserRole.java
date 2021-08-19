@@ -1,7 +1,5 @@
 package com.unipi.adouladiris.medicalstorage.entities.users;
 
-import com.unipi.adouladiris.medicalstorage.entities.operable.abstractClass.Operable;
-
 import javax.persistence.*;
 
 @MappedSuperclass
