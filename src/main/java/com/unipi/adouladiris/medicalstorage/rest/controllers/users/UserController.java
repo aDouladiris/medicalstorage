@@ -1,16 +1,14 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers.users;
 
-import com.unipi.adouladiris.medicalstorage.configuration.security.SecurityConfiguration;
 import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
-import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
 import com.unipi.adouladiris.medicalstorage.rest.dto.UserRequestBody;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import io.swagger.annotations.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -140,7 +138,7 @@ public class UserController {
             response.put("authority", authenticatedUser.getAuthorities().toString() );
             response.put("bearerToken", bearerToken);
             return new ResponseEntity(response.toString(), HttpStatus.OK);
-        }catch (AuthenticationException exception){
+        }catch (Exception exception){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
         }
     }

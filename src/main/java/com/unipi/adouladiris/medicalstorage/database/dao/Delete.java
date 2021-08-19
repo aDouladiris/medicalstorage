@@ -1,18 +1,16 @@
-package com.unipi.adouladiris.medicalstorage.database.dao.delete;
+package com.unipi.adouladiris.medicalstorage.database.dao;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
 import javax.persistence.PersistenceException;
 
-public class Delete extends DbEntitySessionManager implements DeleteInterface {
+public class Delete extends DbEntitySessionManager {
 
-    @Override
     public DbResult deleteEntityById(@NotNull Class<? extends Queryable> typeClass, @NotNull Integer id) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -28,7 +26,6 @@ public class Delete extends DbEntitySessionManager implements DeleteInterface {
         }
     }
 
-    @Override
     public DbResult deleteEntityByName(@NotNull Class<? extends Operable> typeClass, @NotNull String name) {
         Operable objectToDelete = new Select().findOperableEntityByName(typeClass, name).getResult( typeClass );
         try {
@@ -44,7 +41,6 @@ public class Delete extends DbEntitySessionManager implements DeleteInterface {
         }
     }
 
-    @Override
     public DbResult deleteProduct(@NotNull Product product) {
         if ( product.getProduct().keySet().size() > 1 ) return new DbResult();
         return deleteEntityByName(product.getEntityContainingName().getClass(), product.getEntityContainingName().getName());

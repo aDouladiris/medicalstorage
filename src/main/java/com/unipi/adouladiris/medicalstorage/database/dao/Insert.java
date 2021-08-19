@@ -1,9 +1,8 @@
-package com.unipi.adouladiris.medicalstorage.database.dao.insert;
+package com.unipi.adouladiris.medicalstorage.database.dao;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
@@ -19,9 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class Insert extends DbEntitySessionManager implements InsertInterface {
+public class Insert extends DbEntitySessionManager {
 
-    @Override
     public DbResult product(@NotNull Product product) {
         for (Substance newSubstance : product.getProduct().keySet() ){
             if(!new Select().findProduct(newSubstance.getName()).isEmpty()){return new DbResult(newSubstance);}
@@ -43,7 +41,6 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
         return new DbResult(results);
     }
 
-    @Override
     public DbResult queryableEntity(Queryable queryable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -57,7 +54,6 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
         }
     }
 
-    @Override
     public DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
 

@@ -24,18 +24,4 @@ public class HomeController {
         return new ModelAndView("redirect:/swagger-ui.html?urls.primaryName=Medical%20Storage%20Api%20v1%20-%20User#/User", model);
     }
 
-//    @Autowired
-//    @Qualifier("springSecurityFilterChain")
-//    private Filter springSecurityFilterChain;
-//
-//    @GetMapping("/filters")
-//    @ResponseBody
-//    public void getFilters() {
-//        FilterChainProxy filterChainProxy = (FilterChainProxy) springSecurityFilterChain;
-//        List<SecurityFilterChain> list = filterChainProxy.getFilterChains();
-//        list.stream()
-//                .flatMap(chain -> chain.getFilters().stream())
-//                .forEach(filter -> System.out.println(filter.getClass()));
-//    }
-
 }

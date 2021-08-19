@@ -1,11 +1,7 @@
-package com.unipi.adouladiris.medicalstorage.database.dao.update;
+package com.unipi.adouladiris.medicalstorage.database.dao;
 
 import com.sun.istack.NotNull;
-import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
-import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
-import com.unipi.adouladiris.medicalstorage.database.dao.insert.InsertInterface;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTab;
@@ -21,9 +17,8 @@ import javax.persistence.Query;
 import java.util.*;
 
 
-public class Update extends DbEntitySessionManager implements UpdateInterface {
+public class Update extends DbEntitySessionManager {
 
-    @Override
     public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -47,14 +42,12 @@ public class Update extends DbEntitySessionManager implements UpdateInterface {
         }
     }
 
-    @Override
     public DbResult entityByName(@NotNull String name, @NotNull Operable operable) {
         Operable object = new Select().findOperableEntityByName(operable.getClass(), name).getResult( Operable.class );
         if(object == null) return new DbResult();
         return entityById(object.getId(), operable);
     }
 
-    @Override
     public DbResult product(@NotNull Product product) {
 
         for (Substance newSubstance : product.getProduct().keySet() ){
@@ -62,28 +55,14 @@ public class Update extends DbEntitySessionManager implements UpdateInterface {
                 return new DbResult("Product not exists. Cannot update.");
             }
         }
-
         Set<HashMap> results = new HashSet();
-
-        InsertInterface insertInterface = new Insert();
-
         for( Substance substance: product.getProduct().keySet() ){
-//            System.out.println("Substance : " + substance.getName() );
-
             for( Tab tab : product.getProduct().get(substance).keySet() ){
-//                System.out.println("Tab       : " + tab.getName() );
-
                 for ( Category category : product.getProduct().get(substance).get(tab).keySet() ){
-//                    System.out.println("Category  : " + category.getName() );
-
                     for ( Item item : product.getProduct().get(substance).get(tab).get(category).keySet() ){
-//                        System.out.println("Item      : <" + item.getName() + "> " + item.getDescription() );
-
                         for ( Tag tag : product.getProduct().get(substance).get(tab).get(category).get( item ) ){
-//                            System.out.println("Tag       : #" + tag.getName() );
-
                             // Insert keys with value at each iteration.
-                            results.add(insertInterface.product(substance, tab, category, item, tag).getResult(HashMap.class));
+                            results.add(new Insert().product(substance, tab, category, item, tag).getResult(HashMap.class));
                         }
                     }
                 }
@@ -93,7 +72,6 @@ public class Update extends DbEntitySessionManager implements UpdateInterface {
         return new DbResult(results);
     }
 
-    @Override
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception {
 
         HashMap bodyMap = (HashMap) body.get("replacement");

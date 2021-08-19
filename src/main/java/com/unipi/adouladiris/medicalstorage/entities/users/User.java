@@ -1,13 +1,8 @@
 package com.unipi.adouladiris.medicalstorage.entities.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
 @Table(name="user")

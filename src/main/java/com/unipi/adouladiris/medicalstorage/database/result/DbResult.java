@@ -1,8 +1,8 @@
-package com.unipi.adouladiris.medicalstorage.database.dao.result;
+package com.unipi.adouladiris.medicalstorage.database.result;
 import com.sun.istack.NotNull;
 
 
-public class DbResult implements DbResultInterface {
+public class DbResult {
 
     private Boolean empty = true;
     private Object result = null;
@@ -15,26 +15,21 @@ public class DbResult implements DbResultInterface {
         this.empty = false;
     }
 
-    @Override
     public Boolean isEmpty() {
         if (this.result == null && this.exception == null) this.empty = true;
         else this.empty = false;
         return empty;
     }
 
-    @Override
     public Object getResult() { return result; }
 
     //    @Override TODO review interface
     public <T> T getResult(@NotNull Class<T> type) { this.empty = false; return type.cast( result ); } // Requires class. Returns the casted object from the argument class type
 
-    @Override
     public void setResult(@NotNull Object result) { this.result = result; this.empty = false; }
 
-    @Override
     public Exception getException() { return exception; }
 
-    @Override
     public void setException(@NotNull Exception exception) { this.exception = exception; }
 
 

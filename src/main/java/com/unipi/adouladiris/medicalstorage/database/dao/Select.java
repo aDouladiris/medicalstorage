@@ -1,8 +1,8 @@
-package com.unipi.adouladiris.medicalstorage.database.dao.select;
+package com.unipi.adouladiris.medicalstorage.database.dao;
 
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.*;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
@@ -14,9 +14,8 @@ import com.unipi.adouladiris.medicalstorage.entities.users.UserRole;
 import javax.persistence.Query;
 import java.util.*;
 
-public class Select extends DbEntitySessionManager implements SelectInterface {
+public class Select extends DbEntitySessionManager {
 
-    @Override
     public DbResult findAllProducts(){
         String select = "SELECT " + // returns a list of objects
                 "st.substance, " +  // Substance Object
@@ -129,7 +128,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findProduct(String name){
 
         String select = "SELECT " + // returns a list of objects
@@ -318,7 +316,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findOperableEntityByName(String name) {
         // Tables cannot be parameter values
         Set<String> multiSelect = new HashSet<>();
@@ -359,7 +356,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findOperableEntityByName(@NotNull Class<? extends Operable> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -408,7 +404,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findJoinableEntityByName(@NotNull Class<? extends Joinable> classType, @NotNull Operable op1, @NotNull Operable op2) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -430,7 +425,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findJoinableEntityByName(@NotNull Class<? extends Joinable> classType, @NotNull Joinable op1, @NotNull Operable op2) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -462,7 +456,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return dbResult;
     }
 
-    @Override
     public DbResult findByTag(String tag){
 
         Set<Product> results = new HashSet();

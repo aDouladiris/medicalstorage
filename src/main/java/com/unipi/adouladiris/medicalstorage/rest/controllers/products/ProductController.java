@@ -1,12 +1,11 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers.products;
 
 import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
-import com.unipi.adouladiris.medicalstorage.database.dao.delete.Delete;
-import com.unipi.adouladiris.medicalstorage.database.dao.insert.Insert;
-import com.unipi.adouladiris.medicalstorage.database.dao.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.database.dao.select.Select;
-import com.unipi.adouladiris.medicalstorage.database.dao.update.Update;
-import com.unipi.adouladiris.medicalstorage.database.dao.update.UpdateInterface;
+import com.unipi.adouladiris.medicalstorage.database.dao.Delete;
+import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
+import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
+import com.unipi.adouladiris.medicalstorage.database.dao.Select;
+import com.unipi.adouladiris.medicalstorage.database.dao.Update;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
@@ -187,13 +186,12 @@ public class ProductController {
     @ApiImplicitParam(name = "body", dataTypeClass = ProductUpdateRequestBody.class)
     public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
         SecurityContextHolder.getContext().setAuthentication(null);
-        UpdateInterface updateInterface = new Update();
         try {
             Set<Product> productSet = new DataTransferObject(body).getProductSet();
             Set<HashSet> results = new HashSet();
             Set<String> failures = new HashSet();
             productSet.forEach(product -> {
-                DbResult dbResult = updateInterface.product(product);
+                DbResult dbResult = new Update().product(product);
                 if(dbResult.isEmpty()) failures.add(dbResult.getResult(String.class));
                 else results.add(dbResult.getResult(HashSet.class));
             });
@@ -224,9 +222,8 @@ public class ProductController {
         DbResult dbResult = new Select().findProduct(name);
         if(dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
-        UpdateInterface updateInterface = new Update();
         try{
-            dbResult = updateInterface.replaceProduct(product, body);
+            dbResult = new Update().replaceProduct(product, body);
             if(dbResult.isEmpty()) return new ResponseEntity("Could not update.", HttpStatus.CONFLICT);
             Set<ArrayList<HashMap>> results = dbResult.getResult(HashSet.class);
             return new ResponseEntity(results.toString(), HttpStatus.OK);
