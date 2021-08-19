@@ -160,18 +160,15 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
             Role userRole;
-            //System.out.println("Insert class: " + authority);
             DbResult dbResult = new Select().findRole(Role.class, authority);
             if ( dbResult.isEmpty() ){
-                //dbResult = queryableEntity(tag);
                 Serializable insertedRoleUserId =  session.save(new Role(authority));
                 userRole = session.find(Role.class, insertedRoleUserId );
             }
             else userRole = dbResult.getResult( Role.class );
             session.getTransaction().commit();
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            //userRole = session.find(Role.class, insertedRoleUserId);
-            User user = new User(username, passwordEncoder.encode(password), userRole ); //TODO take bean
+            User user = new User(username, passwordEncoder.encode(password), userRole );
             Serializable insertedUserId =  session.save(user);
             session.getTransaction().commit();
             return new DbResult(insertedUserId);

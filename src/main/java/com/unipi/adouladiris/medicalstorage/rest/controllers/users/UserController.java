@@ -23,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.LinkedHashMap;
+
 @RestController
 @RequestMapping("/api/v1/user/")
 @Api(tags = { SwaggerConfiguration.UserController })
@@ -123,20 +125,19 @@ public class UserController {
         }
         String username = body.getUsername();
         String password = body.getPassword();
+        String expMinutes = body.getExpMinutes();
 
         // Use the authenticationManagerUser that we built in SecurityConfiguration.
-        Authentication authentication;
         try {
-            authentication = authenticationManagerUser
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            Authentication authentication = authenticationManagerUser.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
 
-            //Create the token from username.
-            String bearerToken = new JWToken(authenticatedUser).toString();
-            JSONObject response = new JSONObject();
-            response.put("Username", authenticatedUser.getName() );
-            response.put("Authorities", authenticatedUser.getAuthorities().toString() );
+            LinkedHashMap<String, String> response = new LinkedHashMap();
+            //Create the token from username and authority.
+            String bearerToken = new JWToken(authenticatedUser, expMinutes).toString();
+            response.put("username", authenticatedUser.getName() );
+            response.put("authority", authenticatedUser.getAuthorities().toString() );
             response.put("bearerToken", bearerToken);
             return new ResponseEntity(response.toString(), HttpStatus.OK);
         }catch (AuthenticationException exception){
