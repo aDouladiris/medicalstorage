@@ -24,6 +24,8 @@ public abstract class Operable extends Queryable implements Comparable<Operable>
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    // We cannot compare Object as they are not primitive types.
+    // But we can extract the common field name and compare the corresponding letters to sort the Object alphabetically.
     @Override
     public int compareTo(@NotNull Operable operableToCompare) {
         StringBuilder name1 = new StringBuilder(), name2 = new StringBuilder();

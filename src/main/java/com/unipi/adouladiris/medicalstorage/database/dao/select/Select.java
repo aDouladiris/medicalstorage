@@ -16,16 +16,13 @@ import java.util.*;
 
 public class Select extends DbEntitySessionManager implements SelectInterface {
 
-
     @Override
     public DbResult findAllProducts(){
-        //TODO parsing needs review
-
-        String select = "SELECT " +         // returns a list of objects
+        String select = "SELECT " + // returns a list of objects
                 "st.substance, " +  // Substance Object
                 "st.tab, " +        // Tab Object
                 "stc.category, " +  // Category Object
-                "stci.item, " +      // Item Object
+                "stci.item, " +     // Item Object
                 "stcit.tag " +      // Tag Object
                 "FROM SubstanceTabCategoryItemTag stcit " +
                 "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
@@ -52,22 +49,11 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
         for(Object[] row: queryResultList){
 
-//            System.out.println("==============================Insert=============================");
             Substance substance = (Substance)row[0];
-//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             Tab tab = (Tab)row[1];
-//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             Category category = (Category)row[2];
-//            System.out.println("To insert: " + category.getId() + " " + category.getName());
             Item item = (Item)row[3];
-//            System.out.println("To insert: " + item.getId() + " " + item.getName());
             Tag tag = (Tag)row[4];
-//            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
-//            System.out.println("==============================Insert=============================");
-//
-//            System.out.println("To insert: " + substance);
-//            if(product != null) System.out.println("Inside product" + product.getProduct().keySet().toString());
-
             if(!productSet.isEmpty()) {
                 for (Product containedProduct : productSet){
                     if(containedProduct.getProduct().containsKey( substance )){
@@ -78,8 +64,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
             // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
-//                System.out.println("New product");
-
                 // Create new Product.
                 product = new Product();
                 // Create new TreeSet of Tags.
@@ -137,19 +121,9 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
                     TreeMap<Category, TreeMap<Item, TreeSet<Tag>> > categoryItemTagTreeMap = new TreeMap<>();
                     categoryItemTagTreeMap.put( category, itemTagTreeMap );
                     product.getProduct().get(substance).put( tab, categoryItemTagTreeMap );
-//                    System.out.println("*************Product found*************");
-//                    product.printProduct();
-//                    System.out.println("*************Product found*************");
                 }
             }
-
-//            System.out.println("------------------ update ends ------------------");
-//            product.printProduct();
-//            System.out.println("------------------ update review ----------------");
         }
-//        System.out.println("*************Product found*************");
-//        productSet.forEach(p -> p.printProduct() );
-//        System.out.println("*************Product found*************");
 
         dbResult.setResult(productSet);
         return dbResult;
@@ -158,11 +132,11 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
     @Override
     public DbResult findProduct(String name){
 
-        String select = "SELECT " +         // returns a list of objects
+        String select = "SELECT " + // returns a list of objects
                 "st.substance, " +  // Substance Object
                 "st.tab, " +        // Tab Object
                 "stc.category, " +  // Category Object
-                "stci.item, " +      // Item Object
+                "stci.item, " +     // Item Object
                 "stcit.tag " +      // Tag Object
                 "FROM SubstanceTabCategoryItemTag stcit " +
                 "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
@@ -193,15 +167,10 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         for(Object[] row: queryResultList){
 
             Substance substance = (Substance)row[0];
-//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             Tab tab = (Tab)row[1];
-//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             Category category = (Category)row[2];
-//            System.out.println("To insert: " + category.getId() + " " + category.getName());
             Item item = (Item)row[3];
-//            System.out.println("To insert: " + item.getId() + " " + item.getName());
             Tag tag = (Tag)row[4];
-//            System.out.println("To insert: " + tag.getId() + " " + tag.getName());
 
             // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
@@ -265,10 +234,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
                     product.getProduct().get(substance).put( tab, categoryItemTagTreeMap );
                 }
             }
-
-//            System.out.println("------------------ update ends ------------------");
-//            product.printProduct();
-//            System.out.println("------------------ update review ----------------");
         }
 
         dbResult.setResult(product);
@@ -277,8 +242,8 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
     public DbResult findJoinTables(String name){
 
-        String select = "SELECT " +         // returns a list of objects
-                "st, stc, stci, stcit " +
+        String select =
+                "SELECT st, stc, stci, stcit " +
                 "FROM SubstanceTabCategoryItemTag stcit " +
                 "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
                 "INNER JOIN stcit.tag " +
@@ -300,16 +265,10 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         TreeSet<Joinable> joinableSet = new TreeSet<>();
 
         for(Object[] row: queryResultList) {
-
             SubstanceTab substanceTab = (SubstanceTab) row[0];
-//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
-//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
-//            System.out.println("To insert: " + category.getId() + " " + category.getName());
             SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
-//            System.out.println("To insert: " + item.getId() + " " + item.getName());
-
             joinableSet.add(substanceTab);
             joinableSet.add(substanceTabCategory);
             joinableSet.add(substanceTabCategoryItem);
@@ -322,8 +281,8 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
     public DbResult findJoinTable(Class<? extends Joinable> joinClass, String name){
 
-        String select = "SELECT " +         // returns a list of objects
-                "st, stc, stci, stcit " +
+        String select =
+                "SELECT st, stc, stci, stcit " +
                 "FROM SubstanceTabCategoryItemTag stcit " +
                 "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
                 "INNER JOIN stcit.tag " +
@@ -345,21 +304,14 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         TreeSet<Joinable> joinableSet = new TreeSet<>();
 
         for(Object[] row: queryResultList) {
-
             SubstanceTab substanceTab = (SubstanceTab) row[0];
-//            System.out.println("To insert: " + substance.getId() + " " + substance.getName());
             SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
-//            System.out.println("To insert: " + tab.getId() + " " + tab.getName());
             SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
-//            System.out.println("To insert: " + category.getId() + " " + category.getName());
             SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
-//            System.out.println("To insert: " + item.getId() + " " + item.getName());
-
             if(substanceTab.getClass().equals(joinClass)) joinableSet.add(substanceTab);
             if(substanceTabCategory.getClass().equals(joinClass)) joinableSet.add(substanceTabCategory);
             if(substanceTabCategoryItem.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItem);
             if(substanceTabCategoryItemTag.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItemTag);
-
         }
 
         dbResult.setResult(joinableSet);
@@ -368,7 +320,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
     @Override
     public DbResult findOperableEntityByName(String name) {
-
         // Tables cannot be parameter values
         Set<String> multiSelect = new HashSet<>();
         multiSelect.add( "FROM Substance as sub WHERE sub.name = :tmpName " );
@@ -387,9 +338,7 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
                 if( queryResultList.size() > 0 ){
 
-
                     if( queryResultList.isEmpty() ){ return dbResult; }
-
                     Object o = queryResultList.get(0);
                     if( ob.getClass().getSimpleName().equals( "Substance" ) ){
                         dbResult.setResult( (Substance)o );
@@ -413,8 +362,6 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
     @Override
     public DbResult findOperableEntityByName(@NotNull Class<? extends Operable> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
-//        System.out.println("Name  to Insert: " + name);
-//        System.out.println("Class to Insert: " + entityClassName);
         // Tables cannot be parameter values
         StringBuilder select = new StringBuilder();
         if( entityClassName.equals( "Substance" ) ){
@@ -435,14 +382,10 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
 
         Query query = session.createQuery( select.toString() );
         query.setParameter("tmpName", name);
-//        System.out.println("Query: " + query.unwrap(org.hibernate.Query.class).getQueryString());
         List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
-
-//        System.out.println("Result class: " + queryResultList.get(0).toString() );
         DbResult dbResult = new DbResult();
         if( queryResultList.isEmpty() ){ return dbResult; }
         dbResult.setResult( queryResultList.get(0) );
-
         return dbResult;
     }
 
@@ -552,13 +495,11 @@ public class Select extends DbEntitySessionManager implements SelectInterface {
         return new DbResult(results);
     }
 
-
     public DbResult findUser(String username){
         String select = "SELECT " +
                 "user " +               // User Object
                 "FROM User user " +
                 "INNER JOIN user.role AS role " +
-//                "INNER JOIN role.authority " +
                 "WHERE user.username = :username ";
 
         Query query = session.createQuery(select);

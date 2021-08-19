@@ -1,8 +1,7 @@
 package com.unipi.adouladiris.medicalstorage.database.dao.result;
-
 import com.sun.istack.NotNull;
 
-//TODO create constructor
+
 public class DbResult implements DbResultInterface {
 
     private Boolean empty = true;

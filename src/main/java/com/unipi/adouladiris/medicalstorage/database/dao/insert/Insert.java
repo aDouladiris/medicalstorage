@@ -23,31 +23,16 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
 
     @Override
     public DbResult product(@NotNull Product product) {
-
         for (Substance newSubstance : product.getProduct().keySet() ){
-            if(!new Select().findProduct(newSubstance.getName()).isEmpty()){
-                System.out.println("newSubstance: " + newSubstance);
-                return new DbResult(newSubstance);
-            }
+            if(!new Select().findProduct(newSubstance.getName()).isEmpty()){return new DbResult(newSubstance);}
         }
 
         Set<HashMap> results = new HashSet();
-
         for( Substance substance: product.getProduct().keySet() ){
-//            System.out.println("Substance : " + substance.getName() );
-
             for( Tab tab : product.getProduct().get(substance).keySet() ){
-//                System.out.println("Tab       : " + tab.getName() );
-
                 for ( Category category : product.getProduct().get(substance).get(tab).keySet() ){
-//                    System.out.println("Category  : " + category.getName() );
-
                     for ( Item item : product.getProduct().get(substance).get(tab).get(category).keySet() ){
-//                        System.out.println("Item      : <" + item.getName() + "> " + item.getDescription() );
-
                         for ( Tag tag : product.getProduct().get(substance).get(tab).get(category).get( item ) ){
-//                            System.out.println("Tag       : #" + tag.getName() );
-
                             // Insert keys with value at each iteration.
                             results.add(product(substance, tab, category, item, tag).getResult(HashMap.class));
                         }
@@ -55,7 +40,6 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
                 }
             }
         }
-
         return new DbResult(results);
     }
 
@@ -174,7 +158,4 @@ public class Insert extends DbEntitySessionManager implements InsertInterface {
             return new DbResult(ex);
         }
     }
-
-
-
 }

@@ -26,7 +26,6 @@ public class Delete extends DbEntitySessionManager implements DeleteInterface {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
             return new DbResult(ex);
         }
-
     }
 
     @Override
@@ -43,7 +42,6 @@ public class Delete extends DbEntitySessionManager implements DeleteInterface {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
             return new DbResult(ex);
         }
-        //return new Select().findOperableEntityByName(typeClass, name);
     }
 
     @Override
