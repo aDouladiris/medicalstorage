@@ -10,7 +10,6 @@ import java.util.Set;
 @Entity
 @Table(name = "substance")
 public class Substance extends Operable {
-
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "substance")
@@ -18,5 +17,4 @@ public class Substance extends Operable {
 
     public Substance(){}
     public Substance(String name){ setName(name); }
-
 }

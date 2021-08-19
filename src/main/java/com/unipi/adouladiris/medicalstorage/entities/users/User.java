@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name="user")
-public class User extends UserRole { //implements UserDetails {
+public class User extends UserRole {
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -45,45 +45,9 @@ public class User extends UserRole { //implements UserDetails {
         this.enabled = 'Y';
     }
 
-    // TODO needs review
-//    public User(org.springframework.security.core.userdetails.User user){
-//        User userCustom = new Select().findUser(user.getUsername()).getResult(User.class);
-//        this.username = userCustom.getUsername();
-//        this.password = userCustom.getPassword();
-//        this.role = userCustom.getRole();
-//        this.enabled = 'Y';
-//    }
-
     public String getUsername() {return username;}
 
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        if(this.enabled == 'Y') return true;
-//        else return false;
-//    }
-
     public void setUsername(String username) {this.username = username;}
-
-//    @Override
-//    public Collection<GrantedAuthority> getAuthorities() {
-//        return AuthorityUtils.commaSeparatedStringToAuthorityList(this.role.getAuthority()); // TODO ROLE_ prefix
-//    }
-
     public String getPassword() {return password;}
     public void setPassword(String password) {this.password = password;}
 
