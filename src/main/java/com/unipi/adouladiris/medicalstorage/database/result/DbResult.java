@@ -23,14 +23,10 @@ public class DbResult {
 
     public Object getResult() { return result; }
 
-    //    @Override TODO review interface
-    public <T> T getResult(@NotNull Class<T> type) { this.empty = false; return type.cast( result ); } // Requires class. Returns the casted object from the argument class type
+    // Requires class. Returns the casted object from the argument class type
+    public <T> T getResult(@NotNull Class<T> type) { this.empty = false; return type.cast( result ); }
 
     public void setResult(@NotNull Object result) { this.result = result; this.empty = false; }
-
     public Exception getException() { return exception; }
-
     public void setException(@NotNull Exception exception) { this.exception = exception; }
-
-
 }

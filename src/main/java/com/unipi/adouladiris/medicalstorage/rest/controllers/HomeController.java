@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.controllers.home;
+package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -25,8 +25,8 @@ public class Update extends DbEntitySessionManager {
             Operable object = session.find(operable.getClass(), id);
             object.setName(operable.getName());
             if( operable.getClass().getSimpleName().equals("Item") ){
-                Item itemOld = Item.class.cast(object);
-                Item itemNew = Item.class.cast(operable);
+                Item itemOld = (Item) object;
+                Item itemNew = (Item) operable;
                 itemOld.setDescription(itemNew.getDescription());
                 object = itemOld;
             }

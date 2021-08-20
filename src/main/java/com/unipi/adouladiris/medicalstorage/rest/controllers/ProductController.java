@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.controllers.products;
+package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
 import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Delete;

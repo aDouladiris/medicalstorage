@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.controllers.users;
+package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
 import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
