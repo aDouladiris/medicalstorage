@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.configuration.security;
+package com.unipi.adouladiris.medicalstorage.configuration;
 import com.unipi.adouladiris.medicalstorage.filters.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

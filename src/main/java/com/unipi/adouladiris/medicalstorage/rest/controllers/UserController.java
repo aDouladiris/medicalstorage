@@ -1,6 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
-import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
+import com.unipi.adouladiris.medicalstorage.configuration.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
@@ -37,6 +37,7 @@ public class UserController {
 
     //************************** GET/ *************************
     @GetMapping(value = "information")
+    @PreAuthorize("permitAll()")
     @ApiOperation(value = "Get User Information", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Authorized User found!"),
@@ -45,7 +46,6 @@ public class UserController {
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
-    @PreAuthorize("permitAll()")
     public ResponseEntity<String> getUserInformation() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return new ResponseEntity(authentication.getPrincipal(), HttpStatus.OK);

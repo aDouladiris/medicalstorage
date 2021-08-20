@@ -1,6 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
-import com.unipi.adouladiris.medicalstorage.configuration.swagger.SwaggerConfiguration;
+import com.unipi.adouladiris.medicalstorage.configuration.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
@@ -26,7 +26,6 @@ import java.util.*;
 public class ProductController {
 
     // Http request will be intercepted by Token filter before proceeding.
-
     //************************** GET/ **************************
     @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
@@ -91,7 +90,6 @@ public class ProductController {
     public ResponseEntity<String> getProductByTag(@PathVariable String tag) {
         SecurityContextHolder.getContext().setAuthentication(null);
         Set<Product> results =  new Select().findByTag(tag).getResult(HashSet.class);
-//        if (dbResult.isEmpty()) return new ResponseEntity("Product not found!", HttpStatus.NOT_FOUND);
         Set<String> resultNames = new HashSet<>();
         results.forEach(product -> {
             product.getProduct().keySet().forEach( substance -> resultNames.add(substance.getName()) );

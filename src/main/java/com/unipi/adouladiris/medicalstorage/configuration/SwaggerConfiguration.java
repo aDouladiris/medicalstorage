@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.configuration.swagger;
+package com.unipi.adouladiris.medicalstorage.configuration;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
@@ -46,7 +46,7 @@ public class SwaggerConfiguration  {
                 )
                 .apiInfo(apiInfo())
                 .select()
-                .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers.users" ) )
+                .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers" ) )
                 .paths(PathSelectors.ant("/api/v1/user/**"))
                 .build();
     }
@@ -64,7 +64,7 @@ public class SwaggerConfiguration  {
                 .apiInfo(apiInfo())
                 .globalRequestParameters(authorizationParameter())
                 .select()
-                .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers.products" ) )
+                .apis( RequestHandlerSelectors.basePackage( "com.unipi.adouladiris.medicalstorage.rest.controllers" ) )
                 .paths(PathSelectors.ant("/api/v1/product/**"))
                 .build();
     }
