@@ -7,19 +7,19 @@ import org.json.JSONObject;
 import java.util.*;
 
 //TODO needs rename
-public class DataTransferObject {
+public class RequestBodyParse {
 
     private Set<JSONObject> jsonSet;
     private Set<Product> productSet;
 
-    public DataTransferObject(Product product) throws Exception {
+    public RequestBodyParse(Product product) throws Exception {
         TreeSet<Product> products = new TreeSet<>(){{add(product);}};
         this.jsonSet = productSetToJsonObject(products);
     }
 
-    public DataTransferObject(TreeSet<Product> products) throws Exception {this.jsonSet = productSetToJsonObject(products);}
-    public DataTransferObject(ArrayList<Object> body) throws Exception {this.productSet = payloadToProductSet(body);}
-    public DataTransferObject(LinkedHashMap body) throws Exception {this.productSet = payloadToProductSet(body);}
+    public RequestBodyParse(TreeSet<Product> products) throws Exception {this.jsonSet = productSetToJsonObject(products);}
+    public RequestBodyParse(ArrayList<Object> body) throws Exception {this.productSet = payloadToProductSet(body);}
+    public RequestBodyParse(LinkedHashMap body) throws Exception {this.productSet = payloadToProductSet(body);}
 
     private Set<Product> payloadToProductSet(LinkedHashMap body) throws Exception {
         //System.out.println("body: " + body.toString());

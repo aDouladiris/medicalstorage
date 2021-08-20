@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.dto;
+package com.unipi.adouladiris.medicalstorage.swagger.models;
 
 import io.swagger.annotations.ApiModelProperty;
 

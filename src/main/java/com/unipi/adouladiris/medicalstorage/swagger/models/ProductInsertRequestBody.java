@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.dto;
+package com.unipi.adouladiris.medicalstorage.swagger.models;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -89,33 +89,13 @@ public class ProductInsertRequestBody {
                                     "]}}]}}]}}}" +
                     "]"
     )
-    public Object[] product;
+    private Object[] product;
 
+    public Object[] getProduct() {
+        return product;
+    }
 
-    //    @ApiModelProperty(
-//            notes = "Password of the User",
-//            name="Password",
-//            dataType = "String",
-//            required=true,
-//            example = "123"
-//    )
-//    private String password;
-//
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
-
-
+    public void setProduct(Object[] product) {
+        this.product = product;
+    }
 }

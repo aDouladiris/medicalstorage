@@ -1,4 +1,4 @@
-package com.unipi.adouladiris.medicalstorage.rest.dto;
+package com.unipi.adouladiris.medicalstorage.swagger.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.Api;

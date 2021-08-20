@@ -1,6 +1,6 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
-import com.unipi.adouladiris.medicalstorage.configuration.SwaggerConfiguration;
+import com.unipi.adouladiris.medicalstorage.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Delete;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
@@ -9,6 +9,9 @@ import com.unipi.adouladiris.medicalstorage.database.dao.Update;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
+import com.unipi.adouladiris.medicalstorage.swagger.models.ProductInsertRequestBody;
+import com.unipi.adouladiris.medicalstorage.swagger.models.ProductReplaceRequestBody;
+import com.unipi.adouladiris.medicalstorage.swagger.models.ProductUpdateRequestBody;
 import io.swagger.annotations.*;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -44,7 +47,7 @@ public class ProductController {
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         TreeSet<Product> productSet = dbResult.getResult(TreeSet.class);
         try{
-            DataTransferObject dto = new DataTransferObject(productSet);
+            RequestBodyParse dto = new RequestBodyParse(productSet);
             return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
         }
         catch (Exception exc){
@@ -69,7 +72,7 @@ public class ProductController {
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         try{
-            DataTransferObject dto = new DataTransferObject(product);
+            RequestBodyParse dto = new RequestBodyParse(product);
             return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
         }
         catch (Exception exc){
@@ -138,7 +141,7 @@ public class ProductController {
     public ResponseEntity<String> insertProduct(@RequestBody LinkedHashMap body) {
         SecurityContextHolder.getContext().setAuthentication(null);
         try{
-            Set<Product> productSet = new DataTransferObject(body).getProductSet();
+            Set<Product> productSet = new RequestBodyParse(body).getProductSet();
             Set<HashSet> results = new HashSet();
             Set<String> failures = new HashSet();
 
@@ -185,7 +188,7 @@ public class ProductController {
     public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
         SecurityContextHolder.getContext().setAuthentication(null);
         try {
-            Set<Product> productSet = new DataTransferObject(body).getProductSet();
+            Set<Product> productSet = new RequestBodyParse(body).getProductSet();
             Set<HashSet> results = new HashSet();
             Set<String> failures = new HashSet();
             productSet.forEach(product -> {

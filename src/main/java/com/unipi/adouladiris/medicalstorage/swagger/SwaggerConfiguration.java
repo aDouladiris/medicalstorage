@@ -1,7 +1,7 @@
-package com.unipi.adouladiris.medicalstorage.configuration;
+package com.unipi.adouladiris.medicalstorage.swagger;
 
 import com.fasterxml.classmate.TypeResolver;
-import com.unipi.adouladiris.medicalstorage.rest.dto.*;
+import com.unipi.adouladiris.medicalstorage.swagger.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

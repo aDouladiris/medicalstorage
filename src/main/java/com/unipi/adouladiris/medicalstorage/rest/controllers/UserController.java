@@ -1,10 +1,10 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
-import com.unipi.adouladiris.medicalstorage.configuration.SwaggerConfiguration;
+import com.unipi.adouladiris.medicalstorage.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.rest.dto.RegisterUserRequestBody;
-import com.unipi.adouladiris.medicalstorage.rest.dto.UserRequestBody;
+import com.unipi.adouladiris.medicalstorage.swagger.models.RegisterUserRequestBody;
+import com.unipi.adouladiris.medicalstorage.swagger.models.UserRequestBody;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import io.swagger.annotations.*;
 import org.json.JSONObject;
