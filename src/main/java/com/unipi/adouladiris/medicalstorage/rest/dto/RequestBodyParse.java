@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.util.*;
 
-//TODO needs rename
 public class RequestBodyParse {
 
     private Set<JSONObject> jsonSet;
