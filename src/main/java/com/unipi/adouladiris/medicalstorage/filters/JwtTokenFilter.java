@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
+// Filter class that exists at the beginning of the security chain checking each HTTP request.
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
@@ -29,12 +30,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter){this.dateTimeFormatter = dateTimeFormatter;}
 
+    // Returns if request target endpoint should be filtered or not.
+    // Only /api/v1/product/ endpoint should be filtered.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         if(request.getRequestURI().contains("/api/v1/product/")) return false; // ShouldFilter
         else return true; // ShouldNotFilter
     }
 
+    // If request target endpoint is filtered, then it will check request headers if containing Bearer field.
+    // If exists, then it will reconstruct the JwT token as an object JWToken and validate it by examining its
+    // expiring date.
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {

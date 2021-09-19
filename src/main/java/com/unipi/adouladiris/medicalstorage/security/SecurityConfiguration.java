@@ -15,15 +15,6 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 
 import javax.sql.DataSource;
 
-import static java.lang.String.format;
-
-
-// https://stackoverflow.com/questions/35890540/when-to-use-spring-securitys-antmatcher
-// https://stackoverflow.com/questions/58995870/why-do-we-need-to-call-http-addfilterbefore-method-in-spring-security-configur
-// checkhttps://www.toptal.com/spring/spring-security-tutorial
-// newest????https://www.baeldung.com/spring-security-oauth-resource-server
-// readhttps://medium.com/javarevisited/spring-security-jwt-authentication-in-detail-bb98b5055b50
-
 //@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
@@ -89,7 +80,7 @@ public class SecurityConfiguration {
 
         // Configure the DefaultSecurityFilterChain by registering our custom Jwt filter right after the SecurityContextPersistenceFilter.
         // If the filter is successful then we assign a user with username and authority to the SecurityContext so we would not need an
-        // AuthenticationManager later to avoid quering the database.
+        // AuthenticationManager later to avoid querying the database.
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http

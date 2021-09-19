@@ -15,8 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class JWToken {
 
@@ -62,6 +60,9 @@ public class JWToken {
         signature = parts[2];
     }
 
+    // In order to validate a Jwt token, we reconstruct JwT signature by its three-part string taking only the headers and the payload (signature is encrypting these two parts).
+    // If the newly constructed signature is equal to the third part of the token (the signature), then the token is partially valid because is was issued with the same secret key as ours.
+    // Then we examine its expiring date. If the expiration date is not passed, then the token is completely valid.
     public boolean isValid() throws NoSuchAlgorithmException, InvalidKeyException {
         return payload.getLong("exp") > (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)) &&//token not expired
                signature.equals(hmacSha256(this.encodedHeader + "." + encode(payload) )); //signature matched
@@ -71,6 +72,7 @@ public class JWToken {
     private String encode(JSONObject obj) {return encode(obj.toString().getBytes(StandardCharsets.UTF_8));}
     private String decode(String encodedString) {return new String(Base64.getUrlDecoder().decode(encodedString));}
 
+    // Encrypt data string using HMAC.
     private String hmacSha256(String data) throws InvalidKeyException, NoSuchAlgorithmException {
             byte[] hash = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
             Mac sha256Hmac = Mac.getInstance("HmacSHA256");
@@ -91,6 +93,7 @@ public class JWToken {
 
     public String getSubject() {return payload.getString("sub");}
 
+    // Get user role by checking the payload of the token.
     public Collection<GrantedAuthority> getAudience() {
         JSONArray arr = payload.getJSONArray("aud");
         StringBuilder audience = new StringBuilder();

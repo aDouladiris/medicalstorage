@@ -11,6 +11,8 @@ import javax.persistence.PersistenceException;
 
 public class Delete extends DbEntitySessionManager {
 
+    // Delete entity by Id. Pass the class type and the Id parameter to find the corresponding entity, remove row from records and clear db cache
+    // to make deletion visible. The corresponding table is obtained by passing the class type as parameter.
     public DbResult deleteEntityById(@NotNull Class<? extends Queryable> typeClass, @NotNull Integer id) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -26,6 +28,8 @@ public class Delete extends DbEntitySessionManager {
         }
     }
 
+    // Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity, remove row from records and clear db cache
+    // to make deletion visible. The corresponding table is obtained by passing the class type as parameter.
     public DbResult deleteEntityByName(@NotNull Class<? extends Operable> typeClass, @NotNull String name) {
         Operable objectToDelete = new Select().findOperableEntityByName(typeClass, name).getResult( typeClass );
         try {
@@ -41,6 +45,7 @@ public class Delete extends DbEntitySessionManager {
         }
     }
 
+    // Delete Product by deleting the Substance entity which is the first single key using deleteEntityByName method.
     public DbResult deleteProduct(@NotNull Product product) {
         if ( product.getProduct().keySet().size() > 1 ) return new DbResult();
         return deleteEntityByName(product.getEntityContainingName().getClass(), product.getEntityContainingName().getName());

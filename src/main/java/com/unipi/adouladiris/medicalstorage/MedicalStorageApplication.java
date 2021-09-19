@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
 
-// Is used to mark a configuration class that declares one or more @Bean methods
+// Marks a configuration class that declares one or more @Bean methods
 // and also triggers auto-configuration and component scanning.
 // It is scanning our @Component classes that we build.
 @SpringBootApplication

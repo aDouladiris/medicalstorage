@@ -20,7 +20,10 @@ import java.util.Set;
 
 public class Insert extends DbEntitySessionManager {
 
+    // Insert Product tree containing entities as keys and values after checking for existing substance entity.
+    // Each entity in the Product tree is inserted individually.
     public DbResult product(@NotNull Product product) {
+        // Return empty if entity Substance exists.
         for (Substance newSubstance : product.getProduct().keySet() ){
             if(!new Select().findProduct(newSubstance.getName()).isEmpty()){return new DbResult(newSubstance);}
         }
@@ -41,6 +44,9 @@ public class Insert extends DbEntitySessionManager {
         return new DbResult(results);
     }
 
+    // Save entity by simple instance save method and returning the Id of the newly created row.
+    // The only downside is that we use Hibernate API (method: save) as we wanted to keep the code generalized and not framework-specific.
+    // We could use Persistence API but we have to research for the newly inserted instance to gew row Id.
     public DbResult queryableEntity(Queryable queryable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -54,10 +60,13 @@ public class Insert extends DbEntitySessionManager {
         }
     }
 
+    // To insert a Product tree, we insert each entity individually. If the instance of each entity exists, we retrieve the instance.
+    // If not, we create a new instance of the entity.
+    // After each entity insertion, we use their Id to join them at JoinTables.
+    // At the end, we return a HashMap containing the participated entities Ids.
     public DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
 
-        //TODO extract method
         DbResult dbResult = new Select().findOperableEntityByName( Substance.class, substance.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(substance); substance = session.find(Substance.class, dbResult.getResult( Integer.class ) ); }
         else substance = dbResult.getResult( Substance.class );

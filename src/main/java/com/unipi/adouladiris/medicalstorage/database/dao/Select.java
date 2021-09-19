@@ -16,6 +16,7 @@ import java.util.*;
 
 public class Select extends DbEntitySessionManager {
 
+    // Find all Product trees by joining all entities according to join tables.
     public DbResult findAllProducts(){
         String select = "SELECT " + // returns a list of objects
                 "st.substance, " +  // Substance Object
@@ -128,6 +129,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Find Product tree with the matching substance by joining all entities according to join tables.
     public DbResult findProduct(String name){
 
         String select = "SELECT " + // returns a list of objects
@@ -238,124 +240,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
-    public DbResult findJoinTables(String name){
-
-        String select =
-                "SELECT st, stc, stci, stcit " +
-                "FROM SubstanceTabCategoryItemTag stcit " +
-                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
-                "INNER JOIN stcit.tag " +
-                "INNER JOIN stci.substanceTabCategory AS stc " +
-                "INNER JOIN stci.item " +
-                "INNER JOIN stc.substanceTab AS st " +
-                "INNER JOIN stc.category " +
-                "INNER JOIN st.substance " +
-                "INNER JOIN st.tab " +
-                "WHERE st.substance.name = :subName ";
-
-        Query query = session.createQuery(select);
-        query.setParameter("subName", name);
-        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
-
-        DbResult dbResult = new DbResult();
-        if( queryResultList.isEmpty() ){ return dbResult; }
-
-        TreeSet<Joinable> joinableSet = new TreeSet<>();
-
-        for(Object[] row: queryResultList) {
-            SubstanceTab substanceTab = (SubstanceTab) row[0];
-            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
-            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
-            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
-            joinableSet.add(substanceTab);
-            joinableSet.add(substanceTabCategory);
-            joinableSet.add(substanceTabCategoryItem);
-            joinableSet.add(substanceTabCategoryItemTag);
-        }
-
-        dbResult.setResult(joinableSet);
-        return dbResult;
-    }
-
-    public DbResult findJoinTable(Class<? extends Joinable> joinClass, String name){
-
-        String select =
-                "SELECT st, stc, stci, stcit " +
-                "FROM SubstanceTabCategoryItemTag stcit " +
-                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
-                "INNER JOIN stcit.tag " +
-                "INNER JOIN stci.substanceTabCategory AS stc " +
-                "INNER JOIN stci.item " +
-                "INNER JOIN stc.substanceTab AS st " +
-                "INNER JOIN stc.category " +
-                "INNER JOIN st.substance " +
-                "INNER JOIN st.tab " +
-                "WHERE st.substance.name = :subName ";
-
-        Query query = session.createQuery(select);
-        query.setParameter("subName", name);
-        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
-
-        DbResult dbResult = new DbResult();
-        if( queryResultList.isEmpty() ){ return dbResult; }
-
-        TreeSet<Joinable> joinableSet = new TreeSet<>();
-
-        for(Object[] row: queryResultList) {
-            SubstanceTab substanceTab = (SubstanceTab) row[0];
-            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
-            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
-            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
-            if(substanceTab.getClass().equals(joinClass)) joinableSet.add(substanceTab);
-            if(substanceTabCategory.getClass().equals(joinClass)) joinableSet.add(substanceTabCategory);
-            if(substanceTabCategoryItem.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItem);
-            if(substanceTabCategoryItemTag.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItemTag);
-        }
-
-        dbResult.setResult(joinableSet);
-        return dbResult;
-    }
-
-    public DbResult findOperableEntityByName(String name) {
-        // Tables cannot be parameter values
-        Set<String> multiSelect = new HashSet<>();
-        multiSelect.add( "FROM Substance as sub WHERE sub.name = :tmpName " );
-        multiSelect.add( "FROM Tab as tab WHERE tab.name = :tmpName " );
-        multiSelect.add( "FROM Category as cat WHERE cat.name = :tmpName " );
-        multiSelect.add( "FROM Item as item WHERE item.name = :tmpName " );
-        multiSelect.add( "FROM Tag as tag WHERE tag.name = :tmpName " );
-
-        DbResult dbResult = new DbResult();
-        for ( String select : multiSelect ){
-
-            Query query = session.createQuery( select );
-            query.setParameter("tmpName", name);
-            List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
-            for (Object ob : queryResultList ){
-
-                if( queryResultList.size() > 0 ){
-
-                    if( queryResultList.isEmpty() ){ return dbResult; }
-                    Object o = queryResultList.get(0);
-                    if( ob.getClass().getSimpleName().equals( "Substance" ) ){
-                        dbResult.setResult( (Substance)o );
-                    }
-                    else if( ob.getClass().getSimpleName().equals( "Tab" ) ){
-                        dbResult.setResult( (Tab)o );
-                    }
-                    else if( ob.getClass().getSimpleName().equals( "Category" ) ){
-                        dbResult.setResult( (Category)o );
-                    }
-                    else if( ob.getClass().getSimpleName().equals( "Item" ) ){
-                        dbResult.setResult( (Item)o );
-                    }
-                    return dbResult;
-                }
-            }
-        }
-        return dbResult;
-    }
-
+    // Find entity instance by its name property.
     public DbResult findOperableEntityByName(@NotNull Class<? extends Operable> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -385,6 +270,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Find Role entity by its name.
     public DbResult findRole(@NotNull Class<? extends UserRole> classType, @NotNull String name) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -404,6 +290,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Find join table entity (which is SubstanceTab) containing foreign keys from entities that are not join tables.
     public DbResult findJoinableEntityByName(@NotNull Class<? extends Joinable> classType, @NotNull Operable op1, @NotNull Operable op2) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -425,6 +312,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Find join table entities(all join tables except SubstanceTab) containing foreign keys from entities that are join tables and entities that are not.
     public DbResult findJoinableEntityByName(@NotNull Class<? extends Joinable> classType, @NotNull Joinable op1, @NotNull Operable op2) {
         String entityClassName = classType.getSimpleName();
         // Tables cannot be parameter values
@@ -456,6 +344,7 @@ public class Select extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Find Substance matching tag entities names and retrieve the corresponding Product tree.
     public DbResult findByTag(String tag){
 
         Set<Product> results = new HashSet();
@@ -488,20 +377,139 @@ public class Select extends DbEntitySessionManager {
         return new DbResult(results);
     }
 
-    public DbResult findUser(String username){
-        String select = "SELECT " +
-                "user " +               // User Object
-                "FROM User user " +
-                "INNER JOIN user.role AS role " +
-                "WHERE user.username = :username ";
+//    public DbResult findUser(String username){
+//        String select = "SELECT " +
+//                "user " +               // User Object
+//                "FROM User user " +
+//                "INNER JOIN user.role AS role " +
+//                "WHERE user.username = :username ";
+//
+//        Query query = session.createQuery(select);
+//        query.setParameter("username", username);
+//        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+//
+//        for( Object o : queryResultList ) { return new DbResult(User.class.cast(o)); }
+//        return new DbResult();
+//    }
 
-        Query query = session.createQuery(select);
-        query.setParameter("username", username);
-        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
 
-        for( Object o : queryResultList ) { return new DbResult(User.class.cast(o)); }
-        return new DbResult();
-    }
+    //    public DbResult findJoinTables(String name){
+//
+//        String select =
+//                "SELECT st, stc, stci, stcit " +
+//                "FROM SubstanceTabCategoryItemTag stcit " +
+//                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
+//                "INNER JOIN stcit.tag " +
+//                "INNER JOIN stci.substanceTabCategory AS stc " +
+//                "INNER JOIN stci.item " +
+//                "INNER JOIN stc.substanceTab AS st " +
+//                "INNER JOIN stc.category " +
+//                "INNER JOIN st.substance " +
+//                "INNER JOIN st.tab " +
+//                "WHERE st.substance.name = :subName ";
+//
+//        Query query = session.createQuery(select);
+//        query.setParameter("subName", name);
+//        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+//
+//        DbResult dbResult = new DbResult();
+//        if( queryResultList.isEmpty() ){ return dbResult; }
+//
+//        TreeSet<Joinable> joinableSet = new TreeSet<>();
+//
+//        for(Object[] row: queryResultList) {
+//            SubstanceTab substanceTab = (SubstanceTab) row[0];
+//            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
+//            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
+//            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
+//            joinableSet.add(substanceTab);
+//            joinableSet.add(substanceTabCategory);
+//            joinableSet.add(substanceTabCategoryItem);
+//            joinableSet.add(substanceTabCategoryItemTag);
+//        }
+//
+//        dbResult.setResult(joinableSet);
+//        return dbResult;
+//    }
+
+//    public DbResult findJoinTable(Class<? extends Joinable> joinClass, String name){
+//
+//        String select =
+//                "SELECT st, stc, stci, stcit " +
+//                "FROM SubstanceTabCategoryItemTag stcit " +
+//                "INNER JOIN stcit.substanceTabCategoryItem AS stci " +
+//                "INNER JOIN stcit.tag " +
+//                "INNER JOIN stci.substanceTabCategory AS stc " +
+//                "INNER JOIN stci.item " +
+//                "INNER JOIN stc.substanceTab AS st " +
+//                "INNER JOIN stc.category " +
+//                "INNER JOIN st.substance " +
+//                "INNER JOIN st.tab " +
+//                "WHERE st.substance.name = :subName ";
+//
+//        Query query = session.createQuery(select);
+//        query.setParameter("subName", name);
+//        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+//
+//        DbResult dbResult = new DbResult();
+//        if( queryResultList.isEmpty() ){ return dbResult; }
+//
+//        TreeSet<Joinable> joinableSet = new TreeSet<>();
+//
+//        for(Object[] row: queryResultList) {
+//            SubstanceTab substanceTab = (SubstanceTab) row[0];
+//            SubstanceTabCategory substanceTabCategory = (SubstanceTabCategory) row[1];
+//            SubstanceTabCategoryItem substanceTabCategoryItem = (SubstanceTabCategoryItem) row[2];
+//            SubstanceTabCategoryItemTag substanceTabCategoryItemTag = (SubstanceTabCategoryItemTag) row[3];
+//            if(substanceTab.getClass().equals(joinClass)) joinableSet.add(substanceTab);
+//            if(substanceTabCategory.getClass().equals(joinClass)) joinableSet.add(substanceTabCategory);
+//            if(substanceTabCategoryItem.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItem);
+//            if(substanceTabCategoryItemTag.getClass().equals(joinClass)) joinableSet.add(substanceTabCategoryItemTag);
+//        }
+//
+//        dbResult.setResult(joinableSet);
+//        return dbResult;
+//    }
+
+//    public DbResult findOperableEntityByName(String name) {
+//        // Tables cannot be parameter values
+//        Set<String> multiSelect = new HashSet<>();
+//        multiSelect.add( "FROM Substance as sub WHERE sub.name = :tmpName " );
+//        multiSelect.add( "FROM Tab as tab WHERE tab.name = :tmpName " );
+//        multiSelect.add( "FROM Category as cat WHERE cat.name = :tmpName " );
+//        multiSelect.add( "FROM Item as item WHERE item.name = :tmpName " );
+//        multiSelect.add( "FROM Tag as tag WHERE tag.name = :tmpName " );
+//
+//        DbResult dbResult = new DbResult();
+//        for ( String select : multiSelect ){
+//
+//            Query query = session.createQuery( select );
+//            query.setParameter("tmpName", name);
+//            List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+//            for (Object ob : queryResultList ){
+//
+//                if( queryResultList.size() > 0 ){
+//
+//                    if( queryResultList.isEmpty() ){ return dbResult; }
+//                    Object o = queryResultList.get(0);
+//                    if( ob.getClass().getSimpleName().equals( "Substance" ) ){
+//                        dbResult.setResult( (Substance)o );
+//                    }
+//                    else if( ob.getClass().getSimpleName().equals( "Tab" ) ){
+//                        dbResult.setResult( (Tab)o );
+//                    }
+//                    else if( ob.getClass().getSimpleName().equals( "Category" ) ){
+//                        dbResult.setResult( (Category)o );
+//                    }
+//                    else if( ob.getClass().getSimpleName().equals( "Item" ) ){
+//                        dbResult.setResult( (Item)o );
+//                    }
+//                    return dbResult;
+//                }
+//            }
+//        }
+//        return dbResult;
+//    }
 
 
 }

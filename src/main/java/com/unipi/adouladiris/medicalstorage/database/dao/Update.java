@@ -19,6 +19,7 @@ import java.util.*;
 
 public class Update extends DbEntitySessionManager {
 
+    // Retrieve entity instance by Id, update content at the instance and save to db.
     public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
@@ -42,12 +43,15 @@ public class Update extends DbEntitySessionManager {
         }
     }
 
-    public DbResult entityByName(@NotNull String name, @NotNull Operable operable) {
-        Operable object = new Select().findOperableEntityByName(operable.getClass(), name).getResult( Operable.class );
-        if(object == null) return new DbResult();
-        return entityById(object.getId(), operable);
-    }
+    // Retrieve entity instance by Name, update content at the instance and save to db.
+//    public DbResult entityByName(@NotNull String name, @NotNull Operable operable) {
+//        Operable object = new Select().findOperableEntityByName(operable.getClass(), name).getResult( Operable.class );
+//        if(object == null) return new DbResult();
+//        return entityById(object.getId(), operable);
+//    }
 
+    // Retrieve each entity from Product tree. If entity exists, update accordingly. If not, created new entity and
+    // append Id to the corresponding JoinTable.
     public DbResult product(@NotNull Product product) {
 
         for (Substance newSubstance : product.getProduct().keySet() ){
@@ -72,6 +76,7 @@ public class Update extends DbEntitySessionManager {
         return new DbResult(results);
     }
 
+    // If http request body for update contains keyword 'replacement', then it finds matching entity and replace it with new values.
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
@@ -108,6 +113,7 @@ public class Update extends DbEntitySessionManager {
         else return new DbResult(results);
     }
 
+    // Replace entity Id at JoinTables.
     private ArrayList<HashMap> processBodyKeys(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
 
         ArrayList<HashMap> results = new ArrayList();
@@ -119,12 +125,14 @@ public class Update extends DbEntitySessionManager {
         return results;
     }
 
+    // Performs actual replacement of entity Id at joinTable by checking key paths of entities in order to find the corresponding entity.
     private HashMap<String, String> updateJoinTable(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
 
         HashMap<Class<? extends Operable>, Operable> operableSet = new HashMap();
         for(Operable entity : indexEntities){ operableSet.put(entity.getClass(), entity); }
         HashMap<String, String> results = new HashMap();
 
+        // If path: Substance->Tab->Category->Item->Tag exists, replace tag entities.
         if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 operableSet.containsKey(Item.class) && operableSet.containsKey(Tag.class)){
 
@@ -175,6 +183,7 @@ public class Update extends DbEntitySessionManager {
                                 });
                     });
         }
+        // If path: Substance->Tab->Category->Item exists, replace item entities.
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
@@ -229,6 +238,7 @@ public class Update extends DbEntitySessionManager {
                     });
 
         }
+        // If path: Substance->Tab->Category exists, replace category entities.
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 !operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
@@ -272,6 +282,7 @@ public class Update extends DbEntitySessionManager {
                     });
 
         }
+        // If path: Substance->Tab exists, replace tab entities.
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && !operableSet.containsKey(Category.class) &&
                 !operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
@@ -312,6 +323,7 @@ public class Update extends DbEntitySessionManager {
                     });
 
         }
+        // If path: Substance exists, replace substance entities.
         else if(operableSet.containsKey(Substance.class) && !operableSet.containsKey(Tab.class) && !operableSet.containsKey(Category.class) &&
                 !operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
@@ -339,6 +351,8 @@ public class Update extends DbEntitySessionManager {
 
     }
 
+    // Count entities at join tables. If entity reference (as a foreign key) to a join table is removed and is not attached to a join table,
+    // then delete it from the corresponding table.
     private DbResult getRecordsCount(Class<? extends Joinable> joinTableName, Class<? extends Operable> operableName, String oldKey){
 
         StringBuilder queryBuilder = new StringBuilder();
@@ -376,7 +390,6 @@ public class Update extends DbEntitySessionManager {
             queryBuilder.append("jt.tag WHERE jt.tag.name =: name ");
         }
 
-        //String select = "FROM SubstanceTab jt INNER JOIN jt.tab WHERE jt.tab.name =: name ";
         String select = queryBuilder.toString();
         Query query = session.createQuery(select);
         query.setParameter("name", oldKey);
