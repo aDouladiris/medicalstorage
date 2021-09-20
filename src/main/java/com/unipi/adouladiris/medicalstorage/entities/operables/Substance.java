@@ -12,7 +12,7 @@ import java.util.Set;
 public class Substance extends Operable {
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "substance")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "substance")
     private Set<SubstanceTab> substanceTabSet;
 
     public Substance(){}

@@ -10,12 +10,12 @@ import javax.persistence.*;
 public class SubstanceTabCategoryItemTag extends Joinable {
 
     // For bidirectional relationship with Substances.
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "substanceTabCategoryItem_Id", nullable = false, referencedColumnName = "Id")
     private SubstanceTabCategoryItem substanceTabCategoryItem;
 
     // For bidirectional relationship with Tabs.
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "tag_Id", nullable = false, referencedColumnName = "Id")
     private Tag tag;
 

@@ -13,7 +13,7 @@ public class Tag extends Operable {
 
     // Manages bidirectional relationship with Tags.
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "tag")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "tag")
     private Set<SubstanceTabCategoryItemTag> substanceTabCategoryItemTagSet;
 
     public Tag(){}

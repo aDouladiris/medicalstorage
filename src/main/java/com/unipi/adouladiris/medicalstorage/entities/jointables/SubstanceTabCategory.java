@@ -11,17 +11,17 @@ import java.util.Set;
 public class SubstanceTabCategory extends Joinable {
 
     // Manages bidirectional relationship with Categories.
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "category_Id", nullable = false, referencedColumnName = "Id")
     private Category category;
 
     // For bidirectional relationship with SubstanceTabs.
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "substanceTab_Id", nullable = false, referencedColumnName = "Id")
     private SubstanceTab substanceTab;
 
     // Manages bidirectional relationship with SubstanceTabCategoryItems.
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "substanceTabCategory")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "substanceTabCategory")
     private Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet;
 
     public SubstanceTabCategory(){}

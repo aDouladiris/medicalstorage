@@ -17,7 +17,7 @@ public class Item extends Operable {
 
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "item")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "item")
     private Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet;
 
     public Item(){}

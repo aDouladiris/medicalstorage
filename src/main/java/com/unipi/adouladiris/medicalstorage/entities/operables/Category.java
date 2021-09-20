@@ -13,7 +13,7 @@ public class Category extends Operable {
 
     // Manages bidirectional relationship with SubstanceTabCategories.
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "category")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "category")
     private Set<SubstanceTabCategory> substanceTabCategorySet;
 
     public Category(){}

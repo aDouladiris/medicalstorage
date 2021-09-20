@@ -13,7 +13,7 @@ public class Tab extends Operable {
 
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "tab")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "tab")
     private Set<SubstanceTab> substanceTabSet;
 
     public Tab(){}
