@@ -3,10 +3,11 @@ package com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass;
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.Queryable;
-import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 
 import javax.persistence.*;
 
+// Marked class in order for entities that extends this class will inherit these fields.
+// Additionally, this class won't be translated as entity, thus it won't exists at database.
 @MappedSuperclass
 public abstract class Operable extends Queryable implements Comparable<Operable>  {
 

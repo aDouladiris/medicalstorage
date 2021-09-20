@@ -17,10 +17,11 @@ public class RequestBodyParse {
     }
 
     public RequestBodyParse(TreeSet<Product> products) throws Exception {this.jsonSet = productSetToJsonObject(products);}
-    public RequestBodyParse(ArrayList<Object> body) throws Exception {this.productSet = payloadToProductSet(body);}
+    //public RequestBodyParse(ArrayList<Object> body) throws Exception {this.productSet = payloadToProductSet(body);}
     public RequestBodyParse(LinkedHashMap body) throws Exception {this.productSet = payloadToProductSet(body);}
 
-    private Set<Product> payloadToProductSet(LinkedHashMap body) throws Exception {
+    // Parse HTTP request body to a HashSet of Product Tree Maps through looping.
+    private Set<Product> payloadToProductSet(LinkedHashMap body) { //throws Exception {
         //System.out.println("body: " + body.toString());
         ArrayList arrayListProducts = (ArrayList) body.get("product");
         //System.out.println("arrayList: " + arrayListProducts);
@@ -103,66 +104,67 @@ public class RequestBodyParse {
         return productSet;
     }
 
-    private Set<Product> payloadToProductSet(ArrayList<Object> body) throws Exception {
-        Set<Product> productSet = new HashSet<>();
-        for(int i=0; i<body.size(); i++){
-            System.out.println("Deserialize start");
-            Product product = new Product();
-            Map<String, HashMap> subMap = Map.class.cast(body.get(i));
-            HashMap<String, HashMap> nameTabMap = subMap.get("Substance");
-            for (Map.Entry e : nameTabMap.entrySet() ){
+//    private Set<Product> payloadToProductSet(ArrayList<Object> body) throws Exception {
+//        Set<Product> productSet = new HashSet<>();
+//        for(int i=0; i<body.size(); i++){
+//            System.out.println("Deserialize start");
+//            Product product = new Product();
+//            Map<String, HashMap> subMap = Map.class.cast(body.get(i));
+//            HashMap<String, HashMap> nameTabMap = subMap.get("Substance");
+//            for (Map.Entry e : nameTabMap.entrySet() ){
+//
+//                System.out.println(e.getKey());
+//                Substance substance = new Substance(e.getKey().toString());
+//                TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
+//                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                ArrayList<HashMap> tabValueJSONList = ArrayList.class.cast(HashMap.class.cast(e.getValue()).get("Tab"));
+//                for(HashMap<String, HashMap> tabValueJSON : tabValueJSONList ){
+//                    for (Map.Entry tabValueJSONEntry : tabValueJSON.entrySet() ){
+//
+//                        System.out.println(tabValueJSONEntry.getKey());
+//                        Tab tab = new Tab(tabValueJSONEntry.getKey().toString());
+//                        TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
+//                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                        ArrayList<HashMap> categoryValueJSONList = ArrayList.class.cast(HashMap.class.cast(tabValueJSONEntry.getValue()).get("Category"));
+//                        for(HashMap<String, HashMap> categoryValueJSON : categoryValueJSONList ){
+//                            for (Map.Entry categoryValueJSONEntry : categoryValueJSON.entrySet() ){
+//
+//                                System.out.println(categoryValueJSONEntry.getKey());
+//                                Category category = new Category(categoryValueJSONEntry.getKey().toString());
+//                                TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
+//                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                ArrayList<HashMap> itemValueJSONList = ArrayList.class.cast(HashMap.class.cast(categoryValueJSONEntry.getValue()).get("Item"));
+//                                for (HashMap itemValueJSON : itemValueJSONList){
+//
+//                                    System.out.println(itemValueJSON.get("Title"));
+//                                    System.out.println(itemValueJSON.get("Description"));
+//                                    ArrayList<String> tagList = ArrayList.class.cast(itemValueJSON.get("Tag"));
+//                                    TreeSet<Tag> tagSet = new TreeSet<>();
+//                                    for(String tag: tagList ){
+//                                        System.out.println(tag);
+//                                        Tag newTag = new Tag(tag);
+//                                        tagSet.add(newTag);
+//                                    }
+//                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                    Item newItem = new Item(itemValueJSON.get("Title").toString(), itemValueJSON.get("Description").toString() );
+//                                    itemMap.put(newItem, tagSet);
+//                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                }
+//                                categoryMap.put(category, itemMap);
+//                            }
+//                        }
+//                        tabMap.put(tab, categoryMap);
+//                    }
+//                }
+//                product.getProduct().put(substance, tabMap);
+//            }
+//            productSet.add(product);
+//        }
+//        return productSet;
+//    }
 
-                System.out.println(e.getKey());
-                Substance substance = new Substance(e.getKey().toString());
-                TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag> >>> tabMap = new TreeMap<>();
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ArrayList<HashMap> tabValueJSONList = ArrayList.class.cast(HashMap.class.cast(e.getValue()).get("Tab"));
-                for(HashMap<String, HashMap> tabValueJSON : tabValueJSONList ){
-                    for (Map.Entry tabValueJSONEntry : tabValueJSON.entrySet() ){
-
-                        System.out.println(tabValueJSONEntry.getKey());
-                        Tab tab = new Tab(tabValueJSONEntry.getKey().toString());
-                        TreeMap<Category, TreeMap<Item, TreeSet<Tag> >> categoryMap = new TreeMap<>();
-                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        ArrayList<HashMap> categoryValueJSONList = ArrayList.class.cast(HashMap.class.cast(tabValueJSONEntry.getValue()).get("Category"));
-                        for(HashMap<String, HashMap> categoryValueJSON : categoryValueJSONList ){
-                            for (Map.Entry categoryValueJSONEntry : categoryValueJSON.entrySet() ){
-
-                                System.out.println(categoryValueJSONEntry.getKey());
-                                Category category = new Category(categoryValueJSONEntry.getKey().toString());
-                                TreeMap<Item, TreeSet<Tag> > itemMap = new TreeMap<>();
-                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                ArrayList<HashMap> itemValueJSONList = ArrayList.class.cast(HashMap.class.cast(categoryValueJSONEntry.getValue()).get("Item"));
-                                for (HashMap itemValueJSON : itemValueJSONList){
-
-                                    System.out.println(itemValueJSON.get("Title"));
-                                    System.out.println(itemValueJSON.get("Description"));
-                                    ArrayList<String> tagList = ArrayList.class.cast(itemValueJSON.get("Tag"));
-                                    TreeSet<Tag> tagSet = new TreeSet<>();
-                                    for(String tag: tagList ){
-                                        System.out.println(tag);
-                                        Tag newTag = new Tag(tag);
-                                        tagSet.add(newTag);
-                                    }
-                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                    Item newItem = new Item(itemValueJSON.get("Title").toString(), itemValueJSON.get("Description").toString() );
-                                    itemMap.put(newItem, tagSet);
-                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                }
-                                categoryMap.put(category, itemMap);
-                            }
-                        }
-                        tabMap.put(tab, categoryMap);
-                    }
-                }
-                product.getProduct().put(substance, tabMap);
-            }
-            productSet.add(product);
-        }
-        return productSet;
-    }
-
-    private Set<JSONObject> productSetToJsonObject(TreeSet<Product> products) throws Exception {
+    // Parse a Product Tree Map to JSON object by assigning each entity name as a key.
+    private Set<JSONObject> productSetToJsonObject(TreeSet<Product> products) { //throws Exception {
         Set<JSONObject> productSet = new HashSet<>();
         for(Product product : products){
             JSONObject substanceJO = new JSONObject();

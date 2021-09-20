@@ -1,16 +1,13 @@
 package com.unipi.adouladiris.medicalstorage.swagger.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
-
-import java.lang.reflect.Array;
 
 
 
 public class RegisterUserRequestBody {
+
+    // All swagger request bodies will contain only information about uer input format examples.
+    // For parsing the request body, we use the Data Transfer Class (DTO) RequestBodyParse.
 
     @ApiModelProperty(
             notes = "Name of the User",

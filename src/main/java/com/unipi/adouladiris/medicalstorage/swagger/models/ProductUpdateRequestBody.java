@@ -3,6 +3,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class ProductUpdateRequestBody {
 
+    // All swagger request bodies will contain only information about uer input format examples.
+    // For parsing the request body, we use the Data Transfer Class (DTO) RequestBodyParse.
+
     @ApiModelProperty(
             name="product",
             dataType = "array",

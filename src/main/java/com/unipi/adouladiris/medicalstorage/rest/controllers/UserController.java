@@ -27,6 +27,10 @@ import java.util.LinkedHashMap;
 @Api(tags = { SwaggerConfiguration.UserController })
 public class UserController {
 
+    //********************************************************************
+    // Http request will be intercepted by Token filter before proceeding.
+    //********************************************************************
+
     private static AuthenticationManager authenticationManagerUser;
     @Autowired
     public UserController(AuthenticationManager authenticationManagerUser){UserController.authenticationManagerUser = authenticationManagerUser;}
@@ -47,13 +51,16 @@ public class UserController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
     public ResponseEntity<String> getUserInformation() {
+        // Get user information from security context.
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return new ResponseEntity(authentication.getPrincipal(), HttpStatus.OK);
     }
     //**********************************************************
 
     //************************** POST/ *************************
-    // https://stackoverflow.com/questions/3521290/logout-get-or-post
+    // We set logout as POST request in order to avoid link prefetching from web browsers.
+    // If browser prefetch a GET link that logs a user out, it will execute a log out.
+    // As soon as prefetching this particular link changes user state, it is better to avoid it using POST.
     @PostMapping(value = "logout")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
     @ApiOperation(value = "Perform User Logout", response = String.class)
@@ -68,6 +75,7 @@ public class UserController {
         //if (SecurityContextHolder.getContext().getAuthentication() == null) return new ResponseEntity("No User Logged In!", HttpStatus.FORBIDDEN);
         JSONObject response = new JSONObject();
         response.put("User", SecurityContextHolder.getContext().getAuthentication().getName());
+        // Empty user security context.
         SecurityContextHolder.getContext().setAuthentication(null);
         return new ResponseEntity("User " + response.get("User") + " logged out!", HttpStatus.OK);
     }
@@ -92,7 +100,12 @@ public class UserController {
 
         if(dbResult.getException() != null){
             String message = dbResult.getException().getCause().getMessage();
-            if(message.contains("UK_SB8BBOUER5WAK8VYIIY4PF2BX table: USER"))
+            // if(message.contains("UK_SB8BBOUER5WAK8VYIIY4PF2BX table: USER"))
+            //TODO to check if working.
+
+            // Each database successful response will be wrapped in a ResponseEntity object.
+            // In case of exception, the response will be wrapped in a ResponseStatusException object.
+            if(message.contains("UK_") && message.contains("table: USER"))
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists.", dbResult.getException());
             else throw new ResponseStatusException(HttpStatus.CONFLICT, message, dbResult.getException());
         }
@@ -111,7 +124,8 @@ public class UserController {
     })
     @ApiImplicitParam(name = "body", dataTypeClass = UserRequestBody.class)
     public ResponseEntity<String> requestToken(@RequestBody UserRequestBody body) {
-
+        // Each database successful response will be wrapped in a ResponseEntity object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         if(body.getUsername() == null) {
             Exception missingUsername = new Exception("Username is missing.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingUsername.getMessage(), missingUsername);

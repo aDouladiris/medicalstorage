@@ -28,7 +28,10 @@ import java.util.*;
 @Api(tags = { SwaggerConfiguration.ProductController })
 public class ProductController {
 
+    //********************************************************************
     // Http request will be intercepted by Token filter before proceeding.
+    //********************************************************************
+
     //************************** GET/ **************************
     @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
@@ -41,11 +44,16 @@ public class ProductController {
             @ApiResponse(code = 404, message = "The requested resource could not be found."),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
+    // Retrieve all products in database.
     public ResponseEntity<String> getAllProducts() {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Query database using Data Access Object classes.
         DbResult dbResult = new Select().findAllProducts();
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         TreeSet<Product> productSet = dbResult.getResult(TreeSet.class);
+        // Each database successful response will be wrapped in a ResponseEntity object after parsed to a Data Transfer Object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try{
             RequestBodyParse dto = new RequestBodyParse(productSet);
             return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
@@ -67,10 +75,14 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     public ResponseEntity<String> getProductByName(@PathVariable String name) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Query database using Data Access Object classes.
         DbResult dbResult = new Select().findProduct(name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
+        // Each database successful response will be wrapped in a ResponseEntity object after parsed to a Data Transfer Object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try{
             RequestBodyParse dto = new RequestBodyParse(product);
             return new ResponseEntity(dto.getJsonSet().toString(), HttpStatus.OK);
@@ -91,12 +103,16 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     public ResponseEntity<String> getProductByTag(@PathVariable String tag) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Query database using Data Access Object classes.
         Set<Product> results =  new Select().findByTag(tag).getResult(HashSet.class);
+        // Products will be assigned to a HashSet.
         Set<String> resultNames = new HashSet<>();
         results.forEach(product -> {
             product.getProduct().keySet().forEach( substance -> resultNames.add(substance.getName()) );
         });
+        // Each database successful response will be wrapped in a ResponseEntity object.
         if(resultNames.isEmpty()) return new ResponseEntity("Tag not found.", HttpStatus.NOT_FOUND);
         else return new ResponseEntity(resultNames.toString(), HttpStatus.OK);
     }
@@ -114,9 +130,14 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     public ResponseEntity<String> deleteProduct(@PathVariable String name) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Query database using Data Access Object classes.
         DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
+        // Dao Delete class will return result field as true and a null exception field or a non-empty exception
+        // field containing an exception and a null result field.
+        // To avoid checking a null result field as a boolean which needs two checks, we check once the exception field.
         if(dbResult.getException() != null) {
             return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
         }
@@ -139,13 +160,18 @@ public class ProductController {
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductInsertRequestBody.class)
     public ResponseEntity<String> insertProduct(@RequestBody LinkedHashMap body) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Each database successful response will be wrapped in a ResponseEntity object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try{
             Set<Product> productSet = new RequestBodyParse(body).getProductSet();
             Set<HashSet> results = new HashSet();
             Set<String> failures = new HashSet();
 
+            // Each Product will be queried separately.
             productSet.forEach(product -> {
+                // Query database using Data Access Object classes.
                 DbResult dbResult = new Insert().product(product);
                 if(dbResult.getResult().getClass().equals(Substance.class)) failures.add(dbResult.getResult(Substance.class).getName());
                 else results.add(dbResult.getResult(HashSet.class));
@@ -186,12 +212,18 @@ public class ProductController {
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductUpdateRequestBody.class)
     public ResponseEntity<String> updateProduct(@RequestBody LinkedHashMap body) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Each database successful response will be wrapped in a ResponseEntity object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try {
             Set<Product> productSet = new RequestBodyParse(body).getProductSet();
             Set<HashSet> results = new HashSet();
             Set<String> failures = new HashSet();
+
+            // Each Product will be queried separately.
             productSet.forEach(product -> {
+                // Query database using Data Access Object classes.
                 DbResult dbResult = new Update().product(product);
                 if(dbResult.isEmpty()) failures.add(dbResult.getResult(String.class));
                 else results.add(dbResult.getResult(HashSet.class));
@@ -219,10 +251,14 @@ public class ProductController {
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductReplaceRequestBody.class)
     public ResponseEntity<String> replaceProduct(@PathVariable String name, @RequestBody LinkedHashMap body) {
+        // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+        // Query database using Data Access Object classes.
         DbResult dbResult = new Select().findProduct(name);
         if(dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
+        // Each database successful response will be wrapped in a ResponseEntity object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try{
             dbResult = new Update().replaceProduct(product, body);
             if(dbResult.isEmpty()) return new ResponseEntity("Could not update.", HttpStatus.CONFLICT);

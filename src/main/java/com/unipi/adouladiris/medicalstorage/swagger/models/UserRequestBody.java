@@ -2,8 +2,6 @@ package com.unipi.adouladiris.medicalstorage.swagger.models;
 
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Column;
-
 public class UserRequestBody {
 
     @ApiModelProperty(

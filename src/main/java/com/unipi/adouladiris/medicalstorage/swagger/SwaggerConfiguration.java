@@ -35,6 +35,7 @@ public class SwaggerConfiguration  {
     public static final String UserController = "User";
     public static final String ProductController = "Product";
 
+    // Configure User endpoint documentation.
     @Bean
     public Docket UserConfiguration() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -51,6 +52,7 @@ public class SwaggerConfiguration  {
                 .build();
     }
 
+    // Configure Product endpoint documentation.
     @Bean
     public Docket ProductConfiguration() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -69,6 +71,7 @@ public class SwaggerConfiguration  {
                 .build();
     }
 
+    // Configure general documentation information about API host.
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("MedicalStorage API")
@@ -77,6 +80,7 @@ public class SwaggerConfiguration  {
                 .licenseUrl("cloudaros@homail.com").version("1").build();
     }
 
+    // Generate a headers field to assign JwT token. Each endpoint will have to use it explicitly.
     private List<RequestParameter> authorizationParameter() {
         RequestParameterBuilder tokenBuilder = new RequestParameterBuilder();
         tokenBuilder

@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 
 public class ProductReplaceRequestBody {
 
+    // All swagger request bodies will contain only information about uer input format examples.
+    // For parsing the request body, we use the Data Transfer Class (DTO) RequestBodyParse.
+
     @ApiModelProperty(
             name="replacement",
             dataType = "array",
