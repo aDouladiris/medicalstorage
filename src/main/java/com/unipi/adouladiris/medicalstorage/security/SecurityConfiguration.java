@@ -54,10 +54,11 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    .csrf() // TODO These security options need explanation instead of disabled them.
-                        .ignoringAntMatchers("/**")
-                    .and()
-                    .headers().frameOptions().sameOrigin() // TODO These security options need explanation instead of disabled them.
+                    // We need CSRF tokens to properly check for CSRF attacks and correctly forwarding our http requests.
+                    // In our case, we just disable for our particular endpoints.
+                    .csrf()
+                        .ignoringAntMatchers("/api/v1/user/**")
+                        .ignoringAntMatchers("/swagger-ui.html?urls.primaryName=Medical%20Storage%20Api%20v1%20-%20User#/User")
                     .and()
                     .antMatcher("/api/v1/user/**")
                         .authorizeRequests().anyRequest().permitAll();
@@ -85,7 +86,11 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .addFilterAfter(jwtTokenFilter, SecurityContextPersistenceFilter.class)
-                    .csrf().disable()
+                    // We need CSRF tokens to properly check for CSRF attacks and correctly forwarding our http requests.
+                    // In our case, we just disable for our particular endpoints.
+                    .csrf()
+                        .ignoringAntMatchers("/api/v1/product/**")
+                    .and()
                     .antMatcher("/api/v1/product/**")
                         .authorizeRequests().anyRequest().hasAnyRole("admin", "customer")
                         .and()

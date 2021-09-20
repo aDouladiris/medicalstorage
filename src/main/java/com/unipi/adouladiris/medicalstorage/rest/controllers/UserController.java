@@ -100,12 +100,10 @@ public class UserController {
 
         if(dbResult.getException() != null){
             String message = dbResult.getException().getCause().getMessage();
-            // if(message.contains("UK_SB8BBOUER5WAK8VYIIY4PF2BX table: USER"))
-            //TODO to check if working.
-
             // Each database successful response will be wrapped in a ResponseEntity object.
             // In case of exception, the response will be wrapped in a ResponseStatusException object.
-            if(message.contains("UK_") && message.contains("table: USER"))
+            // If we get Unique Key constraint exception, the user already exists.
+            if(message.contains("UK_") && message.contains("table: USER")) // Identify specific error for Unique Key constraints at User table.
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists.", dbResult.getException());
             else throw new ResponseStatusException(HttpStatus.CONFLICT, message, dbResult.getException());
         }
