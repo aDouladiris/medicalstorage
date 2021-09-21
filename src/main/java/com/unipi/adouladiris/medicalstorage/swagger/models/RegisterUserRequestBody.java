@@ -14,7 +14,7 @@ public class RegisterUserRequestBody {
             name="Username",
             dataType = "String",
             required=true,
-            example = "DummyName"
+            example = "arg"
     )
     private String username;
 
@@ -23,7 +23,7 @@ public class RegisterUserRequestBody {
             name="Password",
             dataType = "String",
             required=true,
-            example = "DummyPassword"
+            example = "123"
     )
     private String password;
 

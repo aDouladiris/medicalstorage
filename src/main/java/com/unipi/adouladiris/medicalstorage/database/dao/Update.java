@@ -66,7 +66,7 @@ public class Update extends DbEntitySessionManager {
                     for ( Item item : product.getProduct().get(substance).get(tab).get(category).keySet() ){
                         for ( Tag tag : product.getProduct().get(substance).get(tab).get(category).get( item ) ){
                             // Insert keys with value at each iteration.
-                            results.add(new Insert().product(substance, tab, category, item, tag).getResult(HashMap.class));
+                            results.add(productUpdate(substance, tab, category, item, tag).getResult(HashMap.class));
                         }
                     }
                 }
@@ -74,6 +74,89 @@ public class Update extends DbEntitySessionManager {
         }
 
         return new DbResult(results);
+    }
+
+    // To insert a Product tree, we insert each entity individually. If the instance of each entity exists, we retrieve the instance.
+    // If not, we create a new instance of the entity.
+    // After each entity insertion, we use their Id to join them at JoinTables.
+    // At the end, we return a HashMap containing the participated entities Ids.
+    public DbResult productUpdate(Substance substance, Tab tab, Category category, Item item, Tag tag) {
+        if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
+        Insert insertion = new Insert();
+        Select select = new Select();
+
+        DbResult dbResult = select.findOperableEntityByName( Substance.class, substance.getName() );
+        if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(substance); substance = session.find(Substance.class, dbResult.getResult( Integer.class ) ); }
+        else substance = dbResult.getResult( Substance.class );
+
+        dbResult = select.findOperableEntityByName( Tab.class, tab.getName() );
+        if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(tab); tab = session.find(Tab.class, dbResult.getResult( Integer.class ) ); }
+        else tab = dbResult.getResult( Tab.class );
+
+        dbResult = select.findOperableEntityByName( Category.class, category.getName() );
+        if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(category); category = session.find(Category.class, dbResult.getResult( Integer.class ) ); }
+        else category = dbResult.getResult( Category.class );
+
+        dbResult = select.findOperableEntityByName( Item.class, item.getName() );
+        if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(item); item = session.find(Item.class, dbResult.getResult( Integer.class ) ); }
+        else item = dbResult.getResult( Item.class );
+
+        dbResult = select.findOperableEntityByName( Tag.class, tag.getName() );
+        if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(tag); tag = session.find(Tag.class, dbResult.getResult( Integer.class ) ); }
+        else tag = dbResult.getResult( Tag.class );
+
+        SubstanceTab substanceTab;
+        dbResult = select.findJoinableEntityByName(SubstanceTab.class, substance, tab );
+        if ( dbResult.isEmpty() ) {
+            substanceTab = new SubstanceTab( substance, tab );
+            dbResult = insertion.queryableEntity( substanceTab );
+            substanceTab = session.find(SubstanceTab.class, dbResult.getResult( Integer.class ) );
+        }
+        else substanceTab = dbResult.getResult( SubstanceTab.class );
+
+        SubstanceTabCategory substanceTabCategory;
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategory.class, substanceTab, category );
+        if ( dbResult.isEmpty() ) {
+            substanceTabCategory = new SubstanceTabCategory( substanceTab, category );
+            dbResult = insertion.queryableEntity( substanceTabCategory );
+            substanceTabCategory = session.find(SubstanceTabCategory.class, dbResult.getResult( Integer.class ) );
+        }
+        else substanceTabCategory = dbResult.getResult( SubstanceTabCategory.class );
+
+
+        SubstanceTabCategoryItem substanceTabCategoryItem;
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategoryItem.class, substanceTabCategory, item );
+        if ( dbResult.isEmpty() ) {
+            substanceTabCategoryItem = new SubstanceTabCategoryItem( substanceTabCategory, item );
+            dbResult = insertion.queryableEntity( substanceTabCategoryItem );
+            substanceTabCategoryItem = session.find(SubstanceTabCategoryItem.class, dbResult.getResult( Integer.class ) );
+        }
+        else substanceTabCategoryItem = dbResult.getResult( SubstanceTabCategoryItem.class );
+
+
+        SubstanceTabCategoryItemTag substanceTabCategoryItemTag;
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategoryItemTag.class, substanceTabCategoryItem, tag );
+        if ( dbResult.isEmpty() ) {
+            substanceTabCategoryItemTag = new SubstanceTabCategoryItemTag( substanceTabCategoryItem, tag );
+            dbResult = insertion.queryableEntity( substanceTabCategoryItemTag );
+            substanceTabCategoryItemTag = session.find(SubstanceTabCategoryItemTag.class, dbResult.getResult( Integer.class ) );
+        }
+        else substanceTabCategoryItemTag = dbResult.getResult( SubstanceTabCategoryItemTag.class );
+
+        HashMap<String, Integer> idMap = new HashMap();
+        idMap.put( Substance.class.getSimpleName(), substance.getId() );
+        idMap.put( Tab.class.getSimpleName(), tab.getId() );
+        idMap.put( Category.class.getSimpleName(), category.getId() );
+        idMap.put( Item.class.getSimpleName(), item.getId() );
+        idMap.put( Tag.class.getSimpleName(), tag.getId() );
+
+        idMap.put( SubstanceTab.class.getSimpleName(), substanceTab.getId() );
+        idMap.put( SubstanceTabCategory.class.getSimpleName(), substanceTabCategory.getId() );
+        idMap.put( SubstanceTabCategoryItem.class.getSimpleName(), substanceTabCategoryItem.getId() );
+        idMap.put( SubstanceTabCategoryItemTag.class.getSimpleName(), substanceTabCategoryItemTag.getId() );
+
+        dbResult.setResult( idMap );
+        return dbResult;
     }
 
     // If http request body for update contains keyword 'replacement', then it finds matching entity and replace it with new values.

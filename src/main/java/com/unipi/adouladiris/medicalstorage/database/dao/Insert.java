@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
+import java.sql.Clob;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,29 +67,33 @@ public class Insert extends DbEntitySessionManager {
     // At the end, we return a HashMap containing the participated entities Ids.
     public DbResult product(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
+        Select select = new Select();
 
-        DbResult dbResult = new Select().findOperableEntityByName( Substance.class, substance.getName() );
+        DbResult dbResult = select.findOperableEntityByName( Substance.class, substance.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(substance); substance = session.find(Substance.class, dbResult.getResult( Integer.class ) ); }
         else substance = dbResult.getResult( Substance.class );
 
-        dbResult = new Select().findOperableEntityByName( Tab.class, tab.getName() );
+        dbResult = select.findOperableEntityByName( Tab.class, tab.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(tab); tab = session.find(Tab.class, dbResult.getResult( Integer.class ) ); }
         else tab = dbResult.getResult( Tab.class );
 
-        dbResult = new Select().findOperableEntityByName( Category.class, category.getName() );
+        dbResult = select.findOperableEntityByName( Category.class, category.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(category); category = session.find(Category.class, dbResult.getResult( Integer.class ) ); }
         else category = dbResult.getResult( Category.class );
 
-        dbResult = new Select().findOperableEntityByName( Item.class, item.getName() );
-        if ( dbResult.isEmpty() ){ dbResult = queryableEntity(item); item = session.find(Item.class, dbResult.getResult( Integer.class ) ); }
-        else item = dbResult.getResult( Item.class );
+//        dbResult = select.findOperableEntityByName( Item.class, item.getName() );
+//        if ( dbResult.isEmpty() ){ dbResult = queryableEntity(item); item = session.find(Item.class, dbResult.getResult( Integer.class ) ); }
+//        else item = dbResult.getResult( Item.class );
 
-        dbResult = new Select().findOperableEntityByName( Tag.class, tag.getName() );
+        dbResult = queryableEntity(item);
+        item = session.find(Item.class, dbResult.getResult( Integer.class ) );
+
+        dbResult = select.findOperableEntityByName( Tag.class, tag.getName() );
         if ( dbResult.isEmpty() ){ dbResult = queryableEntity(tag); tag = session.find(Tag.class, dbResult.getResult( Integer.class ) ); }
         else tag = dbResult.getResult( Tag.class );
 
         SubstanceTab substanceTab;
-        dbResult = new Select().findJoinableEntityByName(SubstanceTab.class, substance, tab );
+        dbResult = select.findJoinableEntityByName(SubstanceTab.class, substance, tab );
         if ( dbResult.isEmpty() ) {
             substanceTab = new SubstanceTab( substance, tab );
             dbResult = queryableEntity( substanceTab );
@@ -97,7 +102,7 @@ public class Insert extends DbEntitySessionManager {
         else substanceTab = dbResult.getResult( SubstanceTab.class );
 
         SubstanceTabCategory substanceTabCategory;
-        dbResult = new Select().findJoinableEntityByName(SubstanceTabCategory.class, substanceTab, category );
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategory.class, substanceTab, category );
         if ( dbResult.isEmpty() ) {
             substanceTabCategory = new SubstanceTabCategory( substanceTab, category );
             dbResult = queryableEntity( substanceTabCategory );
@@ -107,7 +112,7 @@ public class Insert extends DbEntitySessionManager {
 
 
         SubstanceTabCategoryItem substanceTabCategoryItem;
-        dbResult = new Select().findJoinableEntityByName(SubstanceTabCategoryItem.class, substanceTabCategory, item );
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategoryItem.class, substanceTabCategory, item );
         if ( dbResult.isEmpty() ) {
             substanceTabCategoryItem = new SubstanceTabCategoryItem( substanceTabCategory, item );
             dbResult = queryableEntity( substanceTabCategoryItem );
@@ -117,7 +122,7 @@ public class Insert extends DbEntitySessionManager {
 
 
         SubstanceTabCategoryItemTag substanceTabCategoryItemTag;
-        dbResult = new Select().findJoinableEntityByName(SubstanceTabCategoryItemTag.class, substanceTabCategoryItem, tag );
+        dbResult = select.findJoinableEntityByName(SubstanceTabCategoryItemTag.class, substanceTabCategoryItem, tag );
         if ( dbResult.isEmpty() ) {
             substanceTabCategoryItemTag = new SubstanceTabCategoryItemTag( substanceTabCategoryItem, tag );
             dbResult = queryableEntity( substanceTabCategoryItemTag );

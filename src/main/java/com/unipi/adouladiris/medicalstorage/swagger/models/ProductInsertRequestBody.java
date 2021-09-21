@@ -11,85 +11,187 @@ public class ProductInsertRequestBody {
             name="product",
             dataType = "array",
             required=true,
-            example =  "[{\"Substance\": {\"SubstanceDummyName\": " +
-                            "{\"Tab\": [{\"TabDummyName1\": " +
-                                    "{\"Category\": [{\"CategoryDummyName1\":" +
-                                    "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
+            example =  "[{\"Substance\": {\"DEPON MAXIMUM\": " +
+                         "{\"Tab\": [{\"Γενικά\": " +
+                                    "{\"Category\": [{\"Περιγραφή\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Εμπορική ονομασία\", \"Description\": \"DEPON\", " +
+                                                "\"Tag\": [\"πονοκέφαλος\", \"αναλγητικό\"]" +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Κάτοχος άδειας κυκλοφορίας\", \"Description\": \"UPSA SAS\", " +
+                                                "\"Tag\": [\"\"]" +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Κατηγορία προϊόντος\", \"Description\": \"Φάρμακα ανθρώπινης χρήσης\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Συσκευασία\", \"Description\": \"1 TUBE * 8 TAB\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Οδοί χορήγησης\", \"Description\": \"Από του στόματος (ORAL)\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Αριθμός δόσεων\", \"Description\": \"8 TAB\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}}" +
                                         "]}}," +
-                                "{\"CategoryDummyName2\":" +
+                                    "{\"Διάθεση\": " +
+                                    "{\"Category\": [{\"Υπεύθυνος κυκλοφορίας\":" +
                                         "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                        "]}}]}}," +
-                                "{\"TabDummyName2\": " +
-                                "{\"Category\": [{\"CategoryDummyName3\":" +
-                                "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}," +
-                            "{\"CategoryDummyName4\":" +
+                                            "{" +
+                                                "\"Title\": \"Επωνυμία \", \"Description\": \"UPSA SAS\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Διεύθυνση \", \"Description\": \"Rue Joseph Monier 3, 92500 Rueil-Malmaison FR\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Αριθμός τηλεφώνου\", \"Description\": \"+33171239500\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}}" +
+                                        "]}}," +
+                                    "{\"Οδηγίες χρήσης\": " +
+                                    "{\"Category\": [{\"Ενδείξεις\":" +
                                         "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}]}}]}}}," +
-                            "{\"Substance\": {\"SubstanceDummyName2\": " +
-                                "{\"Tab\": [{\"TabDummyName1\": " +
-                                    "{\"Category\": [{\"CategoryDummyName12\":" +
-                                    "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName12\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName22\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName32\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}," +
-                                    "{\"CategoryDummyName22\":" +
-                                    "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName12\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName22\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName23\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}]}}," +
-                                    "{\"TabDummyName2\": " +
-                                    "{\"Category\": [" +
-                                    "{\"CategoryDummyName3\":" +
-                                    "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}," +
-                                    "{\"CategoryDummyName4\":" +
-                                    "{\"Item\": [" +
-                                        "{\"Title\": \"TittleDummyName1\", \"Description\": \"DescriptionDummy1\", " +
-                                        "\"Tag\": [\"TagDummyName1\", \"TagDummyName2\", \"TagDummyName3\"]}, " +
-                                        "{\"Title\": \"TittleDummyName2\", \"Description\": \"DescriptionDummy2\", " +
-                                        "\"Tag\": [\"TagDummyName4\", \"TagDummyName5\", \"TagDummyName6\"]}, " +
-                                        "{\"Title\": \"TittleDummyName3\", \"Description\": \"DescriptionDummy3\", " +
-                                        "\"Tag\": [\"TagDummyName7\", \"TagDummyName8\", \"TagDummyName9\"]} " +
-                                    "]}}]}}]}}}" +
+                                            "{" +
+                                                "\"Title\": \"Πληροφορίες\", " +
+                                                "\"Description\": \"Αντιμετώπιση ήπιας έως μέτριας εντάσεως άλγους, δυσμηνόρροια και ως αντιπυρετικό. " +
+                                                "Προτιμάται σε άτομα τα οποία πρέπει να αποφεύγουν τη λήψη ακετυλοσαλικυλικού οξέος (υπερευαισθησία στο ακετυλοσαλικυλικό οξύ, βρογχικό άσθμα, " +
+                                                "διαταραχές της πηκτικότητας, ιστορικό πεπτικού έλκους, παιδιά με κίνδυνο αναπτύξεως συνδρόμου Reye από τη χορήγηση σαλικυλικών).\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}} " +
+                                        "]}}," +
+                                    "{\"Προφυλάξεις\": " +
+                                    "{\"Category\": [{\"Αντενδείξεις\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Πληροφορίες\", " +
+                                                "\"Description\": \"Υπερευαισθησία στην παρακεταμόλη ή σε κάποιο από τα έκδοχα του προϊόντος. " +
+                                                "Βαρειά ηπατική και νεφρική ανεπάρκεια. Σε νεφρικές λιθιάσεις (μόνο τα αναβράζοντα δισκία).\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}} " +
+                                        "]}}, " +
+                                    "{\"Φαρμακολογία\": " +
+                                    "{\"Category\": [{\"Φαρμακοδυναμική\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Πληροφορίες\", " +
+                                                "\"Description\": \"Η παρακεταμόλη αποτελεί τον κύριο ενεργό μεταβολίτη της φαινακετίνης αλλά στερείται των παρενεργειών της. " +
+                                                "Έχει αναλγητικές και αντιπυρετικές ιδιότητες παρόμοιες με αυτές του ακετυλοσαλικυλικού οξέος και ασθενείς αντιφλεγμονώδεις ιδιότητες. " +
+                                                "Είναι ασθενής αναστολέας της βιοσύνθεσης των προσταγλανδινών αν και υπάρχουν ενδείξεις ότι είναι πιο αποτελεσματική κατά των ενζύμων του ΚΝΣ " +
+                                                "από αυτά της περιφέρειας. Η αντιπυρετική της δράση οφείλεται σε άμεση επίδραση στα υποθαλαμικά θερμορυθμιστικά κέντρα. Ο μηχανισμός της αναλγητικής δράσης " +
+                                                "της δεν είναι γνωστός. Εφάπαξ ή επαναλαμβανόμενη δοσολογία δεν επιδρά στο καρδιαγγειακό ή στο αναπνευστικό σύστημα. Σε αντίθεση με το ακετυλοσαλικυλικό οξύ, " +
+                                                "η παρακεταμόλη δεν επηρεάζει το χρόνο προθρομβίνης, δεν έχει αντιαιμοπεταλιακή δράση και δεν προκαλεί εξελκώσεις στο γαστρεντερικό σωλήνα. " +
+                                                "Η αντιφλεγμονώδης δράση της είναι ακόμη υπό έρευνα.\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}} " +
+                                    "]}}" +
+                         "]}}}, " +
+
+                        "{\"Substance\": {\"ZINADOL\": " +
+                           "{\"Tab\": [{\"Γενικά\": " +
+                                      "{\"Category\": [{\"Περιγραφή\":" +
+                                            "{\"Item\": [" +
+                                                "{" +
+                                                    "\"Title\": \"Εμπορική ονομασία\", \"Description\": \"ZINADOL\", " +
+                                                    "\"Tag\": [\"αμυγδαλίτιδα\", \"φαρυγγίτιδα\", \"βρογχίτιδας\"]" +
+                                                "}, " +
+                                                "{" +
+                                                    "\"Title\": \"Κάτοχος άδειας κυκλοφορίας\", \"Description\": \"GlaxoSmithKline Α.Β.Ε.Ε.\", " +
+                                                    "\"Tag\": [\"\"] " +
+                                                "}, " +
+                                                "{" +
+                                                    "\"Title\": \"Κατηγορία προϊόντος\", \"Description\": \"Φάρμακα ανθρώπινης χρήσης\", " +
+                                                    "\"Tag\": [\"\"] " +
+                                                "}, " +
+                                                "{" +
+                                                    "\"Title\": \"Συσκευασία\", \"Description\": \"1 BOX * 2 BLPK * 7 TAB\", " +
+                                                    "\"Tag\": [\"\"] " +
+                                                "}, " +
+                                                "{" +
+                                                    "\"Title\": \"Οδοί χορήγησης\", \"Description\": \"Από του στόματος (ORAL)\", " +
+                                                    "\"Tag\": [\"\"] " +
+                                                "}, " +
+                                                "{" +
+                                                    "\"Title\": \"Αριθμός δόσεων\", \"Description\": \"14 TAB\", " +
+                                                    "\"Tag\": [\"\"] " +
+                                                "} " +
+                                                "]}}" +
+                                            "]}}," +
+                                    "{\"Διάθεση\": " +
+                                    "{\"Category\": [{\"Υπεύθυνος κυκλοφορίας\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Επωνυμία \", \"Description\": \"GlaxoSmithKline Α.Β.Ε.Ε.\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Διεύθυνση \", \"Description\": \"Λεωφόρος Κηφισίας 266, 152 32 Χαλάνδρι\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "}, " +
+                                            "{" +
+                                                "\"Title\": \"Αριθμός τηλεφώνου\", \"Description\": \"+302106882100\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}}" +
+                                        "]}}," +
+                                    "{\"Οδηγίες χρήσης\": " +
+                                    "{\"Category\": [{\"Ενδείξεις\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Πληροφορίες\", " +
+                                                "\"Description\": \"Το Zinadol ενδείκνυται για την αντιμετώπιση των λοιμώξεων " +
+                                                "που αναφέρονται παρακάτω σε ενήλικες και παιδιά " +
+                                                "από την ηλικία των 3 μηνών (βλέπε παραγράφους 4.4 και 5.1). " +
+                                                "Οξεία στρεπτοκοκκική αμυγδαλίτιδα και φαρυγγίτιδα" +
+                                                "Οξεία βακτηριακή παραρρινοκολπίτιδα " +
+                                                "Οξεία μέση ωτίτιδα " +
+                                                "Οξείς παροξυσμοί χρόνιας βρογχίτιδας " +
+                                                "Κυστίτιδα " +
+                                                "Πυελονεφρίτιδα " +
+                                                "Μη επιπλεγμένες λοιμώξεις δέρματος και μαλακών μορίων " +
+                                                "Θεραπεία πρώιμης νόσου του Lyme " +
+                                                "Θα πρέπει να λαμβάνονται υπόψη οι επίσημες οδηγίες αναφορικά με την κατάλληλη χρήση αντιβακτηριακών παραγόντων.\", " +
+                                                "\"Tag\": [\"\"] " +
+                                                "} " +
+                                            "]}} " +
+                                        "]}}," +
+                                    "{\"Προφυλάξεις\": " +
+                                    "{\"Category\": [{\"Αντενδείξεις\":" +
+                                        "{\"Item\": [" +
+                                            "{" +
+                                                "\"Title\": \"Πληροφορίες\", " +
+                                                "\"Description\": \"Υπερευαισθησία στην κεφουροξίμη ή σε οποιοδήποτε από τα έκδοχα που αναφέρονται στο τμήμα 6.1. " +
+                                                "Ασθενείς με γνωστή υπερευαισθησία σε αντιβιοτικά με κεφαλοσπορίνες. " +
+                                                "Ιστορικό σοβαρής υπερευαισθησίας (π.χ. αναφυλακτική αντίδραση) σε οποιοδήποτε άλλο τύπο β-λακταμικού αντιβακτηριακού " +
+                                                "παράγοντα (πενικιλλίνες, μονομπακτάμες και καρβαπενέμες).\", " +
+                                                "\"Tag\": [\"\"] " +
+                                            "} " +
+                                            "]}} " +
+                                        "]}}," +
+                                    "{\"Φαρμακολογία\": " +
+                                    "{\"Category\": [{\"Φαρμακοδυναμική\":" +
+                                        "{\"Item\": [" +
+                                        "{" +
+                                            "\"Title\": \"TittleDummyName1\", " +
+                                            "\"Description\": \"Φαρμακοθεραπευτική κατηγορία: αντιβακτηριακά για συστηματική χρήση, κεφαλοσπορίνες δεύτερης γενιάς.\", " +
+                                            "\"Tag\": [\"\"] " +
+                                        "} " +
+                                        "]}} " +
+                                    "]}}" +
+                        "]}}} " +
+
                     "]"
     )
     private Object[] product;

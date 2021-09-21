@@ -3,6 +3,8 @@ package com.unipi.adouladiris.medicalstorage.entities.jointables;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Tab;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Set;

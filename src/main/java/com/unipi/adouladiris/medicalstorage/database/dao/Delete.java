@@ -27,13 +27,24 @@ public class Delete extends DbEntitySessionManager {
     // Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity, remove row from records and clear db cache
     // to make deletion visible. The corresponding table is obtained by passing the class type as parameter.
     public DbResult deleteEntityByName(@NotNull Class<? extends Operable> typeClass, @NotNull String name) {
+        // Before perform deleting, search for entity.
+        // Clears L1 cache.
+        session.clear();
+
         Operable objectToDelete = new Select().findOperableEntityByName(typeClass, name).getResult( typeClass );
         try {
             if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            session.remove( objectToDelete );
+
+            session.remove(objectToDelete);
             session.getTransaction().commit();
-            session.clear();
+
+
+            // Clears L2 cache.
             sessionFactory.getCache().evictAll();
+
+
+            System.out.println("SF cc: " + sessionFactory.getCache().contains(objectToDelete.getClass(), objectToDelete));
+
             return new DbResult(true);
         } catch (Exception ex ) {
             if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }

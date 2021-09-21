@@ -141,7 +141,7 @@ public class ProductController {
         if(dbResult.getException() != null) {
             return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
         }
-        return new ResponseEntity(dbResult.getResult(), HttpStatus.OK);
+        return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.OK);
     }
     //**********************************************************
 

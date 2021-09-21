@@ -2,6 +2,8 @@ package com.unipi.adouladiris.medicalstorage.entities.jointables;
 
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Tag;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -15,8 +17,8 @@ public class SubstanceTabCategoryItemTag extends Joinable {
     private SubstanceTabCategoryItem substanceTabCategoryItem;
 
     // For bidirectional relationship with Tabs.
-    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "tag_Id", nullable = false, referencedColumnName = "Id")
+    @ManyToOne(cascade = CascadeType.ALL)
     private Tag tag;
 
     public SubstanceTabCategoryItemTag(){}

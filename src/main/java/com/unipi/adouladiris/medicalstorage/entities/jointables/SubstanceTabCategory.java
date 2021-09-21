@@ -2,6 +2,8 @@ package com.unipi.adouladiris.medicalstorage.entities.jointables;
 
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Category;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -21,7 +23,7 @@ public class SubstanceTabCategory extends Joinable {
     private SubstanceTab substanceTab;
 
     // Manages bidirectional relationship with SubstanceTabCategoryItems.
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "substanceTabCategory")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "substanceTabCategory")
     private Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet;
 
     public SubstanceTabCategory(){}
