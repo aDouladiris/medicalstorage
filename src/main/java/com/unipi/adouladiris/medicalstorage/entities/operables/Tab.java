@@ -16,6 +16,7 @@ public class Tab extends Operable {
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "tab")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTab> substanceTabSet;
 
     public Tab(){}

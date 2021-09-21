@@ -25,6 +25,7 @@ public class SubstanceTab extends Joinable {
 
     // For bidirectional relationship with SubstanceTabCategories.
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "substanceTab")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTabCategory> substanceTabCategorySet;
 
     public SubstanceTab(){}

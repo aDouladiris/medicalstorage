@@ -26,6 +26,7 @@ public class Item extends Operable {
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "item")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet;
 
     public Item(){}
@@ -37,8 +38,7 @@ public class Item extends Operable {
         this.description = description;
     }
 
-//
-//    public String getName() { return name; }
-//    public void setName(String name) { this.name = name; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
 }

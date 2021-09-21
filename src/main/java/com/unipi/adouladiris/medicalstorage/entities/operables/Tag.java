@@ -16,6 +16,7 @@ public class Tag extends Operable {
     // Manages bidirectional relationship with Tags.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "tag")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTabCategoryItemTag> substanceTabCategoryItemTagSet;
 
     public Tag(){}

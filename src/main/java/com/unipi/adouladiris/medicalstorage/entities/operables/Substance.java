@@ -3,6 +3,7 @@ package com.unipi.adouladiris.medicalstorage.entities.operables;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTab;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -15,6 +16,7 @@ public class Substance extends Operable {
     // Manages bidirectional relationship with SubstanceTabs.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "substance")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTab> substanceTabSet;
 
     public Substance(){}

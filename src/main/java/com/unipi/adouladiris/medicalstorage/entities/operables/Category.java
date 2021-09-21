@@ -16,6 +16,7 @@ public class Category extends Operable {
     // Manages bidirectional relationship with SubstanceTabCategories.
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "category")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTabCategory> substanceTabCategorySet;
 
     public Category(){}

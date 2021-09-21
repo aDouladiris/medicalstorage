@@ -11,14 +11,14 @@ import javax.persistence.*;
 @Table(name="substance_tab_category_item_tag", uniqueConstraints = @UniqueConstraint(columnNames={"substanceTabCategoryItem_Id", "tag_Id"}) )
 public class SubstanceTabCategoryItemTag extends Joinable {
 
-    // For bidirectional relationship with Substances.
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    // For bidirectional relationship with SubstanceTabCategoryItems.
+    @ManyToOne
     @JoinColumn(name = "substanceTabCategoryItem_Id", nullable = false, referencedColumnName = "Id")
     private SubstanceTabCategoryItem substanceTabCategoryItem;
 
-    // For bidirectional relationship with Tabs.
+    // For bidirectional relationship with Tags.
     @JoinColumn(name = "tag_Id", nullable = false, referencedColumnName = "Id")
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Tag tag;
 
     public SubstanceTabCategoryItemTag(){}

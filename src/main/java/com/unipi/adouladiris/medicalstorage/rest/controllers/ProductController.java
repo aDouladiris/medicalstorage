@@ -133,7 +133,7 @@ public class ProductController {
         // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
         // Query database using Data Access Object classes.
-        DbResult dbResult = new Delete().deleteEntityByName(Substance.class, name);
+        DbResult dbResult = new Delete().deleteProductByName(name);
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         // Dao Delete class will return result field as true and a null exception field or a non-empty exception
         // field containing an exception and a null result field.

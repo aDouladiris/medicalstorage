@@ -29,13 +29,18 @@ public abstract class Operable extends Queryable implements Comparable<Operable>
     // But we can extract the common field name and compare the corresponding letters to sort the Object alphabetically.
     @Override
     public int compareTo(@NotNull Operable operableToCompare) {
+
         StringBuilder name1 = new StringBuilder(), name2 = new StringBuilder();
         if ( this.getClass().getSimpleName().equals("Product") && operableToCompare.getClass().getSimpleName().equals("Product") ){
+
             // Get the very first key which is Substance.
             Product.class.cast(this).getProduct().keySet().forEach(key -> name1.append( key.getName() ));
             Product.class.cast(operableToCompare).getProduct().keySet().forEach(key -> name2.append( key.getName() ));
+
             return name1.toString().compareToIgnoreCase( name2.toString() );
         }
-        else return this.getName().compareToIgnoreCase( operableToCompare.getName() );
+        else
+            return this.getName().compareToIgnoreCase( operableToCompare.getName() );
+
     }
 }

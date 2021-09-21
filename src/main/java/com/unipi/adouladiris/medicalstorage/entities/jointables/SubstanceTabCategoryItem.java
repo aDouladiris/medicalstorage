@@ -24,6 +24,7 @@ public class SubstanceTabCategoryItem extends Joinable {
 
     // Manages bidirectional relationship with Tags.
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "substanceTabCategoryItem")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SubstanceTabCategoryItemTag> substanceTabCategoryItemTagSet;
 
     public SubstanceTabCategoryItem(){}
