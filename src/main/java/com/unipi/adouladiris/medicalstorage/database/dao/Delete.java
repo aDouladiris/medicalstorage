@@ -71,78 +71,11 @@ public class Delete extends DbEntitySessionManager {
 
     }
 
+
+    // Cascading delete will not delete related entities, only from the same class.
     public DbResult deleteProductByName(@NotNull String name) {
 
-        DbResult dbResult = new Select().findProduct(name);
-        if(dbResult.isEmpty()){
-            return new DbResult(false);
-        }
-        else{
-            return findProductToDelete(name);
-
-
-//            Product product = dbResult.getResult(Product.class);
-//            LinkedHashMap<Class,Integer> entitiesToDelete = new LinkedHashMap();
-//
-//            // Extract all entities to a hashmap.
-//            product.getProduct().keySet()
-//                    .forEach(entity -> entitiesToDelete.put(entity.getClass(), entity.getId()));
-//            // Get substance values
-//            product.getProduct().values()
-//                    .forEach(substanceValue -> {substanceValue.keySet().forEach(entity -> entitiesToDelete.put(entity.getClass(), entity.getId()));
-//                                // Get tab values
-//                                substanceValue.values()
-//                                        .forEach(tabValue -> {tabValue.keySet().forEach(entity -> entitiesToDelete.put(entity.getClass(), entity.getId()));
-//                                            // Get category values
-//                                            tabValue.values()
-//                                                    .forEach(catValue -> {catValue.keySet().forEach(entity -> entitiesToDelete.put(entity.getClass(), entity.getId()));
-//                                                        // Get item values
-//                                                        catValue.values()
-//                                                                .forEach(itemValue -> itemValue.forEach(entity -> {entitiesToDelete.put(entity.getClass(), entity.getId());
-//                                                                    itemValue.forEach(tag -> entitiesToDelete.put(tag.getClass(),tag.getId()) );
-//                                                                    }));
-//                                                    });
-//                                });
-//                    });
-
-            // Reverse ordered class keys.
-//            List<Class> reverseOrderedKeys = new ArrayList(entitiesToDelete.keySet());
-//            Collections.reverse(reverseOrderedKeys);
-//
-//            Select select = new Select();
-//
-//            for (Class classType : reverseOrderedKeys){
-//                System.out.println("class: " + classType.getSimpleName() + " id: " + entitiesToDelete.get(classType));
-//
-//                select.find
-//
-//                SubstanceTab substanceTab = select.findJoinableEntityByName(SubstanceTab.class, entitiesToDelete.get(Substance.class), entitiesToDelete.get(Tab.class) );
-//            }
-
-
-
-
-//            try {
-//                if (!session.getTransaction().isActive()) session.getTransaction().begin();
-//                for (Map.Entry entry : entitiesToDelete.entrySet()){
-//                    Object object = session.find(entry.getKey().getClass(), entry.getValue());
-//                    session.remove(object);
-//                }
-//                session.getTransaction().commit();
-//                return new DbResult(true);
-//            } catch (Exception ex) {
-//                if (session.getTransaction().isActive()) {
-//                    session.getTransaction().rollback();
-//                }
-//                return new DbResult(ex);
-//            }
-
-        }
-
-    }
-
-    public DbResult findProductToDelete(String name){
-
+        // Find all related classes to a Product.
         String select = "SELECT " + // returns a list of objects
                 "st, "   +  // SubstanceTab Object
                 "stc, "  +  // SubstanceTabCategory Object
@@ -169,44 +102,43 @@ public class Delete extends DbEntitySessionManager {
 
         if( queryResultList.isEmpty() ){ return new DbResult(); }
 
-        try {
-            HashMap<Object, Integer> objectsToDelete = new HashMap();
+        HashMap<Object, Integer> objectsToDelete = new HashMap();
 
-            for (Object[] objects : queryResultList){
-                for (Object object : objects){
-                    //System.out.println("raw objects: " + object.getClass().getSimpleName() + " Joinable: " + (object instanceof Joinable));
-                    Joinable joinTable = (Joinable)object;
-                    //System.out.println("raw objects: " + joinTable.getClass().getSimpleName() + " " + joinTable.getId());
-                    objectsToDelete.put(joinTable, joinTable.getId());
-                }
+        // Group jointables as keys to remove duplicates.
+        for (Object[] objects : queryResultList){
+            for (Object object : objects){
+                Joinable joinTable = (Joinable)object;
+                objectsToDelete.put(joinTable, joinTable.getId());
             }
+        }
 
-            HashMap<Object, Integer>
-                    objectsToDeleteSubstanceTabCategoryItemTag = new HashMap(),
-                    objectsToDeleteSubstanceTabCategoryItem = new HashMap(),
-                    objectsToDeleteSubstanceTabCategory = new HashMap(),
-                    objectsToDeleteSubstanceTab = new HashMap();
+        // Create four different hashmaps to contain different Ids.
+        HashMap<Object, Integer>
+                objectsToDeleteSubstanceTabCategoryItemTag = new HashMap(),
+                objectsToDeleteSubstanceTabCategoryItem = new HashMap(),
+                objectsToDeleteSubstanceTabCategory = new HashMap(),
+                objectsToDeleteSubstanceTab = new HashMap();
 
-            objectsToDelete.forEach((joinable,jId) ->{
-                //System.out.println("ordered objects: " +jId + " " + joinable.getClass().getSimpleName());
-                if(joinable instanceof SubstanceTabCategoryItemTag){
-                    objectsToDeleteSubstanceTabCategoryItemTag.put(joinable,jId);
-                }
-                if(joinable instanceof SubstanceTabCategoryItem){
-                    objectsToDeleteSubstanceTabCategoryItem.put(joinable,jId);
-                }
-                if(joinable instanceof SubstanceTabCategory){
-                    objectsToDeleteSubstanceTabCategory.put(joinable,jId);
-                }
-                if(joinable instanceof SubstanceTab){
-                    objectsToDeleteSubstanceTab.put(joinable,jId);
-                }
-            });
+        objectsToDelete.forEach((joinable,jId) ->{
+            if(joinable instanceof SubstanceTabCategoryItemTag){
+                objectsToDeleteSubstanceTabCategoryItemTag.put(joinable,jId);
+            }
+            if(joinable instanceof SubstanceTabCategoryItem){
+                objectsToDeleteSubstanceTabCategoryItem.put(joinable,jId);
+            }
+            if(joinable instanceof SubstanceTabCategory){
+                objectsToDeleteSubstanceTabCategory.put(joinable,jId);
+            }
+            if(joinable instanceof SubstanceTab){
+                objectsToDeleteSubstanceTab.put(joinable,jId);
+            }
+        });
 
+        try {
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategoryItemTag.forEach(
                     (joinable,jId) -> {
-                        System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
+                        //System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
                         Object jointableToDelete = session.find(joinable.getClass(), jId);
                         session.remove(jointableToDelete);
                     });
@@ -215,7 +147,7 @@ public class Delete extends DbEntitySessionManager {
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategoryItem.forEach(
                     (joinable,jId) -> {
-                        System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
+                        //System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
                         Object jointableToDelete = session.find(joinable.getClass(), jId);
                         session.remove(jointableToDelete);
                     });
@@ -224,7 +156,7 @@ public class Delete extends DbEntitySessionManager {
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategory.forEach(
                     (joinable,jId) -> {
-                        System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
+                        //System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
                         Object jointableToDelete = session.find(joinable.getClass(), jId);
                         session.remove(jointableToDelete);
                     });
@@ -233,7 +165,7 @@ public class Delete extends DbEntitySessionManager {
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTab.forEach(
                     (joinable,jId) -> {
-                        System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
+                        //System.out.println("grouped objects: " +jId + " " + joinable.getClass().getSimpleName());
                         Object jointableToDelete = session.find(joinable.getClass(), jId);
                         session.remove(jointableToDelete);
                     });
