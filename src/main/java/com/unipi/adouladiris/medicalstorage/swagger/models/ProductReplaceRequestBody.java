@@ -14,7 +14,7 @@ public class ProductReplaceRequestBody {
             name="replacement",
             dataType = "array",
             required=true,
-            example = "{\"Tab\":[{\"Precaution\": \"PrecautionReplaced\"}]}"
+            example = "{\"Tab\":[{\"Γενικά\": \"Γενικά replaced\"}]}"
     )
     private LinkedHashMap<String, ArrayList<LinkedHashMap>>replacement;
     public LinkedHashMap<String, ArrayList<LinkedHashMap>> getReplacement() {return replacement;}

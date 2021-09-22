@@ -65,7 +65,7 @@ public class ProductController {
 
     @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Retrieve available product by name.")
+    @ApiOperation(value = "Retrieve available updateProduct by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product received."),
             @ApiResponse(code = 400, message = "Conflict while parsing."),
@@ -78,7 +78,7 @@ public class ProductController {
         // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
         // Query database using Data Access Object classes.
-        DbResult dbResult = new Select().findProduct(name);
+        DbResult dbResult = new Select().findProduct(name.toUpperCase());
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         // Each database successful response will be wrapped in a ResponseEntity object after parsed to a Data Transfer Object.
@@ -121,7 +121,7 @@ public class ProductController {
     //************************** DELETE/ ***********************
     @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Delete product by name.")
+    @ApiOperation(value = "Delete updateProduct by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product deleted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -133,7 +133,7 @@ public class ProductController {
         // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
         // Query database using Data Access Object classes.
-        DbResult dbResult = new Delete().deleteProductByName(name);
+        DbResult dbResult = new Delete().deleteProductByName(name.toUpperCase());
         if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         // Dao Delete class will return result field as true and a null exception field or a non-empty exception
         // field containing an exception and a null result field.
@@ -141,14 +141,20 @@ public class ProductController {
         if(dbResult.getException() != null) {
             return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
         }
-        return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.OK);
+        if(dbResult.getResult(Boolean.class)){
+            return new ResponseEntity("Product deleted.", HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity("Something happened.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
     //**********************************************************
 
     //************************** POST/ *************************
     @PostMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Insert product.")
+    @ApiOperation(value = "Insert updateProduct.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product inserted."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -172,6 +178,8 @@ public class ProductController {
             // Each Product will be queried separately.
             productSet.forEach(product -> {
                 // Query database using Data Access Object classes.
+                // Check for capitals.
+                //product.getEntityContainingName()
                 DbResult dbResult = new Insert().product(product);
                 if(dbResult.getResult().getClass().equals(Substance.class)) failures.add(dbResult.getResult(Substance.class).getName());
                 else results.add(dbResult.getResult(HashSet.class));
@@ -201,7 +209,7 @@ public class ProductController {
     //************************** PUT/ **************************
     @PutMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Update matching products.")
+    @ApiOperation(value = "Update existing updateProduct.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -224,7 +232,7 @@ public class ProductController {
             // Each Product will be queried separately.
             productSet.forEach(product -> {
                 // Query database using Data Access Object classes.
-                DbResult dbResult = new Update().product(product);
+                DbResult dbResult = new Update().updateProduct(product);
                 if(dbResult.isEmpty()) failures.add(dbResult.getResult(String.class));
                 else results.add(dbResult.getResult(HashSet.class));
             });
@@ -240,7 +248,7 @@ public class ProductController {
 
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Update available product by name.")
+    @ApiOperation(value = "Replace existing updateProduct.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -254,7 +262,7 @@ public class ProductController {
         // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
         // Query database using Data Access Object classes.
-        DbResult dbResult = new Select().findProduct(name);
+        DbResult dbResult = new Select().findProduct(name.toUpperCase());
         if(dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
         Product product = dbResult.getResult(Product.class);
         // Each database successful response will be wrapped in a ResponseEntity object.

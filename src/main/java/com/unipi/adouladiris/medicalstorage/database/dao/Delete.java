@@ -18,26 +18,28 @@ import java.util.*;
 
 
 public class Delete extends DbEntitySessionManager {
+    // TODO Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity and remove row from records.
+    // The corresponding table is obtained by passing the class type as parameter.
+    public DbResult deleteEntityById(@NotNull Class<? extends Operable> typeClass, @NotNull Integer Id) {
+            try {
+                if (!session.getTransaction().isActive()) session.getTransaction().begin();
 
-    // Delete entity by Id. Pass the class type and the Id parameter to find the corresponding entity, remove row from records and clear db cache
-    // to make deletion visible. The corresponding table is obtained by passing the class type as parameter.
-//    public DbResult deleteEntityById(@NotNull Class<? extends Queryable> typeClass, @NotNull Integer id) {
-//        try {
-//            if(!session.getTransaction().isActive()) session.getTransaction().begin();
-//            Object object = session.find(typeClass, id);
-//            session.remove(object);
-//            session.getTransaction().commit();
-//            session.clear();
-//            sessionFactory.getCache().evictAll();
-//            return new DbResult(true);
-//        } catch (PersistenceException ex ) {
-//            if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
-//            return new DbResult(ex);
-//        }
-//    }
+                Object object = session.find(typeClass, Id);
+                session.remove(object);
+                session.getTransaction().commit();
 
-    // Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity, remove row from records and clear db cache
-    // to make deletion visible. The corresponding table is obtained by passing the class type as parameter.
+                return new DbResult(true);
+            } catch (Exception ex) {
+                if (session.getTransaction().isActive()) {
+                    session.getTransaction().rollback();
+                }
+                return new DbResult(ex);
+            }
+    }
+
+
+    // Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity and remove row from records.
+    // The corresponding table is obtained by passing the class type as parameter.
     public DbResult deleteEntityByName(@NotNull Class<? extends Operable> typeClass, @NotNull String name) {
 
         // Before perform deleting, search for entity.
@@ -47,18 +49,11 @@ public class Delete extends DbEntitySessionManager {
         } else {
             Operable objectToDelete = dbResult.getResult(typeClass);
             try {
-                // Clears L1 cache by entity manager to commit pending transactions.
-
-                // Clears L2 cache.
-//                sessionFactory.getCache().evictAll();
-//                session.clear();
-
                 if (!session.getTransaction().isActive()) session.getTransaction().begin();
 
                 Object object = session.find(typeClass, objectToDelete.getId());
                 session.remove(object);
                 session.getTransaction().commit();
-
 
                 return new DbResult(true);
             } catch (Exception ex) {
@@ -68,11 +63,9 @@ public class Delete extends DbEntitySessionManager {
                 return new DbResult(ex);
             }
         }
-
     }
 
-
-    // Cascading delete will not delete related entities, only from the same class.
+    // Cascading delete will not delete related entities.
     public DbResult deleteProductByName(@NotNull String name) {
 
         // Find all related classes to a Product.
@@ -112,7 +105,7 @@ public class Delete extends DbEntitySessionManager {
             }
         }
 
-        // Create four different hashmaps to contain different Ids.
+        // Create four different hashmaps to contain different Id groups of join tables.
         HashMap<Object, Integer>
                 objectsToDeleteSubstanceTabCategoryItemTag = new HashMap(),
                 objectsToDeleteSubstanceTabCategoryItem = new HashMap(),
@@ -134,6 +127,8 @@ public class Delete extends DbEntitySessionManager {
             }
         });
 
+        // Delete each group from each table from the end to the beginning and every time commit each batch delete:
+        // SubstanceTabCategoryItemTag -> SubstanceTabCategoryItem -> SubstanceTabCategory -> SubstanceTab
         try {
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategoryItemTag.forEach(
@@ -144,6 +139,21 @@ public class Delete extends DbEntitySessionManager {
                     });
             session.getTransaction().commit();
 
+            // Clear entities without relations.
+            objectsToDeleteSubstanceTabCategoryItemTag.forEach(
+                    (joinable,jId) -> {
+                        SubstanceTabCategoryItemTag stcit = (SubstanceTabCategoryItemTag)joinable;
+                        Tag tag = stcit.getTag();
+
+                        if(!tag.getName().equals("")){
+                            Integer counter = getRecordsCount(SubstanceTabCategoryItemTag.class,tag.getClass(),tag.getName() ).getResult(Integer.class);
+                            System.out.println("entity Id:" + tag.getId() + " name: " + tag.getName() + " counter: " + counter );
+                            if(counter == 0){
+                                deleteEntityById(tag.getClass(), tag.getId());
+                            }
+                        }
+                    });
+
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategoryItem.forEach(
                     (joinable,jId) -> {
@@ -152,6 +162,19 @@ public class Delete extends DbEntitySessionManager {
                         session.remove(jointableToDelete);
                     });
             session.getTransaction().commit();
+
+            // Clear entities without relations.
+            objectsToDeleteSubstanceTabCategoryItem.forEach(
+                    (joinable,jId) -> {
+                        SubstanceTabCategoryItem stci = (SubstanceTabCategoryItem)joinable;
+                        Item item = stci.getItem();
+
+                        Integer counter = getRecordsCount(SubstanceTabCategoryItem.class,item.getClass(),item.getName() ).getResult(Integer.class);
+                        System.out.println("entity Id:" + item.getId() + " name: " + item.getName() + " counter: " + counter );
+                        if(counter == 0){
+                            deleteEntityById(item.getClass(), item.getId());
+                        }
+                    });
 
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTabCategory.forEach(
@@ -162,6 +185,19 @@ public class Delete extends DbEntitySessionManager {
                     });
             session.getTransaction().commit();
 
+            // Clear entities without relations.
+            objectsToDeleteSubstanceTabCategory.forEach(
+                    (joinable,jId) -> {
+                        SubstanceTabCategory stc = (SubstanceTabCategory)joinable;
+                        Category category = stc.getCategory();
+
+                        Integer counter = getRecordsCount(SubstanceTabCategory.class,category.getClass(),category.getName() ).getResult(Integer.class);
+                        System.out.println("entity Id:" + category.getId() + " name: " + category.getName() + " counter: " + counter );
+                        if(counter == 0){
+                            deleteEntityById(category.getClass(), category.getId());
+                        }
+                    });
+
             if (!session.getTransaction().isActive()) session.getTransaction().begin();
             objectsToDeleteSubstanceTab.forEach(
                     (joinable,jId) -> {
@@ -170,6 +206,25 @@ public class Delete extends DbEntitySessionManager {
                         session.remove(jointableToDelete);
                     });
             session.getTransaction().commit();
+
+            // Clear entities without relations.
+            objectsToDeleteSubstanceTab.forEach(
+                    (joinable,jId) -> {
+                        SubstanceTab st = (SubstanceTab)joinable;
+                        Substance substance = st.getSubstance();
+                        Tab tab = st.getTab();
+
+                        Integer substanceCounter = getRecordsCount(SubstanceTab.class,substance.getClass(),substance.getName() ).getResult(Integer.class);
+                        Integer tabCounter = getRecordsCount(SubstanceTab.class,tab.getClass(),tab.getName() ).getResult(Integer.class);
+                        System.out.println("entity Id:" + substance.getId() + " name: " + substance.getName() + " counter: " + substanceCounter );
+                        System.out.println("entity Id:" + tab.getId() + " name: " + tab.getName() + " counter: " + tabCounter );
+                        if(substanceCounter == 0){
+                            deleteEntityById(substance.getClass(), substance.getId());
+                        }
+                        if(tabCounter == 0){
+                            deleteEntityById(tab.getClass(), tab.getId());
+                        }
+                    });
 
             return new DbResult(true);
         } catch (Exception ex) {
@@ -182,9 +237,9 @@ public class Delete extends DbEntitySessionManager {
     }
 
     // Delete Product by deleting the Substance entity which is the first single key using deleteEntityByName method.
-//    public DbResult deleteProduct(@NotNull Product product) {
-//        if ( product.getProduct().keySet().size() > 1 ) return new DbResult();
-//        return deleteEntityByName(product.getEntityContainingName().getClass(), product.getEntityContainingName().getName());
+//    public DbResult deleteProduct(@NotNull Product updateProduct) {
+//        if ( updateProduct.getProduct().keySet().size() > 1 ) return new DbResult();
+//        return deleteEntityByName(updateProduct.getEntityContainingName().getClass(), updateProduct.getEntityContainingName().getName());
 //    }
 
 }

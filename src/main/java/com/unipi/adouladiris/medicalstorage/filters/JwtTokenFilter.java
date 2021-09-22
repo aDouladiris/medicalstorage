@@ -31,7 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter){this.dateTimeFormatter = dateTimeFormatter;}
 
     // Returns if request target endpoint should be filtered or not.
-    // Only /api/v1/product/ endpoint should be filtered.
+    // Only /api/v1/updateProduct/ endpoint should be filtered.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         if(request.getRequestURI().contains("/api/v1/product/")) return false; // ShouldFilter

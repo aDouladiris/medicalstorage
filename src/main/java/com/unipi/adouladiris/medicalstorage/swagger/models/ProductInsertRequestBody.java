@@ -8,7 +8,7 @@ public class ProductInsertRequestBody {
     // For parsing the request body, we use the Data Transfer Class (DTO) RequestBodyParse.
 
     @ApiModelProperty(
-            name="product",
+            name="updateProduct",
             dataType = "array",
             required=true,
             example =  "[{\"Substance\": {\"DEPON MAXIMUM\": " +

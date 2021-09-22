@@ -12,7 +12,6 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Jo
 import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.*;
 
@@ -20,28 +19,28 @@ import java.util.*;
 public class Update extends DbEntitySessionManager {
 
     // Retrieve entity instance by Id, update content at the instance and save to db.
-    public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {
-        try {
-            if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            Operable object = session.find(operable.getClass(), id);
-            object.setName(operable.getName());
-            if( operable.getClass().getSimpleName().equals("Item") ){
-                Item itemOld = (Item) object;
-                Item itemNew = (Item) operable;
-                itemOld.setDescription(itemNew.getDescription());
-                object = itemOld;
-            }
-            session.update(object);
-            session.getTransaction().commit();
-            if(!session.getTransaction().isActive()) session.getTransaction().begin();
-            object = session.find(operable.getClass(), id);
-            session.getTransaction().commit();
-            return new DbResult(object);
-        } catch (PersistenceException ex ) {
-            if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
-            return new DbResult(ex);
-        }
-    }
+//    public DbResult entityById(@NotNull Integer id, @NotNull Operable operable) {
+//        try {
+//            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+//            Operable object = session.find(operable.getClass(), id);
+//            object.setName(operable.getName());
+//            if( operable.getClass().getSimpleName().equals("Item") ){
+//                Item itemOld = (Item) object;
+//                Item itemNew = (Item) operable;
+//                itemOld.setDescription(itemNew.getDescription());
+//                object = itemOld;
+//            }
+//            session.update(object);
+//            session.getTransaction().commit();
+//            if(!session.getTransaction().isActive()) session.getTransaction().begin();
+//            object = session.find(operable.getClass(), id);
+//            session.getTransaction().commit();
+//            return new DbResult(object);
+//        } catch (PersistenceException ex ) {
+//            if ( session.getTransaction().isActive() ) { session.getTransaction().rollback(); }
+//            return new DbResult(ex);
+//        }
+//    }
 
     // Retrieve entity instance by Name, update content at the instance and save to db.
 //    public DbResult entityByName(@NotNull String name, @NotNull Operable operable) {
@@ -50,37 +49,11 @@ public class Update extends DbEntitySessionManager {
 //        return entityById(object.getId(), operable);
 //    }
 
-    // Retrieve each entity from Product tree. If entity exists, update accordingly. If not, created new entity and
-    // append Id to the corresponding JoinTable.
-    public DbResult product(@NotNull Product product) {
-
-        for (Substance newSubstance : product.getProduct().keySet() ){
-            if(new Select().findProduct(newSubstance.getName()).isEmpty()){
-                return new DbResult("Product not exists. Cannot update.");
-            }
-        }
-        Set<HashMap> results = new HashSet();
-        for( Substance substance: product.getProduct().keySet() ){
-            for( Tab tab : product.getProduct().get(substance).keySet() ){
-                for ( Category category : product.getProduct().get(substance).get(tab).keySet() ){
-                    for ( Item item : product.getProduct().get(substance).get(tab).get(category).keySet() ){
-                        for ( Tag tag : product.getProduct().get(substance).get(tab).get(category).get( item ) ){
-                            // Insert keys with value at each iteration.
-                            results.add(productUpdate(substance, tab, category, item, tag).getResult(HashMap.class));
-                        }
-                    }
-                }
-            }
-        }
-
-        return new DbResult(results);
-    }
-
     // To insert a Product tree, we insert each entity individually. If the instance of each entity exists, we retrieve the instance.
     // If not, we create a new instance of the entity.
     // After each entity insertion, we use their Id to join them at JoinTables.
     // At the end, we return a HashMap containing the participated entities Ids.
-    public DbResult productUpdate(Substance substance, Tab tab, Category category, Item item, Tag tag) {
+    private DbResult findOrCreateEntity(Substance substance, Tab tab, Category category, Item item, Tag tag) {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
         Insert insertion = new Insert();
         Select select = new Select();
@@ -159,6 +132,32 @@ public class Update extends DbEntitySessionManager {
         return dbResult;
     }
 
+    // Retrieve each entity from Product tree. If entity exists, update accordingly. If not, created new entity and
+    // append Id to the corresponding JoinTable.
+    public DbResult updateProduct(@NotNull Product product) {
+
+        for (Substance newSubstance : product.getProduct().keySet() ){
+            if(new Select().findProduct(newSubstance.getName()).isEmpty()){
+                return new DbResult("Product not exists. Cannot update.");
+            }
+        }
+        Set<HashMap> results = new HashSet();
+        for( Substance substance: product.getProduct().keySet() ){
+            for( Tab tab : product.getProduct().get(substance).keySet() ){
+                for ( Category category : product.getProduct().get(substance).get(tab).keySet() ){
+                    for ( Item item : product.getProduct().get(substance).get(tab).get(category).keySet() ){
+                        for ( Tag tag : product.getProduct().get(substance).get(tab).get(category).get( item ) ){
+                            // Insert keys with value at each iteration.
+                            results.add(findOrCreateEntity(substance, tab, category, item, tag).getResult(HashMap.class));
+                        }
+                    }
+                }
+            }
+        }
+
+        return new DbResult(results);
+    }
+
     // If http request body for update contains keyword 'replacement', then it finds matching entity and replace it with new values.
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception {
 
@@ -214,6 +213,7 @@ public class Update extends DbEntitySessionManager {
         HashMap<Class<? extends Operable>, Operable> operableSet = new HashMap();
         for(Operable entity : indexEntities){ operableSet.put(entity.getClass(), entity); }
         HashMap<String, String> results = new HashMap();
+        Delete delete = new Delete();
 
         // If path: Substance->Tab->Category->Item->Tag exists, replace tag entities.
         if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
@@ -258,7 +258,7 @@ public class Update extends DbEntitySessionManager {
 
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategoryItemTag.getClass(), newTag.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
-                                        new Delete().deleteEntityByName(newTag.getClass(), oldKey.toString());
+                                        delete.deleteEntityByName(newTag.getClass(), oldKey.toString());
                                         results.put(oldKey.toString()+"{removed}", newTag.getName());
                                     }
                                     else results.put(oldKey.toString(), newTag.getName());
@@ -312,7 +312,7 @@ public class Update extends DbEntitySessionManager {
 
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategoryItem.getClass(), newItem.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
-                                        new Delete().deleteEntityByName(newItem.getClass(), oldKey.toString());
+                                        delete.deleteEntityByName(newItem.getClass(), oldKey.toString());
                                         results.put(oldKey.toString()+"{removed}", newItem.getName() + " " + newItem.getDescription());
                                     }
                                     else results.put(oldKey.toString(), newItem.getName() + " " + newItem.getDescription());
@@ -356,7 +356,7 @@ public class Update extends DbEntitySessionManager {
 
                                     Integer oldKeyJoins = getRecordsCount(substanceTabCategory.getClass(), newCategory.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
-                                        new Delete().deleteEntityByName(newCategory.getClass(), oldKey.toString());
+                                        delete.deleteEntityByName(newCategory.getClass(), oldKey.toString());
                                         results.put(oldKey.toString()+"{removed}", newCategory.getName());
                                     }
                                     else results.put(oldKey.toString(), newCategory.getName());
@@ -397,7 +397,7 @@ public class Update extends DbEntitySessionManager {
 
                                     Integer oldKeyJoins = getRecordsCount(substanceTab.getClass(), newTab.getClass(), oldKey.toString()).getResult(Integer.class);
                                     if(oldKeyJoins == 0){
-                                        new Delete().deleteEntityByName(newTab.getClass(), oldKey.toString());
+                                        delete.deleteEntityByName(newTab.getClass(), oldKey.toString());
                                         results.put(oldKey.toString()+"{removed}", newTab.getName());
                                     }
                                     else results.put(oldKey.toString(), newTab.getName());
@@ -434,50 +434,6 @@ public class Update extends DbEntitySessionManager {
 
     }
 
-    // Count entities at join tables. If entity reference (as a foreign key) to a join table is removed and is not attached to a join table,
-    // then delete it from the corresponding table.
-    private DbResult getRecordsCount(Class<? extends Joinable> joinTableName, Class<? extends Operable> operableName, String oldKey){
 
-        StringBuilder queryBuilder = new StringBuilder();
-
-        queryBuilder.append("FROM ");
-
-        if(joinTableName.equals(SubstanceTab.class)){
-            queryBuilder.append("SubstanceTab jt ");
-        }
-        else if(joinTableName.equals(SubstanceTabCategory.class)){
-            queryBuilder.append("SubstanceTabCategory jt ");
-        }
-        else if(joinTableName.equals(SubstanceTabCategoryItem.class)){
-            queryBuilder.append("SubstanceTabCategoryItem jt ");
-        }
-        else if(joinTableName.equals(SubstanceTabCategoryItemTag.class)){
-            queryBuilder.append("SubstanceTabCategoryItemTag jt ");
-        }
-
-        queryBuilder.append("INNER JOIN ");
-
-        if(operableName.equals(Substance.class)){
-            queryBuilder.append("jt.substance WHERE jt.substance.name =: name ");
-        }
-        else if(operableName.equals(Tab.class)){
-            queryBuilder.append("jt.tab WHERE jt.tab.name =: name ");
-        }
-        else if(operableName.equals(Category.class)){
-            queryBuilder.append("jt.category WHERE jt.category.name =: name ");
-        }
-        else if(operableName.equals(Item.class)){
-            queryBuilder.append("jt.item WHERE jt.item.name =: name ");
-        }
-        else if(operableName.equals(Tag.class)){
-            queryBuilder.append("jt.tag WHERE jt.tag.name =: name ");
-        }
-
-        String select = queryBuilder.toString();
-        Query query = session.createQuery(select);
-        query.setParameter("name", oldKey);
-        List<Object[]> queryResultList = query.getResultList();
-        return new DbResult(queryResultList.size());
-    }
 
 }

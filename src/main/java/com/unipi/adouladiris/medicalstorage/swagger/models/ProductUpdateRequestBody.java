@@ -7,11 +7,11 @@ public class ProductUpdateRequestBody {
     // For parsing the request body, we use the Data Transfer Class (DTO) RequestBodyParse.
 
     @ApiModelProperty(
-            name="product",
+            name="updateProduct",
             dataType = "array",
             required=true,
-            example = "[{\"Substance\": {\"Zinadol\": {\"Tab\": [{\"Precaution\": {\"Category\": [{\"Contraindications\": {"+
-                        "\"Item\": [{\"Title\": \"AlkoolReplaced\", \"Description\": \"TESTupdated\", \"Tag\": [\"PonokefalosReplaced\"]}]}}]}}]}}}]"
+            example = "[{\"Substance\": {\"ZINADOL\": {\"Tab\": [{\"Γενικά\": {\"Category\": [{\"Περιγραφή\": {"+
+                        "\"Item\": [{\"Title\": \"Φαρμακοτεχνική μορφή\", \"Description\": \"Δισκία επικαλυμμένα με υμένιο (TAB_FILM_COATED)\", \"Tag\": [\"\"]}]}}]}}]}}}]"
     )
     private Object[] product;
     public Object[] getProduct() {return product;}

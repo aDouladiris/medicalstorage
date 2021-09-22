@@ -62,7 +62,7 @@ public class Select extends DbEntitySessionManager {
                 }
             }
 
-            // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
+            // If updateProduct is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
                 // Create new Product.
                 product = new Product();
@@ -82,9 +82,9 @@ public class Select extends DbEntitySessionManager {
                 TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag>>> > tmpTabCatItemTagTreeMap = new TreeMap<>();
                 // Insert tab and TreeMap of Category and TreeMap of Item and TreeSet of Tags to the TreeMap.
                 tmpTabCatItemTagTreeMap.put(tab, categoryItemTagTreeMap);
-                // Insert substance and nested TreeMap to the product nested TreeMap.
+                // Insert substance and nested TreeMap to the updateProduct nested TreeMap.
                 product.getProduct().put(substance, tmpTabCatItemTagTreeMap);
-                // Add product ot the result TreeSet of Products.
+                // Add updateProduct ot the result TreeSet of Products.
                 productSet.add(product);
             }
             else{
@@ -172,9 +172,9 @@ public class Select extends DbEntitySessionManager {
             Item item = (Item)row[3];
             Tag tag = (Tag)row[4];
 
-            // If product is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
+            // If updateProduct is uninitialized or do not contain a key that we can update, then create a new path and add it to the Set.
             if( product == null || !product.getProduct().containsKey( substance ) ){
-//                System.out.println("New product");
+//                System.out.println("New updateProduct");
                 // Create new Product.
                 product = new Product();
                 // Create new TreeSet of Tags.
@@ -193,9 +193,9 @@ public class Select extends DbEntitySessionManager {
                 TreeMap<Tab, TreeMap<Category, TreeMap<Item, TreeSet<Tag>>> > tmpTabCatItemTagTreeMap = new TreeMap<>();
                 // Insert tab and TreeMap of Category and TreeMap of Item and TreeSet of Tags to the TreeMap.
                 tmpTabCatItemTagTreeMap.put(tab, categoryItemTagTreeMap);
-                // Insert substance and nested TreeMap to the product nested TreeMap.
+                // Insert substance and nested TreeMap to the updateProduct nested TreeMap.
                 product.getProduct().put(substance, tmpTabCatItemTagTreeMap);
-                // Add product ot the result TreeSet of Products.
+                // Add updateProduct ot the result TreeSet of Products.
                 productSet.add(product);
             }
             else{
