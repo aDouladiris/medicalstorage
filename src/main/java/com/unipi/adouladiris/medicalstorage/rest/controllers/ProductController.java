@@ -142,10 +142,11 @@ public class ProductController {
             return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
         }
         if(dbResult.getResult(Boolean.class)){
-            return new ResponseEntity("Product deleted.", HttpStatus.OK);
+            return new ResponseEntity("Product deleted along with entities without relations.", HttpStatus.OK);
         }
         else{
-            return new ResponseEntity("Something happened.", HttpStatus.INTERNAL_SERVER_ERROR);
+            // Return something unexpected.
+            return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -177,9 +178,10 @@ public class ProductController {
 
             // Each Product will be queried separately.
             productSet.forEach(product -> {
+                // Change Substance name to capital letters.
+                String productName = product.getEntityContainingName().getName();
+                product.getEntityContainingName().setName(productName.toUpperCase());
                 // Query database using Data Access Object classes.
-                // Check for capitals.
-                //product.getEntityContainingName()
                 DbResult dbResult = new Insert().product(product);
                 if(dbResult.getResult().getClass().equals(Substance.class)) failures.add(dbResult.getResult(Substance.class).getName());
                 else results.add(dbResult.getResult(HashSet.class));

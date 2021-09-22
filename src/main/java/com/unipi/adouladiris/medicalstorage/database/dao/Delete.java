@@ -147,7 +147,7 @@ public class Delete extends DbEntitySessionManager {
 
                         if(!tag.getName().equals("")){
                             Integer counter = getRecordsCount(SubstanceTabCategoryItemTag.class,tag.getClass(),tag.getName() ).getResult(Integer.class);
-                            System.out.println("entity Id:" + tag.getId() + " name: " + tag.getName() + " counter: " + counter );
+                            //System.out.println("entity Id:" + tag.getId() + " name: " + tag.getName() + " counter: " + counter );
                             if(counter == 0){
                                 deleteEntityById(tag.getClass(), tag.getId());
                             }
@@ -170,7 +170,7 @@ public class Delete extends DbEntitySessionManager {
                         Item item = stci.getItem();
 
                         Integer counter = getRecordsCount(SubstanceTabCategoryItem.class,item.getClass(),item.getName() ).getResult(Integer.class);
-                        System.out.println("entity Id:" + item.getId() + " name: " + item.getName() + " counter: " + counter );
+                        //System.out.println("entity Id:" + item.getId() + " name: " + item.getName() + " counter: " + counter );
                         if(counter == 0){
                             deleteEntityById(item.getClass(), item.getId());
                         }
@@ -192,7 +192,7 @@ public class Delete extends DbEntitySessionManager {
                         Category category = stc.getCategory();
 
                         Integer counter = getRecordsCount(SubstanceTabCategory.class,category.getClass(),category.getName() ).getResult(Integer.class);
-                        System.out.println("entity Id:" + category.getId() + " name: " + category.getName() + " counter: " + counter );
+                        //System.out.println("entity Id:" + category.getId() + " name: " + category.getName() + " counter: " + counter );
                         if(counter == 0){
                             deleteEntityById(category.getClass(), category.getId());
                         }
@@ -216,8 +216,8 @@ public class Delete extends DbEntitySessionManager {
 
                         Integer substanceCounter = getRecordsCount(SubstanceTab.class,substance.getClass(),substance.getName() ).getResult(Integer.class);
                         Integer tabCounter = getRecordsCount(SubstanceTab.class,tab.getClass(),tab.getName() ).getResult(Integer.class);
-                        System.out.println("entity Id:" + substance.getId() + " name: " + substance.getName() + " counter: " + substanceCounter );
-                        System.out.println("entity Id:" + tab.getId() + " name: " + tab.getName() + " counter: " + tabCounter );
+//                        System.out.println("entity Id:" + substance.getId() + " name: " + substance.getName() + " counter: " + substanceCounter );
+//                        System.out.println("entity Id:" + tab.getId() + " name: " + tab.getName() + " counter: " + tabCounter );
                         if(substanceCounter == 0){
                             deleteEntityById(substance.getClass(), substance.getId());
                         }
