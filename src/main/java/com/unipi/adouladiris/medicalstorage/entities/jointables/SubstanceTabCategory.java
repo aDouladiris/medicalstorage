@@ -38,4 +38,7 @@ public class SubstanceTabCategory extends Joinable {
 
     public SubstanceTab getSubstanceTab() { return substanceTab; }
 
+    public Set<SubstanceTabCategoryItem> getSubstanceTabCategoryItemSet() {
+        return substanceTabCategoryItemSet;
+    }
 }

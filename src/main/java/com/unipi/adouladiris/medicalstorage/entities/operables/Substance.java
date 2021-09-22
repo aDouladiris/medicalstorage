@@ -21,4 +21,12 @@ public class Substance extends Operable {
 
     public Substance(){}
     public Substance(String name){ setName(name); }
+
+    public Set<SubstanceTab> getSubstanceTabSet() {
+        return substanceTabSet;
+    }
+
+    public void setSubstanceTabSet(Set<SubstanceTab> substanceTabSet) {
+        this.substanceTabSet = substanceTabSet;
+    }
 }

@@ -9,6 +9,7 @@ import com.unipi.adouladiris.medicalstorage.database.dao.Update;
 import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.operables.Substance;
 import com.unipi.adouladiris.medicalstorage.rest.dto.*;
+import com.unipi.adouladiris.medicalstorage.swagger.models.ProductEntityDeleteRequestBody;
 import com.unipi.adouladiris.medicalstorage.swagger.models.ProductInsertRequestBody;
 import com.unipi.adouladiris.medicalstorage.swagger.models.ProductReplaceRequestBody;
 import com.unipi.adouladiris.medicalstorage.swagger.models.ProductUpdateRequestBody;
@@ -65,7 +66,7 @@ public class ProductController {
 
     @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Retrieve available updateProduct by name.")
+    @ApiOperation(value = "Retrieve available product by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product received."),
             @ApiResponse(code = 400, message = "Conflict while parsing."),
@@ -121,7 +122,7 @@ public class ProductController {
     //************************** DELETE/ ***********************
     @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Delete updateProduct by name.")
+    @ApiOperation(value = "Delete product by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product deleted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -150,12 +151,50 @@ public class ProductController {
         }
 
     }
+
+    @DeleteMapping("")
+    @PreAuthorize("hasRole('admin')")
+    @ApiOperation(value = "Delete entity from product by name.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Entity deleted."),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found."),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = ProductEntityDeleteRequestBody.class)
+    public ResponseEntity<String> deleteEntityFromProduct(@RequestBody LinkedHashMap body) {
+        // When request successfully reach controller, each controller will empty security context.
+        SecurityContextHolder.getContext().setAuthentication(null);
+        try{
+            // Query database using Data Access Object classes.
+            //DbResult dbResult = new Delete().deleteProductByName(name.toUpperCase());
+            DbResult dbResult = new Delete().deleteEntityFromProduct(body);
+            if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
+            // Dao Delete class will return result field as true and a null exception field or a non-empty exception
+            // field containing an exception and a null result field.
+            // To avoid checking a null result field as a boolean which needs two checks, we check once the exception field.
+            if(dbResult.getException() != null) {
+                return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
+            }
+            if(dbResult.getResult(Boolean.class)){
+                return new ResponseEntity("Product deleted along with entities without relations.", HttpStatus.OK);
+            }
+            else{
+                // Return something unexpected.
+                return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exc.getMessage(), exc);
+        }
+    }
     //**********************************************************
 
     //************************** POST/ *************************
     @PostMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Insert updateProduct.")
+    @ApiOperation(value = "Insert Product.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product inserted."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -177,7 +216,7 @@ public class ProductController {
             Set<String> failures = new HashSet();
 
             // Each Product will be queried separately.
-            productSet.forEach(product -> {
+            for(Product product : productSet){
                 // Change Substance name to capital letters.
                 String productName = product.getEntityContainingName().getName();
                 product.getEntityContainingName().setName(productName.toUpperCase());
@@ -185,7 +224,7 @@ public class ProductController {
                 DbResult dbResult = new Insert().product(product);
                 if(dbResult.getResult().getClass().equals(Substance.class)) failures.add(dbResult.getResult(Substance.class).getName());
                 else results.add(dbResult.getResult(HashSet.class));
-            });
+            }
 
             JSONObject response = new JSONObject();
             if(results.isEmpty() && !failures.isEmpty()){
@@ -211,7 +250,7 @@ public class ProductController {
     //************************** PUT/ **************************
     @PutMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Update existing updateProduct.")
+    @ApiOperation(value = "Update existing product.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -250,7 +289,7 @@ public class ProductController {
 
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Replace existing updateProduct.")
+    @ApiOperation(value = "Replace existing product.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),

@@ -26,4 +26,8 @@ public class SubstanceTabCategoryItemTag extends Joinable {
 
     public Tag getTag() {return tag;}
     public void setTag(Tag tag) {this.tag = tag;}
+
+    public SubstanceTabCategoryItem getSubstanceTabCategoryItem() {
+        return substanceTabCategoryItem;
+    }
 }

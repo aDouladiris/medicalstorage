@@ -158,33 +158,27 @@ public class Update extends DbEntitySessionManager {
         return new DbResult(results);
     }
 
-    // If http request body for update contains keyword 'replacement', then it finds matching entity and replace it with new values.
+    // If request body for update contains keyword 'replacement', then it finds matching entity and replace it with new values.
     public DbResult replaceProduct(@NotNull Product product, @NotNull LinkedHashMap body) throws Exception {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
         Set<ArrayList<HashMap>> results = new HashSet();
 
         product.getProduct().forEach(
-                (substanceKey, substanceValue) -> { if(bodyMap.containsKey("Substance")){
-                    results.add(processBodyKeys((ArrayList) bodyMap.get("Substance"), substanceKey));
-                    }
+                (substanceKey, substanceValue) -> {
+                    matchEntitiesToReplace("Substance", bodyMap, results, substanceKey, substanceKey );
                     substanceValue.forEach(
-                            (tabKey, tabValue) -> { if(bodyMap.containsKey("Tab")) {
-                                results.add(processBodyKeys((ArrayList) bodyMap.get("Tab"), substanceKey, tabKey));
-                            }
+                            (tabKey, tabValue) -> {
+                                matchEntitiesToReplace("Tab", bodyMap, results, tabKey, substanceKey, tabKey );
                                 tabValue.forEach(
-                                        (categoryKey, categoryValue) -> { if(bodyMap.containsKey("Category")) {
-                                            results.add(processBodyKeys((ArrayList) bodyMap.get("Category"), substanceKey, tabKey, categoryKey));
-                                        }
+                                        (categoryKey, categoryValue) -> {
+                                            matchEntitiesToReplace("Category", bodyMap, results, categoryKey, substanceKey, tabKey, categoryKey );
                                         categoryValue.forEach(
                                                 (itemKey, itemValue) -> {
-                                                    if(bodyMap.containsKey("Item")) {
-                                                        results.add(processBodyKeys((ArrayList) bodyMap.get("Item"), substanceKey, tabKey, categoryKey, itemKey));
-                                                    }
+                                                    matchEntitiesToReplace("Item", bodyMap, results, itemKey, substanceKey, tabKey, categoryKey, itemKey );
                                                     itemValue.forEach(
-                                                            tag -> { if(bodyMap.containsKey("Tag")) {
-                                                                results.add(processBodyKeys((ArrayList) bodyMap.get("Tag"), substanceKey, tabKey, categoryKey, itemKey, tag));
-                                                            }
+                                                            tag -> {
+                                                                matchEntitiesToReplace("Tag", bodyMap, results, tag, substanceKey, tabKey, categoryKey, itemKey, tag );
                                                             });
                                                 });
                                         });
@@ -197,14 +191,25 @@ public class Update extends DbEntitySessionManager {
 
     // Replace entity Id at JoinTables.
     private ArrayList<HashMap> processBodyKeys(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
-
         ArrayList<HashMap> results = new ArrayList();
         bodyArrayToProcess.forEach(
                 replacement -> {
                     replacement.forEach( (oldKey, newKey) -> { results.add(updateJoinTable(bodyArrayToProcess, indexEntities)); }); }
         );
-
         return results;
+    }
+
+    private void matchEntitiesToReplace(String keyName, HashMap bodyMap, Set<ArrayList<HashMap>> results, Operable entity, Operable... collection){
+        if(bodyMap.containsKey(keyName)) {
+            bodyMap.values().forEach(pairToReplace -> {
+                ArrayList<LinkedHashMap > valsToReplace = (ArrayList)pairToReplace;
+                valsToReplace.forEach(val -> {
+                    if(val.containsKey(entity.getName())){
+                        results.add(processBodyKeys((ArrayList) bodyMap.get(keyName), collection));
+                    }
+                });
+            });
+        }
     }
 
     // Performs actual replacement of entity Id at joinTable by checking key paths of entities in order to find the corresponding entity.
@@ -387,6 +392,8 @@ public class Update extends DbEntitySessionManager {
                                         newTab = session.find(newTab.getClass(), newInsertedId);
                                     }
                                     else newTab = dbResult.getResult(Tab.class);
+
+                                    System.out.println("toReplace: " + newTab.getName() );
 
                                     if(!session.getTransaction().isActive()) session.getTransaction().begin();
                                     //session.getReference(SubstanceTab.class, )

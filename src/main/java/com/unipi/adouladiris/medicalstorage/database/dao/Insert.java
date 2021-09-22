@@ -14,16 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.sql.Clob;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class Insert extends DbEntitySessionManager {
 
     // Insert Product tree containing entities as keys and values after checking for existing substance entity.
     // Each entity in the Product tree is inserted individually.
-    public DbResult product(@NotNull Product product) {
+    public DbResult product(@NotNull Product product) throws Exception {
         // Return empty if entity Substance exists.
         for (Substance newSubstance : product.getProduct().keySet() ){
             if(!new Select().findProduct(newSubstance.getName()).isEmpty()){return new DbResult(newSubstance);}

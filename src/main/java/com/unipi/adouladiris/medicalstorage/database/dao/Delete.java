@@ -65,6 +65,130 @@ public class Delete extends DbEntitySessionManager {
         }
     }
 
+    // If request body for update contains keyword 'product', then it finds matching entity and replace it with new values.
+    public DbResult deleteEntityFromProduct(@NotNull LinkedHashMap body) throws Exception {
+
+        ArrayList<HashMap> bodyMap = (ArrayList) body.get("product");
+        Set<ArrayList<HashMap>> results = new HashSet();
+
+        for (HashMap nestedMap : bodyMap){
+
+            if(nestedMap.containsKey("Substance")){
+
+                LinkedHashMap<String, Object> pathToDeleteValues = (LinkedHashMap)nestedMap.get("Substance");
+                for(Map.Entry mapEntrySubstance : pathToDeleteValues.entrySet()){
+                    String substanceName = (String) mapEntrySubstance.getKey();
+                    System.out.println("substanceName: " + substanceName);
+
+                    Substance substance = new Select().findOperableEntityByName(Substance.class, substanceName).getResult(Substance.class);
+
+                    Set<SubstanceTab> substanceTabSet = substance.getSubstanceTabSet();
+                    for(SubstanceTab st : substanceTabSet){
+                        System.out.println("st tab: " + st.getTab().getName());
+
+                        Set<SubstanceTabCategory> substanceTabCategorySet = st.getSubstanceTabCategorySet();
+                        for(SubstanceTabCategory stc : substanceTabCategorySet){
+                            System.out.println("stc category: " + stc.getCategory().getName());
+
+                            Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet = stc.getSubstanceTabCategoryItemSet();
+                            for(SubstanceTabCategoryItem stci : substanceTabCategoryItemSet){
+                                System.out.println("stci item: " + stci.getItem().getName());
+
+                                Set<SubstanceTabCategoryItemTag> substanceTabCategoryItemTagSet = stci.getSubstanceTabCategoryItemTagSet();
+                                for(SubstanceTabCategoryItemTag stcit : substanceTabCategoryItemTagSet){
+                                    System.out.println("stcit tag: " + stcit.getTag().getName());
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+
+
+//                    LinkedHashMap  mapEntryTab = (LinkedHashMap ) mapEntrySubstance.getValue();
+//                    if(mapEntryTab.containsKey("Tab")){
+//
+//                        ArrayList<LinkedHashMap>  pathToDeleteTab = (ArrayList)mapEntryTab.get("Tab");
+//                        for(LinkedHashMap tabHashMap : pathToDeleteTab){
+//                            for(Object entryTab : tabHashMap.entrySet()){
+//                                Map.Entry<String, LinkedHashMap> castedEntryTab = (Map.Entry)entryTab;
+//                                String tabName = castedEntryTab.getKey();
+//                                System.out.println("tabName: " + tabName);
+//
+////                                if(castedEntryTab.getValue().containsKey("Category")){
+////                                    ArrayList<LinkedHashMap> categoryArraylist = (ArrayList<LinkedHashMap>) castedEntryTab.getValue().get("Category");
+////
+////                                    for(LinkedHashMap categoryHashMap : categoryArraylist){
+////
+//////                                        categoryHashMap.
+//////
+//////                                        //Map.Entry<String, Object> category = (Map.Entry<String, Object>) categoryHashMap.entrySet();
+//////
+//////                                        System.out.println(categoryHashMap.getClass().getSimpleName());
+//////                                        System.out.println(categoryHashMap.toString());
+////
+////                                    }
+////                                }
+////                                else{
+////                                    return new DbResult(results);
+////                                }
+//                            }
+//                        }
+//                    }
+//                    else{
+//                        return new DbResult(results);
+//                    }
+                }
+            }
+            else{
+                return new DbResult(results);
+            }
+//            for(Object pathToDelete : nestedMap.values()){
+//
+//                LinkedHashMap pathToDeleteValues = (LinkedHashMap)pathToDelete;
+//
+//
+//                for(Object entrySubstance : pathToDeleteValues.entrySet()){
+//                    Map.Entry castedEntrySubstance = (Map.Entry)entrySubstance;
+//                    String substanceName = (String) castedEntrySubstance.getKey();
+//                    System.out.println("substanceName: " + substanceName);
+//
+//                    LinkedHashMap castedEntrySubstanceValue = (LinkedHashMap) castedEntrySubstance.getValue();
+//                    if(castedEntrySubstanceValue.containsKey("Tab")){
+//
+//                    }
+//                    else{
+//                        return new DbResult(results);
+//                    }
+
+//                    System.out.println(castedEntrySubstanceValue.get("Tab").getClass().getSimpleName());
+//                    System.out.println(castedEntrySubstanceValue.get("Tab").toString());
+//                    for(Object entryTab : castedEntrySubstanceValue.entrySet()){
+//                        Map.Entry castedEntryTab = (Map.Entry)entryTab;
+//                        String tabName = (String) castedEntryTab.getKey();
+//                        System.out.println("tabName: " + tabName);
+//                        System.out.println(castedEntryTab.getValue().getClass().getSimpleName());
+//                        System.out.println(castedEntryTab.getValue().toString());
+//
+//                    }
+
+
+//                }
+//
+//            }
+
+        }
+
+
+
+
+        return new DbResult(results);
+
+    }
+
     // Cascading delete will not delete related entities.
     public DbResult deleteProductByName(@NotNull String name) {
 

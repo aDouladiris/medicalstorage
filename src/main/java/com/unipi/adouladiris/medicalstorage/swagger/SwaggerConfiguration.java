@@ -61,6 +61,7 @@ public class SwaggerConfiguration  {
                 .additionalModels(
                         typeResolver.resolve(ProductUpdateRequestBody.class),
                         typeResolver.resolve(ProductInsertRequestBody.class),
+                        typeResolver.resolve(ProductEntityDeleteRequestBody.class),
                         typeResolver.resolve(ProductReplaceRequestBody.class)
                 )
                 .apiInfo(apiInfo())

@@ -45,4 +45,8 @@ public class SubstanceTabCategoryItem extends Joinable {
     public void setSubstanceTabCategory(SubstanceTabCategory substanceTabCategory) {
         this.substanceTabCategory = substanceTabCategory;
     }
+
+    public Set<SubstanceTabCategoryItemTag> getSubstanceTabCategoryItemTagSet() {
+        return substanceTabCategoryItemTagSet;
+    }
 }
