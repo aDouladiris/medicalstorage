@@ -36,7 +36,7 @@ public class ProductController {
     //************************** GET/ **************************
     @GetMapping("all")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Retrieve all available products.")
+    @ApiOperation(value = "Retrieve all products from database")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Products received."),
             @ApiResponse(code = 400, message = "Conflict while parsing."),
@@ -66,7 +66,7 @@ public class ProductController {
 
     @GetMapping("{name}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Retrieve available product by name.")
+    @ApiOperation(value = "Retrieve product specified by name")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product received."),
             @ApiResponse(code = 400, message = "Conflict while parsing."),
@@ -95,7 +95,7 @@ public class ProductController {
 
     @GetMapping("tag/{tag}")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Retrieve all available products by tag.")
+    @ApiOperation(value = "Retrieve products by tag")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product received."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -122,7 +122,7 @@ public class ProductController {
     //************************** DELETE/ ***********************
     @DeleteMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Delete product by name.")
+    @ApiOperation(value = "Delete product by name (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product deleted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -154,7 +154,7 @@ public class ProductController {
 
     @DeleteMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Delete items from product by name.")
+    @ApiOperation(value = "Delete items from product by name (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Entity deleted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -194,7 +194,7 @@ public class ProductController {
     //************************** POST/ *************************
     @PostMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Insert Product.")
+    @ApiOperation(value = "Insert product (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product inserted."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -250,7 +250,7 @@ public class ProductController {
     //************************** PUT/ **************************
     @PutMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Update existing product.")
+    @ApiOperation(value = "Update existing product")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -289,7 +289,7 @@ public class ProductController {
 
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Replace existing product.")
+    @ApiOperation(value = "Replace existing product by name")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),

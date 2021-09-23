@@ -43,7 +43,10 @@ public class SwaggerConfiguration  {
                 .groupName("Medical Storage Api v1 - User")
                 .additionalModels(
                         typeResolver.resolve(UserRequestBody.class),
-                        typeResolver.resolve(RegisterUserRequestBody.class)
+                        typeResolver.resolve(LoginUserRequestBody.class),
+                        typeResolver.resolve(RegisterUserRequestBody.class),
+                        typeResolver.resolve(ModifyUserRequestBody.class),
+                        typeResolver.resolve(EnableUserRequestBody.class)
                 )
                 .apiInfo(apiInfo())
                 .select()

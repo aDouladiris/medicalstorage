@@ -1,10 +1,12 @@
 package com.unipi.adouladiris.medicalstorage.rest.controllers;
 
+import com.sun.istack.NotNull;
+import com.unipi.adouladiris.medicalstorage.database.dao.Delete;
+import com.unipi.adouladiris.medicalstorage.database.dao.Update;
 import com.unipi.adouladiris.medicalstorage.swagger.SwaggerConfiguration;
 import com.unipi.adouladiris.medicalstorage.database.dao.Insert;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
-import com.unipi.adouladiris.medicalstorage.swagger.models.RegisterUserRequestBody;
-import com.unipi.adouladiris.medicalstorage.swagger.models.UserRequestBody;
+import com.unipi.adouladiris.medicalstorage.swagger.models.*;
 import com.unipi.adouladiris.medicalstorage.utilities.JWToken;
 import io.swagger.annotations.*;
 import org.json.JSONObject;
@@ -42,7 +44,7 @@ public class UserController {
     //************************** GET/ *************************
     @GetMapping(value = "information")
     @PreAuthorize("permitAll()")
-    @ApiOperation(value = "Get User Information", response = String.class)
+    @ApiOperation(value = "Get information about user from Security Context", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Authorized User found!"),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
@@ -57,13 +59,186 @@ public class UserController {
     }
     //**********************************************************
 
+    //************************** DELETE/ *************************
+    @DeleteMapping(value = "delete")
+    @PreAuthorize("hasAnyRole('admin')")
+    @ApiOperation(value = "Delete user account from database (Admin only)", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Authorized User found!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found!"),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request")
+    })
+    public ResponseEntity<String> deleteUser(@NotNull String username) {
+        try {
+            DbResult dbResult = new Delete().deleteUserByName(username);
+            if(dbResult.isEmpty()){
+                return new ResponseEntity("User not found.", HttpStatus.NOT_FOUND);
+            }
+            if(dbResult.getException() != null){
+                return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.CONFLICT);
+            }
+            else{
+                String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+                if(currentUser.equals(username)){
+                    // Empty security context.
+                    SecurityContextHolder.getContext().setAuthentication(null);
+                    return new ResponseEntity("User " + username + " has been deleted and logged out.", HttpStatus.OK);
+                }else{
+                    return new ResponseEntity("User " + username + " has been deleted.", HttpStatus.OK);
+                }
+            }
+        }catch (Exception exception){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+        }
+    }
+    //************************************************************
+
+    //**************************** PUT/ **************************
+    @PutMapping(value = "modify")
+    @PreAuthorize("hasAnyRole('admin', 'customer')")
+    @ApiOperation(value = "Change user password", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User password changed!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found!"),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = ModifyUserRequestBody.class)
+    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequestBody body) {
+        if(body.getUsername() == null || body.getUsername().length() == 0){
+            Exception missingUsername = new Exception("Username is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingUsername.getMessage(), missingUsername);
+        }
+
+        if(body.getOldPassword() == null || body.getOldPassword().length() == 0){
+            Exception missingPassword = new Exception("Old password is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingPassword.getMessage(), missingPassword);
+        }
+
+        if(body.getNewPassword() == null || body.getNewPassword().length() == 0){
+            Exception missingNewUsername = new Exception("New password is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingNewUsername.getMessage(), missingNewUsername);
+        }
+
+        try {
+            DbResult dbResult = new Update().modifyUserPassword(bCryptPasswordEncoder,body.getUsername(),body.getOldPassword(),body.getNewPassword());
+            if(dbResult.getException() != null){
+                return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.CONFLICT);
+            }
+            else{
+                return new ResponseEntity("User's " + body.getUsername() + " password has been changed.", HttpStatus.OK);
+            }
+        }catch (Exception exception){
+            if(exception.getMessage().equals("Old password and new password is the same")){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage(), exception);
+            }
+            else if(exception.getMessage().equals("Wrong password")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+            }
+        }
+    }
+
+    @PutMapping(value = "status")
+    @PreAuthorize("hasAnyRole('admin')")
+    @ApiOperation(value = "Enable/Disable user and change authority (Admin only)", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User status changed!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found!"),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = EnableUserRequestBody.class)
+    public ResponseEntity<String> statusRoleEnable(@RequestBody EnableUserRequestBody body) {
+        if(body.getUsername() == null || body.getUsername().length() == 0){
+            Exception missingUsername = new Exception("Username is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingUsername.getMessage(), missingUsername);
+        }
+
+        if(body.getPassword() == null || body.getPassword().length() == 0){
+            Exception missingPassword = new Exception("Old password is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingPassword.getMessage(), missingPassword);
+        }
+
+        if(body.getRole() == null || body.getRole().length() == 0){
+            Exception missingNewUsername = new Exception("User status is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingNewUsername.getMessage(), missingNewUsername);
+        }
+
+        if(body.getEnabled() == ' '){
+            Exception missingNewUsername = new Exception("User status enabled is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingNewUsername.getMessage(), missingNewUsername);
+        }
+
+        try {
+            DbResult dbResult = new Update().modifyUserRoleAndStatus(bCryptPasswordEncoder,body.getUsername(),body.getPassword(),
+                    body.getRole(),body.getEnabled());
+            if(dbResult.getException() != null){
+                return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.CONFLICT);
+            }
+            else{
+                return new ResponseEntity("User's " + body.getUsername() + " status has been changed.", HttpStatus.OK);
+            }
+        }catch (Exception exception){
+            if(exception.getMessage().equals("Wrong password")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+            }
+
+        }
+    }
+    //************************************************************
+
     //************************** POST/ *************************
+    @PostMapping(value = "login")
+    @PreAuthorize("permitAll()")
+    @ApiOperation(value = "User login using Basic authentication", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Authenticated User logged in!"),
+            @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
+            @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
+            @ApiResponse(code = 404, message = "The requested resource could not be found!"),
+            @ApiResponse(code = 500, message = "Server Internal Error at executing request")
+    })
+    @ApiImplicitParam(name = "body", dataTypeClass = LoginUserRequestBody.class)
+    public ResponseEntity<String> login(@RequestBody UserRequestBody body) {
+        // Each database successful response will be wrapped in a ResponseEntity object.
+        // In case of exception, the response will be wrapped in a ResponseStatusException object.
+        if(body.getUsername() == null) {
+            Exception missingUsername = new Exception("Username is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingUsername.getMessage(), missingUsername);
+        }
+        else if(body.getPassword() == null ) {
+            Exception missingPassword = new Exception("Password is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingPassword.getMessage(), missingPassword);
+        }
+        String username = body.getUsername();
+        String password = body.getPassword();
+
+        // Use the authenticationManagerUser that we built in SecurityConfiguration.
+        try {
+            Authentication authentication = authenticationManagerUser.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+            return new ResponseEntity("User " + authenticatedUser.getName() + " has logged in!", HttpStatus.OK);
+        }catch (Exception exception){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+        }
+    }
     // We set logout as POST request in order to avoid link prefetching from web browsers.
     // If browser prefetch a GET link that logs a user out, it will execute a log out.
     // As soon as prefetching this particular link changes user state, it is better to avoid it using POST.
     @PostMapping(value = "logout")
     @PreAuthorize("hasAnyRole('admin', 'customer')")
-    @ApiOperation(value = "Perform User Logout", response = String.class)
+    @ApiOperation(value = "User logout", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Authenticated User logged out!"),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
@@ -82,7 +257,7 @@ public class UserController {
 
     @PostMapping(value = "register")
     @PreAuthorize("permitAll()")
-    @ApiOperation(value = "Don't have a account? Register here!")
+    @ApiOperation(value = "Register new user in database")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User has been created."),
             @ApiResponse(code = 400, message = "Conflict occurred."),
@@ -110,9 +285,9 @@ public class UserController {
         return new ResponseEntity("User inserted at " + dbResult.getResult().toString(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "requestToken")
+    @PostMapping(value = "token")
     @PreAuthorize("permitAll()")
-    @ApiOperation(value = "Request Auth Token using credentials", response = String.class)
+    @ApiOperation(value = "Get Json Web Authentication token", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "JsonWebToken generated!"),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
@@ -121,7 +296,7 @@ public class UserController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
     @ApiImplicitParam(name = "body", dataTypeClass = UserRequestBody.class)
-    public ResponseEntity<String> requestToken(@RequestBody UserRequestBody body) {
+    public ResponseEntity<String> token(@RequestBody UserRequestBody body) {
         // Each database successful response will be wrapped in a ResponseEntity object.
         // In case of exception, the response will be wrapped in a ResponseStatusException object.
         if(body.getUsername() == null) {

@@ -11,7 +11,7 @@ public class Role  extends UserRole {
     private String authority;
 
     // Manages bidirectional relationship with Role.
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "role")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "role")
     private Set<User> userSet;
 
     public Role() {}

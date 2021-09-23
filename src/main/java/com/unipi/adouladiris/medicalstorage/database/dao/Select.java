@@ -394,20 +394,20 @@ public class Select extends DbEntitySessionManager {
         return new DbResult(results);
     }
 
-//    public DbResult findUser(String username){
-//        String select = "SELECT " +
-//                "user " +               // User Object
-//                "FROM User user " +
-//                "INNER JOIN user.role AS role " +
-//                "WHERE user.username = :username ";
-//
-//        Query query = session.createQuery(select);
-//        query.setParameter("username", username);
-//        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
-//
-//        for( Object o : queryResultList ) { return new DbResult(User.class.cast(o)); }
-//        return new DbResult();
-//    }
+    public DbResult findUser(String username){
+        String select = "SELECT " +
+                "user " +               // User Object
+                "FROM User user " +
+                "INNER JOIN user.role AS role " +
+                "WHERE user.username = :username ";
+
+        Query query = session.createQuery(select);
+        query.setParameter("username", username);
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+        for( Object o : queryResultList ) { return new DbResult(User.class.cast(o)); }
+        return new DbResult();
+    }
 
 
     //    public DbResult findJoinTables(String name){

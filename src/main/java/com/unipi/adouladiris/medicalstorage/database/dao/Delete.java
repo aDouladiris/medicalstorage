@@ -10,6 +10,8 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCate
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.users.Role;
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -350,10 +352,28 @@ public class Delete extends DbEntitySessionManager {
 
     }
 
-    // Delete Product by deleting the Substance entity which is the first single key using deleteEntityByName method.
-//    public DbResult deleteProduct(@NotNull Product updateProduct) {
-//        if ( updateProduct.getProduct().keySet().size() > 1 ) return new DbResult();
-//        return deleteEntityByName(updateProduct.getEntityContainingName().getClass(), updateProduct.getEntityContainingName().getName());
-//    }
+    // Delete User
+    public DbResult deleteUserByName(@NotNull String username) throws Exception {
+
+        DbResult dbResult = new Select().findUser(username);
+        if(dbResult.isEmpty()){
+            throw new Exception("User not found");
+        }
+        else{
+            User user = dbResult.getResult(User.class);
+            try{
+                if (!session.getTransaction().isActive()) session.getTransaction().begin();
+                session.remove(user);
+                session.getTransaction().commit();
+                return new DbResult(true);
+            }
+            catch(Exception ex){
+                if (session.getTransaction().isActive()) {
+                    session.getTransaction().rollback();
+                }
+                return new DbResult(ex);
+            }
+        }
+    }
 
 }

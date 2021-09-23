@@ -11,8 +11,14 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCate
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
+import com.unipi.adouladiris.medicalstorage.entities.users.Role;
+import com.unipi.adouladiris.medicalstorage.entities.users.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.Query;
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -438,9 +444,89 @@ public class Update extends DbEntitySessionManager {
                                 });
                     });
         }
-
         return results;
+    }
 
+    // Change User password
+    public DbResult modifyUserPassword(@NotNull BCryptPasswordEncoder bCryptPasswordEncoder,
+                                       @NotNull String username, @NotNull String oldPassword,
+                                       @NotNull String newPassword) throws Exception {
+
+        if(oldPassword.equals(newPassword)){
+            throw new Exception("Old password and new password is the same");
+        }
+
+        DbResult dbResult = new Select().findUser(username);
+        if(dbResult.isEmpty()){
+            throw new Exception("User not found");
+        }
+
+        if(dbResult.getException() != null){
+            throw dbResult.getException();
+        }
+
+        User user = dbResult.getResult(User.class);
+        if(!bCryptPasswordEncoder.matches(oldPassword, user.getPassword())){
+            throw new Exception("Wrong password");
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        try{
+            if (!session.getTransaction().isActive()) session.getTransaction().begin();
+            session.merge(user);
+            session.getTransaction().commit();
+            return new DbResult(true);
+        }
+        catch(Exception ex){
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            return new DbResult(ex);
+        }
+
+    }
+
+    // Change User Enabled status and Role.
+    public DbResult modifyUserRoleAndStatus(@NotNull BCryptPasswordEncoder bCryptPasswordEncoder,
+                                            @NotNull String username, @NotNull String password,
+                                            @NotNull String role, @NotNull char enabled) throws Exception {
+
+        Select select = new Select();
+        DbResult dbResult = select.findUser(username);
+        if(dbResult.isEmpty()){
+            throw new Exception("User not found");
+        }
+        else{
+            User user = dbResult.getResult(User.class);
+            if(!bCryptPasswordEncoder.matches(password, user.getPassword())){
+                throw new Exception("Wrong password");
+            }
+
+            dbResult = select.findRole(Role.class, role);
+            Role roleEntity;
+            if(dbResult.isEmpty()){
+                Serializable insertedRoleUserId =  session.save(new Role(role));
+                roleEntity = session.find(Role.class, insertedRoleUserId );
+            }
+            else{
+                roleEntity = dbResult.getResult(Role.class);
+            }
+
+            user.setRole(roleEntity);
+            user.setEnabled(enabled);
+
+            try {
+                if (!session.getTransaction().isActive()) session.getTransaction().begin();
+                session.merge(user);
+                session.getTransaction().commit();
+                return new DbResult(true);
+            }
+            catch(Exception ex){
+                if (session.getTransaction().isActive()) {
+                    session.getTransaction().rollback();
+                }
+                return new DbResult(ex);
+            }
+        }
     }
 
 
