@@ -3,7 +3,6 @@ package com.unipi.adouladiris.medicalstorage.database.dao;
 import com.sun.istack.NotNull;
 import com.unipi.adouladiris.medicalstorage.database.result.DbResult;
 import com.unipi.adouladiris.medicalstorage.database.session.DbEntitySessionManager;
-import com.unipi.adouladiris.medicalstorage.domain.Product;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTab;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategory;
 import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCategoryItem;
@@ -11,14 +10,13 @@ import com.unipi.adouladiris.medicalstorage.entities.jointables.SubstanceTabCate
 import com.unipi.adouladiris.medicalstorage.entities.jointables.abstractClass.Joinable;
 import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
-import org.springframework.data.util.Pair;
 
 import javax.persistence.Query;
 import java.util.*;
 
 
 public class Delete extends DbEntitySessionManager {
-    // TODO Delete entity by Name. Pass the class type and the Name parameter to find the corresponding entity and remove row from records.
+    // Delete entity by Id. Pass the class type and the Id parameter to find the corresponding entity and remove row from records.
     // The corresponding table is obtained by passing the class type as parameter.
     public DbResult deleteEntityById(@NotNull Class<? extends Operable> typeClass, @NotNull Integer Id) {
             try {
@@ -65,127 +63,119 @@ public class Delete extends DbEntitySessionManager {
         }
     }
 
-    // If request body for update contains keyword 'product', then it finds matching entity and replace it with new values.
+    // If request body for update contains keyword 'product', then it finds matching item and delete it.
+    // This method deletes only items in a specific format!!!
     public DbResult deleteEntityFromProduct(@NotNull LinkedHashMap body) throws Exception {
 
         ArrayList<HashMap> bodyMap = (ArrayList) body.get("product");
-        Set<ArrayList<HashMap>> results = new HashSet();
+        //Set<ArrayList<HashMap>> results = new HashSet();
+        Select select = new Select();
 
         for (HashMap nestedMap : bodyMap){
 
-            if(nestedMap.containsKey("Substance")){
+            for(Object pathToDelete : nestedMap.values()){
 
-                LinkedHashMap<String, Object> pathToDeleteValues = (LinkedHashMap)nestedMap.get("Substance");
-                for(Map.Entry mapEntrySubstance : pathToDeleteValues.entrySet()){
-                    String substanceName = (String) mapEntrySubstance.getKey();
-                    System.out.println("substanceName: " + substanceName);
+                LinkedHashMap pathToDeleteValues = (LinkedHashMap)pathToDelete;
 
-                    Substance substance = new Select().findOperableEntityByName(Substance.class, substanceName).getResult(Substance.class);
+                for(Object entrySubstance : pathToDeleteValues.entrySet()){
+                    Map.Entry castedEntrySubstance = (Map.Entry)entrySubstance;
+                    //String substanceName = (String) castedEntrySubstance.getKey();
+                    //System.out.println("substanceName: " + substanceName);
 
-                    Set<SubstanceTab> substanceTabSet = substance.getSubstanceTabSet();
-                    for(SubstanceTab st : substanceTabSet){
-                        System.out.println("st tab: " + st.getTab().getName());
-
-                        Set<SubstanceTabCategory> substanceTabCategorySet = st.getSubstanceTabCategorySet();
-                        for(SubstanceTabCategory stc : substanceTabCategorySet){
-                            System.out.println("stc category: " + stc.getCategory().getName());
-
-                            Set<SubstanceTabCategoryItem> substanceTabCategoryItemSet = stc.getSubstanceTabCategoryItemSet();
-                            for(SubstanceTabCategoryItem stci : substanceTabCategoryItemSet){
-                                System.out.println("stci item: " + stci.getItem().getName());
-
-                                Set<SubstanceTabCategoryItemTag> substanceTabCategoryItemTagSet = stci.getSubstanceTabCategoryItemTagSet();
-                                for(SubstanceTabCategoryItemTag stcit : substanceTabCategoryItemTagSet){
-                                    System.out.println("stcit tag: " + stcit.getTag().getName());
-
+                    LinkedHashMap castedEntrySubstanceValue = (LinkedHashMap) castedEntrySubstance.getValue();
+                    if(castedEntrySubstanceValue.containsKey("Tab")){
+                        ArrayList<LinkedHashMap> tabArraylist = (ArrayList)castedEntrySubstanceValue.get("Tab");
+                        for(LinkedHashMap tabHashmap : tabArraylist ){
+                            Set<String> tabHashmapKeys = tabHashmap.keySet();
+                            for(String tabHashmapKey : tabHashmapKeys){
+                                //System.out.println("tabHashmapKey: " + tabHashmapKey);
+                                LinkedHashMap categoryLinkedHashmap = (LinkedHashMap) tabHashmap.get(tabHashmapKey);
+                                if(categoryLinkedHashmap.containsKey("Category")){
+                                    ArrayList<LinkedHashMap> categoryArraylist = (ArrayList<LinkedHashMap>) categoryLinkedHashmap.get("Category");
+                                    for(LinkedHashMap categoryInnerMap : categoryArraylist){
+                                        Set<String> categoryHashmapKeys = categoryInnerMap.keySet();
+                                        for(String categoryHashmapKey : categoryHashmapKeys){
+                                            //System.out.println("categoryHashmapKey: " + categoryHashmapKey);
+                                            LinkedHashMap itemLinkedHashmap = (LinkedHashMap) categoryInnerMap.get(categoryHashmapKey);
+                                            if(itemLinkedHashmap.containsKey("Item")){
+                                                ArrayList<LinkedHashMap> itemArraylist = (ArrayList<LinkedHashMap>) itemLinkedHashmap.get("Item");
+                                                for(LinkedHashMap itemInnerMap : itemArraylist){
+                                                    Set<String> itemHashmapKeys = itemInnerMap.keySet();
+                                                    if(itemHashmapKeys.contains("Tag")){
+                                                        for(String itemHashmapKey : itemHashmapKeys){
+                                                            //System.out.println("itemHashmapKey: " + itemHashmapKey + " Value: " + itemInnerMap.get(itemHashmapKey));
+                                                            if(itemHashmapKey.equals("Tag")){
+//                                                                System.out.println("Tag: " + itemInnerMap.get(itemHashmapKey));
+//
+//                                                                String itemName = itemInnerMap.get("Title").toString();
+//                                                                String itemDesc = itemInnerMap.get("Description").toString();
+//                                                                Item item = select.findItemEntityByNameAndDescription(itemName,itemDesc).getResult(Item.class);
+//                                                                String tagName = itemInnerMap.get(itemHashmapKey).toString();
+//                                                                Tag tag = new Tag(tagName);
+//                                                                SubstanceTabCategoryItemTag stcit = select.findJoinableEntityByName(SubstanceTabCategoryItemTag.class,item,tag).getResult(SubstanceTabCategoryItemTag.class);
+//
+//                                                                if(stcit != null){
+//                                                                    System.out.println("tag test: " + stcit.getTag().getId().toString());
+//                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    else{
+                                                        //System.out.println("itemHashmapKey: " + itemInnerMap.get("Title") + " Value: " + itemInnerMap.get("Description"));
+                                                        String itemName = itemInnerMap.get("Title").toString();
+                                                        String itemDesc = itemInnerMap.get("Description").toString();
+                                                        // Find item to delete.
+                                                        DbResult dbResult = select.findItemEntityByNameAndDescription(itemName,itemDesc);
+                                                        if(dbResult.isEmpty()){
+                                                            return new DbResult();
+                                                        }else{
+                                                            Item item = dbResult.getResult(Item.class);
+                                                            return deleteEntityById(Item.class,item.getId());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else{
+//                                                Substance substance = select.findOperableEntityByName(Substance.class,substanceName).getResult(Substance.class);
+//                                                Tab tab = select.findOperableEntityByName(Tab.class,tabHashmapKey).getResult(Tab.class);
+//                                                SubstanceTab st = select.findJoinableEntityByName(SubstanceTab.class,substance,tab).getResult(SubstanceTab.class);
+//
+//
+//                                                Category category = select.findOperableEntityByName(Category.class,categoryHashmapKey).getResult(Category.class);
+//                                                SubstanceTabCategory stc = select.findJoinableEntityByName(SubstanceTabCategory.class,st,category).getResult(SubstanceTabCategory.class);
+//
+//                                                // Find category to delete.
+//                                                return new DbResult(deleteEntityById(SubstanceTabCategory.class,stc.getId()).getResult(Boolean.class));
+//
+//                                                System.out.println("stc sub: " + stc.getSubstanceTab().getSubstance().getName());
+//                                                System.out.println("stc tab: " + stc.getSubstanceTab().getTab().getName());
+//                                                System.out.println("stc cat: " + stc.getCategory().getName());
+                                            }
+                                        }
+                                    }
                                 }
-
+                                else{
+//                                    Substance substance = select.findOperableEntityByName(Substance.class,substanceName).getResult(Substance.class);
+//                                    Tab tab = select.findOperableEntityByName(Tab.class,tabHashmapKey).getResult(Tab.class);
+//                                    SubstanceTab st = select.findJoinableEntityByName(SubstanceTab.class,substance,tab).getResult(SubstanceTab.class);
+//
+//                                    // Find tab to delete.
+//                                    //st.getTab()
+//
+//                                    System.out.println("st sub: " + st.getSubstance().getName());
+//                                    System.out.println("st tab: " + st.getTab().getName());
+                                }
                             }
-
                         }
-
                     }
-
-
-
-//                    LinkedHashMap  mapEntryTab = (LinkedHashMap ) mapEntrySubstance.getValue();
-//                    if(mapEntryTab.containsKey("Tab")){
-//
-//                        ArrayList<LinkedHashMap>  pathToDeleteTab = (ArrayList)mapEntryTab.get("Tab");
-//                        for(LinkedHashMap tabHashMap : pathToDeleteTab){
-//                            for(Object entryTab : tabHashMap.entrySet()){
-//                                Map.Entry<String, LinkedHashMap> castedEntryTab = (Map.Entry)entryTab;
-//                                String tabName = castedEntryTab.getKey();
-//                                System.out.println("tabName: " + tabName);
-//
-////                                if(castedEntryTab.getValue().containsKey("Category")){
-////                                    ArrayList<LinkedHashMap> categoryArraylist = (ArrayList<LinkedHashMap>) castedEntryTab.getValue().get("Category");
-////
-////                                    for(LinkedHashMap categoryHashMap : categoryArraylist){
-////
-//////                                        categoryHashMap.
-//////
-//////                                        //Map.Entry<String, Object> category = (Map.Entry<String, Object>) categoryHashMap.entrySet();
-//////
-//////                                        System.out.println(categoryHashMap.getClass().getSimpleName());
-//////                                        System.out.println(categoryHashMap.toString());
-////
-////                                    }
-////                                }
-////                                else{
-////                                    return new DbResult(results);
-////                                }
-//                            }
-//                        }
-//                    }
-//                    else{
-//                        return new DbResult(results);
-//                    }
+                    else{
+                        //return new DbResult();
+                    }
                 }
             }
-            else{
-                return new DbResult(results);
-            }
-//            for(Object pathToDelete : nestedMap.values()){
-//
-//                LinkedHashMap pathToDeleteValues = (LinkedHashMap)pathToDelete;
-//
-//
-//                for(Object entrySubstance : pathToDeleteValues.entrySet()){
-//                    Map.Entry castedEntrySubstance = (Map.Entry)entrySubstance;
-//                    String substanceName = (String) castedEntrySubstance.getKey();
-//                    System.out.println("substanceName: " + substanceName);
-//
-//                    LinkedHashMap castedEntrySubstanceValue = (LinkedHashMap) castedEntrySubstance.getValue();
-//                    if(castedEntrySubstanceValue.containsKey("Tab")){
-//
-//                    }
-//                    else{
-//                        return new DbResult(results);
-//                    }
-
-//                    System.out.println(castedEntrySubstanceValue.get("Tab").getClass().getSimpleName());
-//                    System.out.println(castedEntrySubstanceValue.get("Tab").toString());
-//                    for(Object entryTab : castedEntrySubstanceValue.entrySet()){
-//                        Map.Entry castedEntryTab = (Map.Entry)entryTab;
-//                        String tabName = (String) castedEntryTab.getKey();
-//                        System.out.println("tabName: " + tabName);
-//                        System.out.println(castedEntryTab.getValue().getClass().getSimpleName());
-//                        System.out.println(castedEntryTab.getValue().toString());
-//
-//                    }
-
-
-//                }
-//
-//            }
-
         }
 
-
-
-
-        return new DbResult(results);
+        return new DbResult();
 
     }
 

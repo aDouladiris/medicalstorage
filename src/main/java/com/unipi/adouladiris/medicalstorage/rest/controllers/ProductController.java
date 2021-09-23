@@ -154,7 +154,7 @@ public class ProductController {
 
     @DeleteMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Delete entity from product by name.")
+    @ApiOperation(value = "Delete items from product by name.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Entity deleted."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
@@ -170,7 +170,7 @@ public class ProductController {
             // Query database using Data Access Object classes.
             //DbResult dbResult = new Delete().deleteProductByName(name.toUpperCase());
             DbResult dbResult = new Delete().deleteEntityFromProduct(body);
-            if (dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
+            if (dbResult.isEmpty()) return new ResponseEntity("Item not found.", HttpStatus.NOT_FOUND);
             // Dao Delete class will return result field as true and a null exception field or a non-empty exception
             // field containing an exception and a null result field.
             // To avoid checking a null result field as a boolean which needs two checks, we check once the exception field.
@@ -178,7 +178,7 @@ public class ProductController {
                 return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
             }
             if(dbResult.getResult(Boolean.class)){
-                return new ResponseEntity("Product deleted along with entities without relations.", HttpStatus.OK);
+                return new ResponseEntity("Item deleted.", HttpStatus.OK);
             }
             else{
                 // Return something unexpected.
@@ -271,12 +271,12 @@ public class ProductController {
             Set<String> failures = new HashSet();
 
             // Each Product will be queried separately.
-            productSet.forEach(product -> {
+            for(Product product : productSet){
                 // Query database using Data Access Object classes.
                 DbResult dbResult = new Update().updateProduct(product);
                 if(dbResult.isEmpty()) failures.add(dbResult.getResult(String.class));
                 else results.add(dbResult.getResult(HashSet.class));
-            });
+            }
             JSONObject response = new JSONObject();
             response.put("results", results);
             response.put("failures", failures);

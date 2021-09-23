@@ -264,6 +264,23 @@ public class Select extends DbEntitySessionManager {
         Query query = session.createQuery( select.toString() );
         query.setParameter("tmpName", name);
         List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
+
+        DbResult dbResult = new DbResult();
+        if( queryResultList.isEmpty() ){ return dbResult; }
+        dbResult.setResult( queryResultList.get(0) );
+        return dbResult;
+    }
+
+    public DbResult findItemEntityByNameAndDescription(@NotNull String name, @NotNull String description) {
+        // Tables cannot be parameter values
+        StringBuilder select = new StringBuilder();
+        select.append("FROM Item as item WHERE item.name = :tmpName AND item.description = :tmpDescription ");
+
+        Query query = session.createQuery( select.toString() );
+        query.setParameter("tmpName", name);
+        query.setParameter("tmpDescription", description);
+
+        List<Object[]> queryResultList = query.getResultList(); // Result contains rows, row contains columns
         DbResult dbResult = new DbResult();
         if( queryResultList.isEmpty() ){ return dbResult; }
         dbResult.setResult( queryResultList.get(0) );

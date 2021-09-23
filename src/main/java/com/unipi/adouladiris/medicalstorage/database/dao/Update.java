@@ -134,13 +134,15 @@ public class Update extends DbEntitySessionManager {
 
     // Retrieve each entity from Product tree. If entity exists, update accordingly. If not, created new entity and
     // append Id to the corresponding JoinTable.
-    public DbResult updateProduct(@NotNull Product product) {
+    public DbResult updateProduct(@NotNull Product product) throws Exception {
 
         for (Substance newSubstance : product.getProduct().keySet() ){
             if(new Select().findProduct(newSubstance.getName()).isEmpty()){
-                return new DbResult("Product not exists. Cannot update.");
+                //return new DbResult("Product not exists. Cannot update.");
+                throw new Exception("Product not exists. Cannot update.");
             }
         }
+
         Set<HashMap> results = new HashSet();
         for( Substance substance: product.getProduct().keySet() ){
             for( Tab tab : product.getProduct().get(substance).keySet() ){

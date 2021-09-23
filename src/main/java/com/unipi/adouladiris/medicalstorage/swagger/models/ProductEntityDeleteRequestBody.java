@@ -12,7 +12,8 @@ public class ProductEntityDeleteRequestBody {
             dataType = "array",
             required=true,
             example = "[{\"Substance\": {\"ZINADOL\": {\"Tab\": [{\"Γενικά\": {\"Category\": [{\"Περιγραφή\": {"+
-                    "\"Item\": [{\"Title\": \"Φαρμακοτεχνική μορφή\", \"Description\": \"Δισκία επικαλυμμένα με υμένιο (TAB_FILM_COATED)\", \"Tag\": [\"\"]}]}}]}}]}}}]"
+                    "\"Item\": [{\"Title\": \"Φαρμακοτεχνική μορφή\", \"Description\": \"Δισκία επικαλυμμένα με υμένιο (TAB_FILM_COATED)\"}]" +
+                    "}}]}}]}}}]"
     )
     private Object[] product;
     public Object[] getProduct() {return product;}
