@@ -64,7 +64,7 @@ public class UserController {
     @PreAuthorize("hasAnyRole('admin')")
     @ApiOperation(value = "Delete user account from database (Admin only)", response = String.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Authorized User found!"),
+            @ApiResponse(code = 200, message = "User deleted!"),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource"),
             @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
@@ -223,6 +223,12 @@ public class UserController {
         String username = body.getUsername();
         String password = body.getPassword();
 
+        // Return if same user is already logged in.
+        if(SecurityContextHolder.getContext().getAuthentication().getName().equals(username)){
+            Exception loggedUsername = new Exception("Username is already logged in.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, loggedUsername.getMessage(), loggedUsername);
+        }
+
         // Use the authenticationManagerUser that we built in SecurityConfiguration.
         try {
             Authentication authentication = authenticationManagerUser.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -313,8 +319,12 @@ public class UserController {
 
         // Use the authenticationManagerUser that we built in SecurityConfiguration.
         try {
-            Authentication authentication = authenticationManagerUser.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Skip if same user is already logged in.
+            if(!SecurityContextHolder.getContext().getAuthentication().getName().equals(username)){
+                Authentication authentication = authenticationManagerUser.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            // Get user from Security Context.
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
 
             LinkedHashMap<String, String> response = new LinkedHashMap();
