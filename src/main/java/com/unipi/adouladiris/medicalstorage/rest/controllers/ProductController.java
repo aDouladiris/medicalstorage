@@ -140,14 +140,15 @@ public class ProductController {
         // field containing an exception and a null result field.
         // To avoid checking a null result field as a boolean which needs two checks, we check once the exception field.
         if(dbResult.getException() != null) {
-            return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.OK);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, dbResult.getException().getMessage(), dbResult.getException());
         }
         if(dbResult.getResult(Boolean.class)){
             return new ResponseEntity("Product deleted along with entities without relations.", HttpStatus.OK);
         }
         else{
             // Return something unexpected.
-            return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            Exception exception = new Exception(dbResult.getResult().toString());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), exception);
         }
 
     }
@@ -182,7 +183,8 @@ public class ProductController {
             }
             else{
                 // Return something unexpected.
-                return new ResponseEntity(dbResult.getResult().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+                Exception exception = new Exception(dbResult.getResult().toString());
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), exception);
             }
         }
         catch (Exception exc) {
