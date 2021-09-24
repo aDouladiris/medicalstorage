@@ -10,8 +10,9 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "item")
 @AttributeOverride(name = "name", column = @Column(name = "name")) // Override parent attribute name with this name field.
+// Unique constraints for a pair of fields
+@Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"name", "description"}))
 public class Item extends Operable {
 
     // Redeclare this field because we do not want it unique in this table. Item instances can have any names or descriptions.

@@ -12,6 +12,7 @@ import com.unipi.adouladiris.medicalstorage.entities.operables.*;
 import com.unipi.adouladiris.medicalstorage.entities.operables.abstractClass.Operable;
 import com.unipi.adouladiris.medicalstorage.entities.users.Role;
 import com.unipi.adouladiris.medicalstorage.entities.users.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -353,7 +354,8 @@ public class Delete extends DbEntitySessionManager {
     }
 
     // Delete User
-    public DbResult deleteUserByName(@NotNull String username) throws Exception {
+    public DbResult deleteUserByName(@NotNull BCryptPasswordEncoder bCryptPasswordEncoder,
+                                     @NotNull String username, @NotNull String password) throws Exception {
 
         DbResult dbResult = new Select().findUser(username);
         if(dbResult.isEmpty()){
@@ -361,6 +363,10 @@ public class Delete extends DbEntitySessionManager {
         }
         else{
             User user = dbResult.getResult(User.class);
+            if(!bCryptPasswordEncoder.matches(password, user.getPassword())){
+                throw new Exception("Wrong password");
+            }
+
             try{
                 if (!session.getTransaction().isActive()) session.getTransaction().begin();
                 session.remove(user);

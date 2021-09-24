@@ -231,7 +231,7 @@ public class ProductController {
             JSONObject response = new JSONObject();
             if(results.isEmpty() && !failures.isEmpty()){
                 response.put("failures", failures);
-                return new ResponseEntity(response.toString() + " already exists.", HttpStatus.CONFLICT);
+                return new ResponseEntity(response.toString() + " Products already exist.", HttpStatus.CONFLICT);
             }
             else if(!results.isEmpty() && failures.isEmpty()){
                 response.put("results", results);
@@ -252,7 +252,7 @@ public class ProductController {
     //************************** PUT/ **************************
     @PutMapping("")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Update existing product")
+    @ApiOperation(value = "Update existing product (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),
@@ -291,7 +291,7 @@ public class ProductController {
 
     @PutMapping("{name}")
     @PreAuthorize("hasRole('admin')")
-    @ApiOperation(value = "Replace existing product by name")
+    @ApiOperation(value = "Replace existing product by name (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product updated."),
             @ApiResponse(code = 400, message = "Request body malformed."),

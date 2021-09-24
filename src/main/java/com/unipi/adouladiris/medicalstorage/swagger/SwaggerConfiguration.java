@@ -46,6 +46,7 @@ public class SwaggerConfiguration  {
                         typeResolver.resolve(LoginUserRequestBody.class),
                         typeResolver.resolve(RegisterUserRequestBody.class),
                         typeResolver.resolve(ModifyUserRequestBody.class),
+                        typeResolver.resolve(DeleteUserRequestBody.class),
                         typeResolver.resolve(EnableUserRequestBody.class)
                 )
                 .apiInfo(apiInfo())

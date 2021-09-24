@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @Entity
+// Unique constraints for a pair of fields
 @Table(name="substance_tab_category_item_tag", uniqueConstraints = @UniqueConstraint(columnNames={"substanceTabCategoryItem_Id", "tag_Id"}) )
 public class SubstanceTabCategoryItemTag extends Joinable {
 

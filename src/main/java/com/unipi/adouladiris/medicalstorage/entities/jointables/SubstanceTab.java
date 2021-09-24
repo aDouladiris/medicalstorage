@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+// Unique constraints for a pair of fields
 @Table(name="substance_tab", uniqueConstraints = @UniqueConstraint(columnNames={"substance_Id", "tab_Id"}) )
 public class SubstanceTab extends Joinable {
 

@@ -70,27 +70,40 @@ public class UserController {
             @ApiResponse(code = 404, message = "The requested resource could not be found!"),
             @ApiResponse(code = 500, message = "Server Internal Error at executing request")
     })
-    public ResponseEntity<String> deleteUser(@NotNull String username) {
+    @ApiImplicitParam(name = "body", dataTypeClass = DeleteUserRequestBody.class)
+    public ResponseEntity<String> deleteUser(@RequestBody DeleteUserRequestBody body) {
+        if(body.getUsername() == null || body.getUsername().length() == 0){
+            Exception missingUsername = new Exception("Username is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingUsername.getMessage(), missingUsername);
+        }
+
+        if(body.getPassword() == null || body.getPassword().length() == 0){
+            Exception missingPassword = new Exception("Password is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingPassword.getMessage(), missingPassword);
+        }
+
         try {
-            DbResult dbResult = new Delete().deleteUserByName(username);
-            if(dbResult.isEmpty()){
-                return new ResponseEntity("User not found.", HttpStatus.NOT_FOUND);
-            }
+            DbResult dbResult = new Delete().deleteUserByName(bCryptPasswordEncoder,body.getUsername(), body.getPassword());
             if(dbResult.getException() != null){
                 return new ResponseEntity(dbResult.getException().getMessage(), HttpStatus.CONFLICT);
             }
             else{
                 String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-                if(currentUser.equals(username)){
+                if(currentUser.equals(body.getUsername())){
                     // Empty security context.
                     SecurityContextHolder.getContext().setAuthentication(null);
-                    return new ResponseEntity("User " + username + " has been deleted and logged out.", HttpStatus.OK);
+                    return new ResponseEntity("User " + body.getUsername() + " has been deleted and logged out.", HttpStatus.OK);
                 }else{
-                    return new ResponseEntity("User " + username + " has been deleted.", HttpStatus.OK);
+                    return new ResponseEntity("User " + body.getUsername() + " has been deleted.", HttpStatus.OK);
                 }
             }
         }catch (Exception exception){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+            if(exception.getMessage().equals("Wrong password")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
+            }
         }
     }
     //************************************************************
@@ -192,7 +205,6 @@ public class UserController {
             else{
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
             }
-
         }
     }
     //************************************************************
@@ -333,6 +345,8 @@ public class UserController {
             response.put("username", authenticatedUser.getName() );
             response.put("authority", authenticatedUser.getAuthorities().toString() );
             response.put("bearerToken", bearerToken);
+            // Empty user security context.
+            SecurityContextHolder.getContext().setAuthentication(null);
             return new ResponseEntity(response.toString(), HttpStatus.OK);
         }catch (Exception exception){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
