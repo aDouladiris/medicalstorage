@@ -19,4 +19,20 @@ public class ProductReplaceRequestBody {
     private LinkedHashMap<String, ArrayList<LinkedHashMap>>replacement;
     public LinkedHashMap<String, ArrayList<LinkedHashMap>> getReplacement() {return replacement;}
     public void setReplacement(LinkedHashMap<String, ArrayList<LinkedHashMap>> replacement) {this.replacement = replacement;}
+
+    @ApiModelProperty(
+            name="product",
+            dataType = "String",
+            required=true,
+            example = "Zinadol"
+    )
+    private Object[] product;
+
+    public Object[] getProduct() {
+        return product;
+    }
+
+    public void setProduct(Object[] product) {
+        this.product = product;
+    }
 }

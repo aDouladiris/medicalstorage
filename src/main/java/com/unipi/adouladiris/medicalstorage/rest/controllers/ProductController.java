@@ -250,7 +250,7 @@ public class ProductController {
     //**********************************************************
 
     //************************** PUT/ **************************
-    @PutMapping("")
+    @PutMapping("update")
     @PreAuthorize("hasRole('admin')")
     @ApiOperation(value = "Update existing product (Admin only)")
     @ApiResponses(value = {
@@ -289,11 +289,11 @@ public class ProductController {
         }
     }
 
-    @PutMapping("{name}")
+    @PutMapping("replace")
     @PreAuthorize("hasRole('admin')")
     @ApiOperation(value = "Replace existing product by name (Admin only)")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated."),
+            @ApiResponse(code = 200, message = "Product replaced."),
             @ApiResponse(code = 400, message = "Request body malformed."),
             @ApiResponse(code = 401, message = "The user does not have valid authentication credentials for the target resource."),
             @ApiResponse(code = 403, message = "User does not have permission (Authorized but not enough privileges)"),
@@ -301,9 +301,15 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Server Internal Error at executing request.")
     })
     @ApiImplicitParam(name = "body", dataTypeClass = ProductReplaceRequestBody.class)
-    public ResponseEntity<String> replaceProduct(@PathVariable String name, @RequestBody LinkedHashMap body) {
+    public ResponseEntity<String> replaceProduct(@RequestBody LinkedHashMap body) {
         // When request successfully reach controller, each controller will empty security context.
         SecurityContextHolder.getContext().setAuthentication(null);
+
+        if(body.get("product") == null) {
+            Exception missingProductName = new Exception("Product name is missing.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, missingProductName.getMessage(), missingProductName);
+        }
+        String name = body.get("product").toString();
         // Query database using Data Access Object classes.
         DbResult dbResult = new Select().findProduct(name.toUpperCase());
         if(dbResult.isEmpty()) return new ResponseEntity("Product not found.", HttpStatus.NOT_FOUND);
@@ -312,7 +318,7 @@ public class ProductController {
         // In case of exception, the response will be wrapped in a ResponseStatusException object.
         try{
             dbResult = new Update().replaceProduct(product, body);
-            if(dbResult.isEmpty()) return new ResponseEntity("Could not update.", HttpStatus.CONFLICT);
+            if(dbResult.isEmpty()) return new ResponseEntity("Product could not be updated.", HttpStatus.CONFLICT);
             Set<ArrayList<HashMap>> results = dbResult.getResult(HashSet.class);
             return new ResponseEntity(results.toString(), HttpStatus.OK);
         }

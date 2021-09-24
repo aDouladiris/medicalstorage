@@ -59,7 +59,7 @@ public class Update extends DbEntitySessionManager {
     // If not, we create a new instance of the entity.
     // After each entity insertion, we use their Id to join them at JoinTables.
     // At the end, we return a HashMap containing the participated entities Ids.
-    private DbResult findOrCreateEntity(Substance substance, Tab tab, Category category, Item item, Tag tag) {
+    private DbResult findOrCreateEntity(Substance substance, Tab tab, Category category, Item item, Tag tag) throws Exception {
         if ( !session.getTransaction().isActive() ) { session.getTransaction().begin(); }
         Insert insertion = new Insert();
         Select select = new Select();
@@ -76,9 +76,10 @@ public class Update extends DbEntitySessionManager {
         if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(category); category = session.find(Category.class, dbResult.getResult( Integer.class ) ); }
         else category = dbResult.getResult( Category.class );
 
-        dbResult = select.findOperableEntityByName( Item.class, item.getName() );
+        dbResult = select.findItemEntityByNameAndDescription(item.getName(), item.getDescription() );
         if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(item); item = session.find(Item.class, dbResult.getResult( Integer.class ) ); }
-        else item = dbResult.getResult( Item.class );
+        //else item = dbResult.getResult( Item.class );
+        else throw new Exception("Item already exists");
 
         dbResult = select.findOperableEntityByName( Tag.class, tag.getName() );
         if ( dbResult.isEmpty() ){ dbResult = insertion.queryableEntity(tag); tag = session.find(Tag.class, dbResult.getResult( Integer.class ) ); }
@@ -171,6 +172,46 @@ public class Update extends DbEntitySessionManager {
 
         HashMap bodyMap = (HashMap) body.get("replacement");
         Set<ArrayList<HashMap>> results = new HashSet();
+        HashSet<String> itemResults = new HashSet();
+
+        if(bodyMap.containsKey("Item")){
+            System.out.println(bodyMap.get("Item").toString() );
+
+            ArrayList<HashMap> bodyArrayToProcess = (ArrayList) bodyMap.get("Item");
+
+            // For each item to process in the request body
+            for(HashMap itemToReplace : bodyArrayToProcess){
+
+                // Get old item values.
+                Object[] oldItemValues = itemToReplace.keySet().toArray();
+                String oldItemTitle = oldItemValues[0].toString();
+                String oldItemDescription = oldItemValues[1].toString();
+//                System.out.println("oldItemTitle: " + oldItemTitle );
+//                System.out.println("oldItemDescription: " + oldItemDescription );
+
+                // If old item not exists, return empty.
+                DbResult dbResult = new Select().findItemEntityByNameAndDescription(oldItemTitle,oldItemDescription);
+                if(dbResult.isEmpty()){
+                    throw new Exception("Item not exists.");
+                }
+                Item oldItem = dbResult.getResult(Item.class);
+                // Get old item values.
+                Object[] newItemValues = itemToReplace.values().toArray();
+                String newItemTitle = newItemValues[0].toString();
+                String newItemDescription = newItemValues[1].toString();
+//                System.out.println("newItemTitle: " + newItemTitle );
+//                System.out.println("newItemDescription: " + newItemDescription );
+                oldItem.setName(newItemTitle);
+                oldItem.setDescription(newItemDescription);
+
+                if(!session.getTransaction().isActive()) session.getTransaction().begin();
+                session.merge(oldItem);
+                session.getTransaction().commit();
+                itemResults.add("Old Title: " + oldItemTitle +", Old Description: "+ oldItemDescription + " {removed} " +
+                        "New Title: " + newItemTitle + ", New Description: " + newItemDescription);
+            }
+            return new DbResult(itemResults);
+        }
 
         product.getProduct().forEach(
                 (substanceKey, substanceValue) -> {
@@ -183,7 +224,8 @@ public class Update extends DbEntitySessionManager {
                                             matchEntitiesToReplace("Category", bodyMap, results, categoryKey, substanceKey, tabKey, categoryKey );
                                         categoryValue.forEach(
                                                 (itemKey, itemValue) -> {
-                                                    matchEntitiesToReplace("Item", bodyMap, results, itemKey, substanceKey, tabKey, categoryKey, itemKey );
+//                                                    System.out.println("test loop");
+//                                                    matchEntitiesToReplace("Item", bodyMap, results, itemKey, substanceKey, tabKey, categoryKey, itemKey );
                                                     itemValue.forEach(
                                                             tag -> {
                                                                 matchEntitiesToReplace("Tag", bodyMap, results, tag, substanceKey, tabKey, categoryKey, itemKey, tag );
@@ -224,7 +266,9 @@ public class Update extends DbEntitySessionManager {
     private HashMap<String, String> updateJoinTable(ArrayList<HashMap> bodyArrayToProcess, Operable... indexEntities){
 
         HashMap<Class<? extends Operable>, Operable> operableSet = new HashMap();
-        for(Operable entity : indexEntities){ operableSet.put(entity.getClass(), entity); }
+        for(Operable entity : indexEntities){
+            operableSet.put(entity.getClass(), entity);
+        }
         HashMap<String, String> results = new HashMap();
         Delete delete = new Delete();
 
@@ -283,55 +327,55 @@ public class Update extends DbEntitySessionManager {
         else if(operableSet.containsKey(Substance.class) && operableSet.containsKey(Tab.class) && operableSet.containsKey(Category.class) &&
                 operableSet.containsKey(Item.class) && !operableSet.containsKey(Tag.class)){
 
-            SubstanceTab substanceTab =
-                    new Select().findJoinableEntityByName(SubstanceTab.class, operableSet.get(Substance.class), operableSet.get(Tab.class))
-                            .getResult(SubstanceTab.class);
+//            SubstanceTab substanceTab =
+//                    new Select().findJoinableEntityByName(SubstanceTab.class, operableSet.get(Substance.class), operableSet.get(Tab.class))
+//                            .getResult(SubstanceTab.class);
+//
+//            SubstanceTabCategory substanceTabCategory =
+//                    new Select().findJoinableEntityByName(SubstanceTabCategory.class, substanceTab, operableSet.get(Category.class))
+//                            .getResult(SubstanceTabCategory.class);
+//
+//            SubstanceTabCategoryItem substanceTabCategoryItem =
+//                    new Select().findJoinableEntityByName(SubstanceTabCategoryItem.class, substanceTabCategory, operableSet.get(Item.class))
+//                            .getResult(SubstanceTabCategoryItem.class);
 
-            SubstanceTabCategory substanceTabCategory =
-                    new Select().findJoinableEntityByName(SubstanceTabCategory.class, substanceTab, operableSet.get(Category.class))
-                            .getResult(SubstanceTabCategory.class);
-
-            SubstanceTabCategoryItem substanceTabCategoryItem =
-                    new Select().findJoinableEntityByName(SubstanceTabCategoryItem.class, substanceTabCategory, operableSet.get(Item.class))
-                            .getResult(SubstanceTabCategoryItem.class);
-
-            bodyArrayToProcess.forEach(
-                    replacement -> {
-                        replacement.forEach(
-                                (oldKey, newKey) -> {
-
-                                    Item oldItem = (Item) operableSet.get(Item.class);
-                                    if(!session.getTransaction().isActive()) session.getTransaction().begin();
-                                    Item newItem;
-                                    DbResult dbResult = new Select().findOperableEntityByName(Item.class, newKey.toString());
-                                    if(dbResult.isEmpty()){
-
-                                        if(oldKey.toString().equals(oldItem.getName())){
-                                            newItem = new Item(newKey.toString(), oldItem.getDescription());
-                                        }
-                                        else{
-                                            newItem = new Item(oldItem.getName(), newKey.toString());
-                                        }
-
-                                        Integer newInsertedId = new Insert().queryableEntity(newItem).getResult(Integer.class);
-                                        newItem = session.find(Item.class, newInsertedId);
-                                    }
-                                    else newItem = dbResult.getResult(Item.class);
-                                    if(!session.getTransaction().isActive()) session.getTransaction().begin();
-                                    //session.getReference(SubstanceTab.class, )
-                                    substanceTabCategoryItem.setItem(newItem);
-                                    session.merge(substanceTabCategoryItem);
-                                    session.getTransaction().commit();
-
-                                    Integer oldKeyJoins = getRecordsCount(substanceTabCategoryItem.getClass(), newItem.getClass(), oldKey.toString()).getResult(Integer.class);
-                                    if(oldKeyJoins == 0){
-                                        delete.deleteEntityByName(newItem.getClass(), oldKey.toString());
-                                        results.put(oldKey.toString()+"{removed}", newItem.getName() + " " + newItem.getDescription());
-                                    }
-                                    else results.put(oldKey.toString(), newItem.getName() + " " + newItem.getDescription());
-
-                                });
-                    });
+//            // For each item to process in the request body
+//            for(HashMap itemToReplace : bodyArrayToProcess){
+//
+//                // Get old item values.
+//                Object[] oldItemValues = itemToReplace.keySet().toArray();
+//                String oldItemTitle = oldItemValues[0].toString();
+//                String oldItemDescription = oldItemValues[1].toString();
+//                System.out.println("oldItemTitle: " + oldItemTitle );
+//                System.out.println("oldItemDescription: " + oldItemDescription );
+//
+//                // If old item not exists, return empty.
+//                DbResult dbResult = new Select().findItemEntityByNameAndDescription(oldItemTitle,oldItemDescription);
+//                if(dbResult.isEmpty()){
+//                    return results;
+//                }
+//                Item oldItem = dbResult.getResult(Item.class);
+//
+//                // Get old item values.
+//                Object[] newItemValues = itemToReplace.values().toArray();
+//                String newItemTitle = newItemValues[0].toString();
+//                String newItemDescription = newItemValues[1].toString();
+//                System.out.println("newItemTitle: " + newItemTitle );
+//                System.out.println("newItemDescription: " + newItemDescription );
+//
+//
+//                oldItem.setName(newItemTitle);
+//                oldItem.setDescription(newItemDescription);
+//
+//                if(!session.getTransaction().isActive()) session.getTransaction().begin();
+//
+//                session.merge(oldItem);
+//                session.getTransaction().commit();
+//
+//                results.put(oldItemTitle + " "+ oldItemDescription, newItemTitle + " " + newItemDescription);
+//
+//
+//            }
 
         }
         // If path: Substance->Tab->Category exists, replace category entities.
@@ -401,7 +445,7 @@ public class Update extends DbEntitySessionManager {
                                     }
                                     else newTab = dbResult.getResult(Tab.class);
 
-                                    System.out.println("toReplace: " + newTab.getName() );
+                                    //System.out.println("toReplace: " + newTab.getName() );
 
                                     if(!session.getTransaction().isActive()) session.getTransaction().begin();
                                     //session.getReference(SubstanceTab.class, )
