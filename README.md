@@ -12,5 +12,5 @@ Swagger Product Controller
 
 
 Database Schema
-![image](https://user-images.githubusercontent.com/58791947/136961703-e09ba49e-081f-44db-bead-6254f36e2c5b.png)
 
+![image](https://user-images.githubusercontent.com/58791947/136961703-e09ba49e-081f-44db-bead-6254f36e2c5b.png)
