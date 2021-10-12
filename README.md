@@ -9,3 +9,6 @@ Swagger User Controller
 
 Swagger Product Controller
 ![image](https://user-images.githubusercontent.com/58791947/136591863-72fc7c49-62c2-46a2-aeed-7421a007e298.png)
+
+Database Schema
+![image](https://user-images.githubusercontent.com/58791947/136961703-e09ba49e-081f-44db-bead-6254f36e2c5b.png)
